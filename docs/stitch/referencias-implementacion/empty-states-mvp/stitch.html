@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Empty states MVP - Reference - Barber Studio</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+                  "on-error": "#ffffff",
+                  "on-tertiary": "#ffffff",
+                  "secondary-fixed": "#d3e4f9",
+                  "on-tertiary-fixed-variant": "#005236",
+                  "on-background": "#0b1c30",
+                  "surface-bright": "#f8f9ff",
+                  "error": "#ba1a1a",
+                  "on-primary-fixed": "#001257",
+                  "error-container": "#ffdad6",
+                  "background": "#f8f9ff",
+                  "surface-container-lowest": "#ffffff",
+                  "surface-tint": "#4157b6",
+                  "surface-container-high": "#dce9ff",
+                  "inverse-on-surface": "#eaf1ff",
+                  "surface-container": "#e5eeff",
+                  "outline": "#757684",
+                  "on-error-container": "#93000a",
+                  "inverse-surface": "#213145",
+                  "surface": "#f8f9ff",
+                  "secondary-fixed-dim": "#b7c8dc",
+                  "secondary-container": "#d3e4f9",
+                  "tertiary": "#004e33",
+                  "on-tertiary-fixed": "#002113",
+                  "surface-container-low": "#eff4ff",
+                  "on-secondary-fixed-variant": "#384858",
+                  "on-tertiary-container": "#5debaf",
+                  "on-primary-fixed-variant": "#273d9d",
+                  "primary": "#223999",
+                  "surface-variant": "#d3e4fe",
+                  "on-primary": "#ffffff",
+                  "inverse-primary": "#b9c3ff",
+                  "tertiary-fixed": "#6ffbbe",
+                  "tertiary-fixed-dim": "#4edea3",
+                  "primary-fixed-dim": "#b9c3ff",
+                  "tertiary-container": "#006846",
+                  "on-surface-variant": "#454652",
+                  "on-secondary-container": "#566677",
+                  "surface-dim": "#cbdbf5",
+                  "on-secondary-fixed": "#0c1d2b",
+                  "on-primary-container": "#c8d0ff",
+                  "surface-container-highest": "#d3e4fe",
+                  "primary-fixed": "#dde1ff",
+                  "on-surface": "#0b1c30",
+                  "secondary": "#506071",
+                  "on-secondary": "#ffffff",
+                  "primary-container": "#3d52b2",
+                  "outline-variant": "#c5c5d4"
+          },
+          "borderRadius": {
+                  "DEFAULT": "0.25rem",
+                  "lg": "0.5rem",
+                  "xl": "0.75rem",
+                  "full": "9999px"
+          },
+          "spacing": {},
+          "fontFamily": {
+                  "headline": [
+                          "Manrope"
+                  ],
+                  "display": [
+                          "Manrope"
+                  ],
+                  "body": [
+                          "Inter"
+                  ],
+                  "label": [
+                          "Inter"
+                  ]
+          },
+          "fontSize": {}
+  },
+      },
+    }
+  </script>
+<style>
+    body {
+      background-color: #f8f9ff;
+      color: #0b1c30;
+      font-family: 'Inter', sans-serif;
+    }
+    h1, h2, h3, h4, h5, h6, .font-headline, .font-display {
+      font-family: 'Manrope', sans-serif;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .material-symbols-outlined.fill {
+      font-variation-settings: 'FILL' 1;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #223999, #3d52b2);
+      color: #ffffff;
+    }
+    .btn-secondary {
+      background-color: transparent;
+      color: #223999;
+      border: 1px solid #c5c5d4;
+    }
+    .btn-secondary:hover {
+      background-color: #dce9ff;
+      border-color: transparent;
+    }
+  </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+<!-- SideNavBar -->
+<nav class="bg-surface-container-low fixed left-0 top-0 h-full flex flex-col p-4 w-64 border-r-0 z-50 -translate-x-full md:translate-x-0 transition-transform duration-300">
+<div class="flex items-center space-x-3 mb-8 px-2">
+<div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-container flex items-center justify-center text-on-primary text-xl font-bold font-headline shadow-sm shadow-primary/20">BS</div>
+<div>
+<h1 class="font-manrope text-xl font-black text-primary">Barber Studio</h1>
+<p class="text-xs font-inter font-medium text-on-surface-variant">Agenda premium</p>
+</div>
+</div>
+<div class="flex-1 space-y-1">
+<a class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-highest transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+<span class="font-inter text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-highest transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined text-[20px]">calendar_today</span>
+<span class="font-inter text-sm font-medium">Agenda</span>
+</a>
+<a class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-highest transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined text-[20px]">groups</span>
+<span class="font-inter text-sm font-medium">Clientes</span>
+</a>
+<a class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-highest transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined text-[20px]">content_cut</span>
+<span class="font-inter text-sm font-medium">Servicios</span>
+</a>
+<a class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-highest transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined text-[20px]">badge</span>
+<span class="font-inter text-sm font-medium">Profesionales</span>
+</a>
+<a class="flex items-center space-x-3 px-3 py-2.5 rounded-lg bg-surface-container-highest text-primary font-semibold shadow-sm transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined text-[20px] fill">settings</span>
+<span class="font-inter text-sm font-medium">Configuración</span>
+</a>
+</div>
+<div class="mt-auto">
+<button class="w-full btn-primary py-3 rounded-lg flex items-center justify-center space-x-2 font-inter font-medium text-sm transition-all scale-98 active:opacity-80">
+<span class="material-symbols-outlined text-[18px]">add</span>
+<span>Nuevo turno</span>
+</button>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="md:ml-64 flex flex-col min-h-screen flex-1 overflow-hidden">
+<!-- TopNavBar -->
+<header class="flex items-center justify-between px-6 h-16 w-full ml-auto bg-surface/80 backdrop-blur-xl sticky top-0 z-40 border-b border-outline-variant/20">
+<div class="flex-1 max-w-xl">
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-on-surface-variant text-[20px]">search</span>
+<input class="w-full bg-surface-container-lowest border border-outline-variant/30 text-on-surface text-sm rounded-xl pl-10 pr-4 py-2 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors font-body" placeholder="Buscar turnos, clientes o servicios..." type="text"/>
+</div>
+</div>
+<div class="flex items-center space-x-4 ml-4">
+<button class="relative p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-colors">
+<span class="material-symbols-outlined text-[22px]">notifications</span>
+<span class="absolute top-2 right-2.5 w-2 h-2 bg-error rounded-full border border-surface"></span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-colors">
+<span class="material-symbols-outlined text-[22px]">help_outline</span>
+</button>
+<img alt="User Avatar" class="w-8 h-8 rounded-full border border-outline-variant/20 ml-2 cursor-pointer object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7JXZxv55lpdHI4mfRFoLb0Jqs7Jb_fbN90V7LWiANAwclPT6jzeOpB3revb7TA7AGy5Bn7x_Zy4CYgdAtxt5IomPSQHZC9dO_FXyoMoXjBZBq0RuajUsoILcqxumWtDWvj_SCxbDYUOpZ22CZytTMfyeIzM7S-FPTOoZRCPk5XecSafxY7jpRhyRUoITOYH2o1YMifFMx53f0HAaunTpL4guA77qs-jlArdDj4YNaiA6pVLGR72EwUInWgEYU_Rol0aB6mR4ZqEbK"/>
+</div>
+</header>
+<!-- Canvas Container -->
+<div class="flex-1 overflow-y-auto p-8">
+<!-- Page Header -->
+<div class="mb-10 max-w-6xl mx-auto">
+<div class="flex items-center space-x-3 mb-2">
+<span class="px-2.5 py-1 rounded-md bg-primary-fixed/40 text-primary font-inter text-xs font-semibold">Referencia de diseño</span>
+</div>
+<h2 class="font-headline text-3xl font-bold text-on-surface mb-2">Empty states MVP</h2>
+<p class="font-body text-on-surface-variant text-base">Referencia visual para estados vacíos de agenda, gestión y booking.</p>
+</div>
+<!-- Empty States Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto mb-12">
+<!-- 1. Agenda -->
+<div class="bg-surface-container-lowest rounded-xl p-8 flex flex-col items-center text-center border border-outline-variant/20">
+<div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center text-primary mb-5">
+<span class="material-symbols-outlined text-[32px]">event_available</span>
+</div>
+<h3 class="font-headline text-lg font-semibold text-on-surface mb-2">No hay turnos para este día</h3>
+<p class="font-body text-sm text-on-surface-variant mb-6">Podés crear un turno manual o revisar otra fecha.</p>
+<div class="flex flex-col w-full space-y-3 mt-auto">
+<button class="btn-primary w-full py-2.5 rounded-lg font-inter text-sm font-medium transition-opacity hover:opacity-90">Nuevo turno</button>
+<button class="btn-secondary w-full py-2.5 rounded-lg font-inter text-sm font-medium transition-colors">Cambiar fecha</button>
+</div>
+</div>
+<!-- 2. Clientes -->
+<div class="bg-surface-container-lowest rounded-xl p-8 flex flex-col items-center text-center border border-outline-variant/20">
+<div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center text-primary mb-5">
+<span class="material-symbols-outlined text-[32px]">group</span>
+</div>
+<h3 class="font-headline text-lg font-semibold text-on-surface mb-2">Todavía no hay clientes</h3>
+<p class="font-body text-sm text-on-surface-variant mb-6">Los clientes aparecerán cuando crees turnos o los agregues manualmente.</p>
+<div class="flex flex-col w-full space-y-3 mt-auto">
+<button class="btn-primary w-full py-2.5 rounded-lg font-inter text-sm font-medium transition-opacity hover:opacity-90">Nuevo cliente</button>
+</div>
+</div>
+<!-- 3. Servicios -->
+<div class="bg-surface-container-lowest rounded-xl p-8 flex flex-col items-center text-center border border-outline-variant/20">
+<div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center text-primary mb-5">
+<span class="material-symbols-outlined text-[32px]">content_cut</span>
+</div>
+<h3 class="font-headline text-lg font-semibold text-on-surface mb-2">Agregá tu primer servicio</h3>
+<p class="font-body text-sm text-on-surface-variant mb-6">Definí nombre, duración y precio para empezar a tomar reservas.</p>
+<div class="flex flex-col w-full space-y-3 mt-auto">
+<button class="btn-primary w-full py-2.5 rounded-lg font-inter text-sm font-medium transition-opacity hover:opacity-90">Nuevo servicio</button>
+</div>
+</div>
+<!-- 4. Profesionales -->
+<div class="bg-surface-container-lowest rounded-xl p-8 flex flex-col items-center text-center border border-outline-variant/20">
+<div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center text-primary mb-5">
+<span class="material-symbols-outlined text-[32px]">badge</span>
+</div>
+<h3 class="font-headline text-lg font-semibold text-on-surface mb-2">Agregá tu primer profesional</h3>
+<p class="font-body text-sm text-on-surface-variant mb-6">Los profesionales permiten organizar agenda, servicios y disponibilidad.</p>
+<div class="flex flex-col w-full space-y-3 mt-auto">
+<button class="btn-primary w-full py-2.5 rounded-lg font-inter text-sm font-medium transition-opacity hover:opacity-90">Nuevo profesional</button>
+</div>
+</div>
+<!-- 5. Booking (Sin horarios) -->
+<div class="bg-surface-container-lowest rounded-xl p-8 flex flex-col items-center text-center border border-outline-variant/20 relative overflow-hidden">
+<div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-primary-container"></div>
+<div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center text-primary mb-5">
+<span class="material-symbols-outlined text-[32px]">schedule</span>
+</div>
+<h3 class="font-headline text-lg font-semibold text-on-surface mb-2">No hay horarios disponibles</h3>
+<p class="font-body text-sm text-on-surface-variant mb-6">Probá con otra fecha o elegí otro profesional.</p>
+<div class="flex flex-col w-full space-y-3 mt-auto">
+<button class="btn-primary w-full py-2.5 rounded-lg font-inter text-sm font-medium transition-opacity hover:opacity-90">Cambiar fecha</button>
+<button class="btn-secondary w-full py-2.5 rounded-lg font-inter text-sm font-medium transition-colors">Cualquiera disponible</button>
+</div>
+</div>
+<!-- 6. Booking (Sin profesionales) -->
+<div class="bg-surface-container-lowest rounded-xl p-8 flex flex-col items-center text-center border border-outline-variant/20 relative overflow-hidden">
+<div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-primary-container"></div>
+<div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center text-primary mb-5">
+<span class="material-symbols-outlined text-[32px]">person_off</span>
+</div>
+<h3 class="font-headline text-lg font-semibold text-on-surface mb-2">No hay profesionales disponibles</h3>
+<p class="font-body text-sm text-on-surface-variant mb-6">Probá con otra fecha o elegí la opción cualquiera disponible.</p>
+<div class="flex flex-col w-full space-y-3 mt-auto">
+<button class="btn-primary w-full py-2.5 rounded-lg font-inter text-sm font-medium transition-opacity hover:opacity-90">Cambiar fecha</button>
+<button class="btn-secondary w-full py-2.5 rounded-lg font-inter text-sm font-medium transition-colors">Cualquiera disponible</button>
+</div>
+</div>
+</div>
+<!-- Footer Rules -->
+<div class="max-w-6xl mx-auto bg-surface-container-low rounded-xl p-8 border border-outline-variant/20 mb-8">
+<h3 class="font-headline text-lg font-semibold text-on-surface mb-4">Reglas visuales</h3>
+<ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+<li class="flex items-start space-x-2">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5">check_circle</span>
+<span class="font-body text-sm text-on-surface-variant">Un mensaje claro</span>
+</li>
+<li class="flex items-start space-x-2">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5">check_circle</span>
+<span class="font-body text-sm text-on-surface-variant">Una acción principal</span>
+</li>
+<li class="flex items-start space-x-2">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5">check_circle</span>
+<span class="font-body text-sm text-on-surface-variant">Sin rojo/error</span>
+</li>
+<li class="flex items-start space-x-2">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5">check_circle</span>
+<span class="font-body text-sm text-on-surface-variant">Sin ilustraciones grandes</span>
+</li>
+<li class="flex items-start space-x-2">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5">check_circle</span>
+<span class="font-body text-sm text-on-surface-variant">Usar superficies tonales</span>
+</li>
+</ul>
+</div>
+</div>
+</main>
+</body></html>

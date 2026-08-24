@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Agenda admin mobile - Mateo Refined Shell</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800;900&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-fixed-dim": "#b7c8dc",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary-container": "#5debaf",
+                    "surface-variant": "#d3e4fe",
+                    "on-surface-variant": "#454652",
+                    "surface-bright": "#f8f9ff",
+                    "on-primary-fixed-variant": "#273d9d",
+                    "on-background": "#0b1c30",
+                    "on-primary-fixed": "#001257",
+                    "on-error-container": "#93000a",
+                    "on-error": "#ffffff",
+                    "surface-container-high": "#dce9ff",
+                    "outline": "#757684",
+                    "primary-fixed-dim": "#b9c3ff",
+                    "on-primary-container": "#c8d0ff",
+                    "on-tertiary-fixed-variant": "#005236",
+                    "inverse-surface": "#213145",
+                    "surface-container": "#e5eeff",
+                    "secondary": "#506071",
+                    "tertiary-fixed-dim": "#4edea3",
+                    "surface-container-lowest": "#ffffff",
+                    "inverse-primary": "#b9c3ff",
+                    "tertiary-fixed": "#6ffbbe",
+                    "surface-tint": "#4157b6",
+                    "tertiary": "#004e33",
+                    "surface-container-low": "#eff4ff",
+                    "primary-container": "#3d52b2",
+                    "on-surface": "#0b1c30",
+                    "surface": "#f8f9ff",
+                    "on-tertiary-fixed": "#002113",
+                    "error": "#ba1a1a",
+                    "surface-container-highest": "#d3e4fe",
+                    "on-primary": "#ffffff",
+                    "primary-fixed": "#dde1ff",
+                    "primary": "#223999",
+                    "secondary-container": "#d3e4f9",
+                    "tertiary-container": "#006846",
+                    "on-secondary-container": "#566677",
+                    "error-container": "#ffdad6",
+                    "background": "#f8f9ff",
+                    "surface-dim": "#cbdbf5",
+                    "outline-variant": "#c5c5d4",
+                    "on-secondary-fixed-variant": "#384858",
+                    "on-secondary-fixed": "#0c1d2b",
+                    "inverse-on-surface": "#eaf1ff",
+                    "on-tertiary": "#ffffff",
+                    "secondary-fixed": "#d3e4f9"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {},
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "display": ["Manrope"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            },
+            "fontSize": {}
+          },
+        },
+      }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface font-body antialiased min-h-screen flex flex-col md:hidden">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center w-full px-6 py-4 bg-surface/80 backdrop-blur-xl docked full-width z-50 sticky top-0">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-container flex items-center justify-center text-on-primary font-headline font-black text-lg">
+                BS
+            </div>
+<div class="flex flex-col">
+<span class="font-headline text-headline-sm font-bold text-primary">Barber Studio</span>
+<span class="font-label text-sm text-on-surface-variant font-medium">Agenda de hoy</span>
+</div>
+</div>
+<div class="flex items-center gap-4 text-primary">
+<div class="relative">
+<span class="material-symbols-outlined hover:bg-surface-container-high/50 transition-colors p-1 rounded-full cursor-pointer active:scale-95 duration-200" style="font-variation-settings: 'FILL' 0;">notifications</span>
+<span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
+</div>
+<span class="material-symbols-outlined hover:bg-surface-container-high/50 transition-colors p-1 rounded-full cursor-pointer active:scale-95 duration-200" style="font-variation-settings: 'FILL' 0;">help_outline</span>
+<img alt="Profile" class="w-8 h-8 rounded-full object-cover shadow-sm" data-alt="A small circular profile picture of a professional young man with dark hair, looking directly at the camera. The background is a soft, blurred light gray. The lighting is even and bright, typical of a modern professional headshot used in a software application. The aesthetic is clean, sharp, and confident." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMTp86nj9HYErYq9wM1khhGwmUttc3-I_kYj3f2c0dY9pUFgBY6jVNP0jY9Zcx6eui5PmyVh-Od-Sp-LyDKvxGEj4vy1awEvweF1Jc9KfbghJGqJhrD6m_2Pnp0SL5xHt-3yO748OBQYvFkqtTx41tkdgNxQcpDbGn5NtCpLkS0DILd0_Yt8Dsx3RGIwOHWVeqjlgpDhcYHFF38l5purWFNemZZk3oxsxCa4O_Acw56jQTT7DPvdlSME6HRt2Q6LJ5pwzDnlUxomqb"/>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 flex flex-col pb-40">
+<!-- Date Navigation -->
+<div class="px-6 py-4 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<button class="p-2 rounded-lg bg-surface-container-low text-primary hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-lg">chevron_left</span>
+</button>
+<div class="flex flex-col items-center">
+<span class="font-headline text-lg font-bold text-on-surface">Hoy, Martes 28 de abril</span>
+</div>
+<button class="p-2 rounded-lg bg-surface-container-low text-primary hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-lg">chevron_right</span>
+</button>
+</div>
+<button class="p-2 rounded-lg bg-surface-container-low text-primary hover:bg-surface-container-high transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined">calendar_today</span>
+</button>
+</div>
+<!-- Filter Sections -->
+<div class="px-6 pb-4 flex flex-col gap-4">
+<!-- Group 1: Profesionales -->
+<div class="flex flex-col gap-2">
+<span class="font-label text-xs font-medium text-on-surface-variant/80">Profesionales</span>
+<div class="flex flex-wrap gap-2">
+<button class="px-4 py-1.5 rounded-full font-label text-sm font-medium bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high transition-colors">Todos</button>
+<button class="px-4 py-1.5 rounded-full font-label text-sm font-medium bg-primary-fixed text-on-primary-fixed">Mateo</button>
+<button class="px-4 py-1.5 rounded-full font-label text-sm font-medium bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high transition-colors">Lucas</button>
+</div>
+</div>
+<!-- Group 2: Estados -->
+<div class="flex flex-col gap-2">
+<span class="font-label text-xs font-medium text-on-surface-variant/80">Estados</span>
+<div class="flex flex-wrap gap-2">
+<button class="px-4 py-1.5 rounded-full font-label text-sm font-medium bg-primary-fixed text-on-primary-fixed">Todos</button>
+<button class="px-4 py-1.5 rounded-full font-label text-sm font-medium bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high transition-colors">Pendientes</button>
+<button class="px-4 py-1.5 rounded-full font-label text-sm font-medium bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high transition-colors">Confirmados</button>
+</div>
+</div>
+</div>
+<!-- Context Summary -->
+<div class="px-6 pb-6">
+<div class="bg-surface-container-low rounded-xl p-4 flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-secondary-container text-primary font-headline font-bold text-lg flex items-center justify-center shadow-sm">
+                    MR
+                </div>
+<div class="">
+<h2 class="font-headline text-lg font-bold text-on-surface">Mateo Ruiz</h2>
+<p class="font-label text-sm text-on-surface-variant">5 turnos · 1 pendiente · 2 disponibles</p>
+</div>
+</div>
+</div>
+<!-- Agenda List -->
+<div class="px-6 flex flex-col gap-6">
+<!-- 09:30 Block -->
+<div class="flex gap-4">
+<div class="flex flex-col items-end w-16 pt-1 flex-shrink-0">
+<span class="font-headline font-bold text-on-surface">09:30</span>
+</div>
+<div class="flex-1 relative">
+<!-- Confirmed Strip -->
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-tertiary-fixed-dim rounded-l-lg z-10"></div>
+<div class="bg-surface-container-lowest rounded-lg p-4 pl-5 shadow-[0_4px_24px_rgba(11,28,48,0.02)]">
+<div class="flex justify-between items-start mb-2">
+<div class="">
+<h3 class="font-headline font-bold text-lg text-on-surface">Santiago Moreno</h3>
+<p class="font-body text-sm text-on-surface-variant">Corte + barba</p>
+</div>
+<span class="bg-tertiary-fixed/20 text-on-tertiary-fixed-variant px-2 py-0.5 rounded-md font-label text-xs font-medium">Confirmado</span>
+</div>
+<div class="flex justify-end gap-2 mt-4"><button class="w-9 h-9 flex items-center justify-center rounded-lg bg-surface-container-low text-primary hover:bg-surface-container-high transition-colors active:scale-95">
+<span class="material-symbols-outlined text-[20px]">chat_bubble</span>
+</button>
+<button class="w-9 h-9 flex items-center justify-center rounded-lg bg-surface-container-low text-primary hover:bg-surface-container-high transition-colors active:scale-95">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button></div>
+</div>
+</div>
+</div>
+<!-- 10:15 Block (Disponible) -->
+<div class="flex gap-4 opacity-80">
+<div class="flex flex-col items-end w-16 pt-1 flex-shrink-0">
+<span class="font-headline font-bold text-on-surface-variant">10:15</span>
+</div>
+<div class="flex-1">
+<div class="bg-surface-container-low/50 border border-dashed border-outline-variant rounded-xl p-4 flex justify-between items-center">
+<div class="flex flex-col">
+<span class="font-headline font-semibold text-on-surface">Disponible</span>
+<span class="font-label text-xs text-on-surface-variant">30 min</span>
+</div>
+<div class="flex items-center gap-1.5 text-primary font-label text-sm font-semibold cursor-pointer active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[20px]">add_circle</span>
+<span>Crear turno</span>
+</div>
+</div>
+</div>
+</div>
+<!-- 11:00 Block -->
+<div class="flex gap-4">
+<div class="flex flex-col items-end w-16 pt-1 flex-shrink-0">
+<span class="font-headline font-bold text-on-surface">11:00</span>
+</div>
+<div class="flex-1 relative">
+<!-- Confirmed Strip -->
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-tertiary-fixed-dim rounded-l-lg z-10"></div>
+<div class="bg-surface-container-lowest rounded-lg p-4 pl-5 shadow-[0_4px_24px_rgba(11,28,48,0.02)]">
+<div class="flex justify-between items-start mb-2">
+<div class="">
+<h3 class="font-headline font-bold text-lg text-on-surface">Sofia Alvarez</h3>
+<p class="font-body text-sm text-on-surface-variant">Barba premium</p>
+</div>
+<span class="bg-tertiary-fixed/20 text-on-tertiary-fixed-variant px-2 py-0.5 rounded-md font-label text-xs font-medium">Confirmado</span>
+</div>
+<div class="flex justify-end gap-2 mt-4"><button class="w-9 h-9 flex items-center justify-center rounded-lg bg-surface-container-low text-primary hover:bg-surface-container-high transition-colors active:scale-95">
+<span class="material-symbols-outlined text-[20px]">chat_bubble</span>
+</button>
+<button class="w-9 h-9 flex items-center justify-center rounded-lg bg-surface-container-low text-primary hover:bg-surface-container-high transition-colors active:scale-95">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button></div>
+</div>
+</div>
+</div>
+<!-- 12:30 Block (Disponible) -->
+<div class="flex gap-4 opacity-80">
+<div class="flex flex-col items-end w-16 pt-1 flex-shrink-0">
+<span class="font-headline font-bold text-on-surface-variant">12:30</span>
+</div>
+<div class="flex-1">
+<div class="bg-surface-container-low/50 border border-dashed border-outline-variant rounded-xl p-4 flex justify-between items-center">
+<div class="flex flex-col">
+<span class="font-headline font-semibold text-on-surface">Disponible</span>
+<span class="font-label text-xs text-on-surface-variant">45 min</span>
+</div>
+<div class="flex items-center gap-1.5 text-primary font-label text-sm font-semibold cursor-pointer active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[20px]">add_circle</span>
+<span>Crear turno</span>
+</div>
+</div>
+</div>
+</div><!-- 14:00 Block (Pending) -->
+<div class="flex gap-4">
+<div class="flex flex-col items-end w-16 pt-1 flex-shrink-0">
+<span class="font-headline font-bold text-on-surface">14:00</span>
+</div>
+<div class="flex-1 relative">
+<!-- Pending Strip -->
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary-fixed-dim rounded-l-lg z-10"></div>
+<div class="bg-surface-container-lowest rounded-lg p-4 pl-5 shadow-[0_4px_24px_rgba(11,28,48,0.02)]">
+<div class="flex justify-between items-start mb-1">
+<div>
+<h3 class="font-headline font-bold text-lg text-on-surface">Nicolas Vega</h3>
+<p class="font-body text-sm text-on-surface-variant">Corte clásico</p>
+</div>
+<span class="bg-primary-fixed/40 text-primary px-2 py-0.5 rounded-md font-label text-xs font-medium">Pendiente</span>
+</div>
+<div class="flex items-center gap-1.5 text-primary-container mb-4">
+<span class="material-symbols-outlined text-[16px]">chat</span>
+<span class="font-label text-xs">Confirmar por WhatsApp</span>
+</div>
+<div class="flex justify-end gap-2">
+<button class="w-9 h-9 flex items-center justify-center rounded-lg bg-surface-container-low text-primary hover:bg-surface-container-high transition-colors active:scale-95">
+<span class="material-symbols-outlined text-[20px]">chat_bubble</span>
+</button>
+<button class="flex-1 flex items-center justify-center gap-2 px-4 h-9 rounded-lg bg-primary text-on-primary font-label text-sm font-semibold hover:opacity-90 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[18px]">check_circle</span>
+<span>Confirmar</span>
+</button>
+<button class="w-9 h-9 flex items-center justify-center rounded-lg bg-surface-container-low text-primary hover:bg-surface-container-high transition-colors active:scale-95">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- 15:30 Block -->
+<div class="flex gap-4">
+<div class="flex flex-col items-end w-16 pt-1 flex-shrink-0">
+<span class="font-headline font-bold text-on-surface">15:30</span>
+</div>
+<div class="flex-1 relative">
+<!-- Confirmed Strip -->
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-tertiary-fixed-dim rounded-l-lg z-10"></div>
+<div class="bg-surface-container-lowest rounded-lg p-4 pl-5 shadow-[0_4px_24px_rgba(11,28,48,0.02)]">
+<div class="flex justify-between items-start mb-2">
+<div class="">
+<h3 class="font-headline font-bold text-lg text-on-surface">Santiago Moreno</h3>
+<p class="font-body text-sm text-on-surface-variant">Corte + barba</p>
+</div>
+<span class="bg-tertiary-fixed/20 text-on-tertiary-fixed-variant px-2 py-0.5 rounded-md font-label text-xs font-medium">Confirmado</span>
+</div>
+<div class="flex justify-end gap-2 mt-4"><button class="w-9 h-9 flex items-center justify-center rounded-lg bg-surface-container-low text-primary hover:bg-surface-container-high transition-colors active:scale-95">
+<span class="material-symbols-outlined text-[20px]">chat_bubble</span>
+</button>
+<button class="w-9 h-9 flex items-center justify-center rounded-lg bg-surface-container-low text-primary hover:bg-surface-container-high transition-colors active:scale-95">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button></div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Sticky Bottom Action -->
+<div class="fixed bottom-24 left-0 w-full px-4 mb-4 z-40">
+<button class="w-full h-14 rounded-xl text-on-primary font-headline font-bold text-lg shadow-[0_8px_32px_rgba(34,57,153,0.25)] flex items-center justify-center gap-2 active:scale-95 transition-transform duration-200 hover:opacity-90 bg-gradient-to-br from-primary to-primary-container">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add</span>
+Nuevo turno
+</button>
+</div>
+<!-- BottomNavBar -->
+<nav class="bg-surface fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pt-3 pb-6 border-t border-outline-variant/30">
+<!-- Active Tab: Agenda -->
+<button class="flex flex-col items-center justify-center w-20 h-14 bg-surface-container-low text-primary rounded-xl active:scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">calendar_today</span>
+<span class="font-label text-xs font-medium">Agenda</span>
+</button>
+<!-- Inactive Tab: Clientes -->
+<button class="flex flex-col items-center justify-center w-20 h-14 text-on-surface-variant opacity-80 hover:bg-surface-container-low hover:text-primary transition-all rounded-xl active:scale-90 duration-150">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">group</span>
+<span class="font-label text-xs font-medium">Clientes</span>
+</button>
+<!-- Inactive Tab: Servicios -->
+<button class="flex flex-col items-center justify-center w-20 h-14 text-on-surface-variant opacity-80 hover:bg-surface-container-low hover:text-primary transition-all rounded-xl active:scale-90 duration-150">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">content_cut</span>
+<span class="font-label text-xs font-medium">Servicios</span>
+</button>
+<!-- Inactive Tab: Más -->
+<button class="flex flex-col items-center justify-center w-20 h-14 text-on-surface-variant opacity-80 hover:bg-surface-container-low hover:text-primary transition-all rounded-xl active:scale-90 duration-150">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">more_horiz</span>
+<span class="font-label text-xs font-medium">Más</span>
+</button>
+</nav>
+</body></html>

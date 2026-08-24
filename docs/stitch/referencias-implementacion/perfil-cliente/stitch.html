@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Barber Studio - Perfil Cliente</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-dim": "#cbdbf5",
+                        "on-surface": "#0b1c30",
+                        "on-tertiary-fixed": "#002113",
+                        "surface-container-high": "#dce9ff",
+                        "secondary-container": "#d3e4f9",
+                        "primary-fixed": "#dde1ff",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-tertiary-container": "#5debaf",
+                        "error-container": "#ffdad6",
+                        "surface-container": "#e5eeff",
+                        "primary": "#223999",
+                        "on-primary-container": "#c8d0ff",
+                        "error": "#ba1a1a",
+                        "on-primary-fixed": "#001257",
+                        "tertiary-container": "#006846",
+                        "surface-variant": "#d3e4fe",
+                        "tertiary-fixed-dim": "#4edea3",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-container": "#566677",
+                        "on-primary-fixed-variant": "#273d9d",
+                        "on-error-container": "#93000a",
+                        "primary-fixed-dim": "#b9c3ff",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed-dim": "#b7c8dc",
+                        "inverse-surface": "#213145",
+                        "on-surface-variant": "#454652",
+                        "on-tertiary": "#ffffff",
+                        "secondary": "#506071",
+                        "surface-tint": "#4157b6",
+                        "inverse-on-surface": "#eaf1ff",
+                        "on-tertiary-fixed-variant": "#005236",
+                        "tertiary-fixed": "#6ffbbe",
+                        "tertiary": "#004e33",
+                        "secondary-fixed": "#d3e4f9",
+                        "primary-container": "#3d52b2",
+                        "surface-container-low": "#eff4ff",
+                        "on-secondary-fixed-variant": "#384858",
+                        "outline-variant": "#c5c5d4",
+                        "outline": "#757684",
+                        "inverse-primary": "#b9c3ff",
+                        "background": "#f8f9ff",
+                        "on-secondary-fixed": "#0c1d2b",
+                        "on-primary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "on-background": "#0b1c30",
+                        "surface": "#f8f9ff",
+                        "surface-bright": "#f8f9ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope", "sans-serif"],
+                        "display": ["Manrope", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                        "label": ["Inter", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, h4, h5, h6, .font-headline { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body antialiased min-h-screen overflow-x-hidden">
+<!-- Sidebar -->
+<nav class="bg-surface-container-low fixed left-0 top-0 h-full flex flex-col p-4 w-64 border-r-0 z-50 -translate-x-full md:translate-x-0 transition-transform duration-300">
+<div class="flex items-center gap-3 mb-8 mt-2 px-2">
+<div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-container flex items-center justify-center text-on-primary font-bold text-xl font-headline shadow-sm">
+                BS
+            </div>
+<div>
+<h1 class="text-xl font-black text-primary font-headline tracking-tight leading-none">Barber Studio</h1>
+<p class="text-xs text-on-surface-variant font-medium mt-0.5">Agenda premium</p>
+</div>
+</div>
+<div class="flex flex-col gap-1 flex-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors font-medium text-sm" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors font-medium text-sm" href="#">
+<span class="material-symbols-outlined text-[20px]">calendar_today</span>
+<span>Agenda</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-surface-container-lowest text-primary shadow-sm border border-outline-variant/15 font-semibold text-sm" href="#">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">group</span>
+<span>Clientes</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors font-medium text-sm" href="#">
+<span class="material-symbols-outlined text-[20px]">content_cut</span>
+<span>Servicios</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors font-medium text-sm" href="#">
+<span class="material-symbols-outlined text-[20px]">badge</span>
+<span>Profesionales</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors font-medium text-sm" href="#">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+<span>Configuración</span>
+</a>
+</div>
+<div class="mt-auto">
+<button class="w-full flex items-center justify-center gap-2 bg-gradient-to-br from-primary to-primary-container text-on-primary py-2.5 px-4 rounded-xl font-label text-sm font-semibold shadow-[0_8px_16px_rgba(34,57,153,0.15)] hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                Nuevo turno
+            </button>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="md:ml-64 flex flex-col min-h-screen">
+<!-- Topbar -->
+<header class="bg-surface/80 backdrop-blur-xl flex items-center justify-between px-8 w-full h-16 sticky top-0 z-40">
+<div class="flex items-center flex-1 gap-4">
+<button class="md:hidden text-on-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="relative w-full max-w-md hidden sm:block focus-within:ring-2 focus-within:ring-primary-container transition-all rounded-lg">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+<input class="w-full bg-surface-container-lowest text-on-surface text-sm py-2 pl-10 pr-4 rounded-lg border border-outline-variant/15 focus:outline-none focus:border-primary focus:ring-0 transition-all placeholder:text-on-surface-variant/50" placeholder="Buscar turnos, clientes o servicios..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="w-10 h-10 rounded-lg flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors relative">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+<span class="absolute top-2 right-2.5 w-2 h-2 bg-error rounded-full border border-surface-container-lowest"></span>
+</button>
+<button class="w-10 h-10 rounded-lg flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors hidden sm:flex">
+<span class="material-symbols-outlined text-[20px]">help_outline</span>
+</button>
+<div class="h-8 w-px bg-outline-variant/30 mx-2"></div>
+<button class="flex items-center gap-2 hover:opacity-80 transition-opacity">
+<img alt="Admin User" class="w-9 h-9 rounded-full object-cover shadow-sm" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDBxRm56EYFW1qWcvSwMHZz1KMHPbsB5D_HWI9fyxv3T5Xwk4OlEo1BjqycLLcz_Oyxs_YAASmq9hHzaNM0ZAPF-gvOTIVlIGFTRFXmAsfOQLCKqUMKFsIJ6e3457UR5n18qFEsRn0-d7_iY7L8C-VCzb77m1SzsD5sxYAQLJB14Zyg4InBL7gD561Z5JGqS28ZF89GoLcBNMawSiWjdUdr6bLWxN7py7h1pzlxMvdjNVOpfD5fZtNg2S1dwQOBm7-LkuJgdMubjcH6"/>
+</button>
+</div>
+</header>
+<!-- Page Content -->
+<main class="flex-1 p-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<!-- Main Column (Left) -->
+<div class="col-span-1 lg:col-span-8 flex flex-col gap-8">
+<!-- Header Section -->
+<div>
+<p class="text-sm font-medium text-on-surface-variant mb-2">Clientes / Santiago Moreno</p>
+<div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+<div>
+<h2 class="text-3xl font-headline font-extrabold text-on-surface tracking-tight mb-2">Santiago Moreno</h2>
+<div class="flex items-center text-sm"><span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-tertiary-fixed/20 text-on-tertiary-fixed-variant leading-none mr-1 font-label">Activo</span><span class="text-on-surface-variant font-medium">12 visitas</span><span class="text-on-surface-variant">•</span><span class="text-on-surface-variant font-medium">Última visita 12 abr</span></div>
+</div>
+<div class="flex gap-3">
+<button class="px-5 py-2.5 rounded-lg text-sm font-medium border border-outline-variant/30 text-on-surface hover:bg-surface-container-high transition-colors shadow-sm bg-surface-container-lowest">
+                                Editar cliente
+                            </button>
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-5 py-2.5 rounded-lg text-sm font-medium shadow-[0_4px_12px_rgba(34,57,153,0.15)] hover:opacity-90 transition-opacity flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">calendar_add_on</span>
+                                Crear turno
+                            </button>
+</div>
+</div>
+</div>
+<!-- Próximo turno Card -->
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-[0_4px_12px_rgba(11,28,48,0.03)] border border-outline-variant/10 relative overflow-hidden">
+<div class="absolute top-0 left-0 w-1.5 h-full bg-tertiary-fixed-dim"></div>
+<div class="flex justify-between items-start mb-6">
+<div>
+<h3 class="text-lg font-headline font-semibold text-on-surface mb-1">Próximo turno</h3>
+<p class="text-primary font-medium">28 abr · 15:30</p>
+</div>
+<span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-tertiary-fixed/20 text-on-tertiary-fixed-variant font-label">
+                            Confirmado
+                        </span>
+</div>
+<div class="flex items-center gap-4 mb-8 p-4 bg-surface-container-low rounded-lg border border-outline-variant/5">
+<div class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">content_cut</span>
+</div>
+<div>
+<p class="text-on-surface font-medium text-lg">Corte + barba</p>
+<p class="text-on-surface-variant text-sm flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-[16px]">person</span>
+                                Mateo Ruiz
+                            </p>
+</div>
+</div>
+<div class="flex gap-3">
+<button class="flex-1 py-2.5 rounded-lg text-sm font-medium border border-outline-variant/30 text-on-surface bg-surface-container-lowest hover:bg-surface-container-low transition-colors shadow-sm">
+                            Reprogramar
+                        </button>
+<button class="flex-1 py-2.5 rounded-lg text-sm font-medium bg-surface-container text-primary hover:bg-surface-container-high transition-colors">
+                            Ver turno
+                        </button>
+</div>
+</div>
+<!-- Historial Card -->
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-[0_4px_12px_rgba(11,28,48,0.03)] border border-outline-variant/10">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-lg font-headline font-semibold text-on-surface">Historial</h3>
+<a class="text-sm font-medium text-primary hover:text-primary-container transition-colors" href="#">Ver historial completo</a>
+</div>
+<div class="flex flex-col gap-6">
+<!-- Item 1 -->
+<div class="flex justify-between items-center group cursor-pointer">
+<div class="flex items-start gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant group-hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[20px]">check_circle</span>
+</div>
+<div>
+<p class="text-on-surface font-medium">12 abr · Corte clásico</p>
+<p class="text-on-surface-variant text-sm">Mateo Ruiz · Completado</p>
+</div>
+</div>
+<span class="text-on-surface font-semibold">$9.500</span>
+</div>
+<!-- Item 2 -->
+<div class="flex justify-between items-center group cursor-pointer">
+<div class="flex items-start gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant group-hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[20px]">check_circle</span>
+</div>
+<div>
+<p class="text-on-surface font-medium">25 mar · Barba premium</p>
+<p class="text-on-surface-variant text-sm">Lucas Pereira · Completado</p>
+</div>
+</div>
+<span class="text-on-surface font-semibold">$7.000</span>
+</div>
+<!-- Item 3 -->
+<div class="flex justify-between items-center group cursor-pointer">
+<div class="flex items-start gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant group-hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[20px]">check_circle</span>
+</div>
+<div>
+<p class="text-on-surface font-medium">08 mar · Corte + barba</p>
+<p class="text-on-surface-variant text-sm">Mateo Ruiz · Completado</p>
+</div>
+</div>
+<span class="text-on-surface font-semibold">$16.500</span>
+</div>
+</div>
+</div>
+<!-- Notas internas Card -->
+<div class="bg-surface-container-low rounded-xl p-6 border border-outline-variant/15">
+<div class="flex justify-between items-center mb-4">
+<div class="flex items-center gap-2 text-on-surface">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">sticky_note_2</span>
+<h3 class="text-md font-headline font-semibold">Notas internas</h3>
+</div>
+<button class="text-sm font-medium text-primary hover:text-primary-container transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">add</span>
+                            Agregar nota
+                        </button>
+</div>
+<p class="text-on-surface-variant text-sm leading-relaxed bg-surface-container-lowest p-4 rounded-lg shadow-sm border border-outline-variant/5">
+                        Prefiere corte con tijera. Evitar perfumes fuertes.
+                    </p>
+</div>
+</div>
+<!-- Right Column -->
+<div class="col-span-1 lg:col-span-4 flex flex-col gap-6">
+<!-- Contact Card -->
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-[0_4px_12px_rgba(11,28,48,0.03)] border border-outline-variant/10">
+<div class="w-20 h-20 rounded-full bg-surface-container-high mx-auto mb-4 flex items-center justify-center overflow-hidden">
+<span class="material-symbols-outlined text-4xl text-primary" style="font-variation-settings: 'FILL' 1;">account_circle</span>
+</div>
+<div class="text-center mb-6">
+<span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-tertiary-fixed/20 text-on-tertiary-fixed-variant mb-2 font-label">Activo</span>
+</div>
+<div class="space-y-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">call</span>
+</div>
+<div>
+<p class="text-on-surface font-medium text-sm">+54 11 6123-4401</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">mail</span>
+</div>
+<div>
+<p class="text-on-surface font-medium text-sm truncate max-w-[180px]">santiago.moreno@mail.demo</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Summary Card -->
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-[0_4px_12px_rgba(11,28,48,0.03)] border border-outline-variant/10">
+<h3 class="text-md font-headline font-semibold text-on-surface mb-5">Resumen</h3>
+<div class="space-y-4">
+<div class="flex justify-between items-center pb-3 border-b border-outline-variant/15">
+<span class="text-on-surface-variant text-sm">Total visitas</span>
+<span class="text-on-surface font-semibold text-sm">12</span>
+</div>
+<div class="flex justify-between items-center pb-3 border-b border-outline-variant/15">
+<span class="text-on-surface-variant text-sm">Gasto estimado</span>
+<span class="text-on-surface font-semibold text-sm">$126.500</span>
+</div>
+<div class="flex flex-col gap-1 pt-1">
+<span class="text-on-surface-variant text-sm">Servicio frecuente</span>
+<span class="text-on-surface font-medium text-sm bg-surface-container px-3 py-1.5 rounded-md self-start">Corte + barba</span>
+</div>
+</div>
+</div>
+<!-- Quick Actions -->
+<div class="flex flex-col gap-2 mt-2">
+<button class="w-full py-3 px-4 flex items-center gap-3 text-left text-on-surface hover:bg-surface-container-low rounded-xl transition-colors border border-transparent hover:border-outline-variant/10">
+<span class="material-symbols-outlined text-primary">add_circle</span>
+<span class="text-sm font-medium">Nuevo turno</span>
+</button>
+<button class="w-full py-3 px-4 flex items-center gap-3 text-left text-on-surface hover:bg-surface-container-low rounded-xl transition-colors border border-transparent hover:border-outline-variant/10">
+<span class="material-symbols-outlined text-primary">send</span>
+<span class="text-sm font-medium">Enviar recordatorio</span>
+</button>
+<button class="w-full py-3 px-4 flex items-center gap-3 text-left text-on-surface hover:bg-surface-container-low rounded-xl transition-colors border border-transparent hover:border-outline-variant/10">
+<span class="material-symbols-outlined text-primary">content_copy</span>
+<span class="text-sm font-medium">Copiar teléfono</span>
+</button>
+</div>
+</div>
+</main>
+</div>
+</body></html>

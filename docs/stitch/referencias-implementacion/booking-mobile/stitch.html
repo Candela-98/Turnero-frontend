@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Barber Studio - Booking</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "error": "#ba1a1a",
+                "surface-container-lowest": "#ffffff",
+                "secondary-container": "#d3e4f9",
+                "background": "#f8f9ff",
+                "on-primary-fixed": "#001257",
+                "inverse-surface": "#213145",
+                "on-tertiary": "#ffffff",
+                "surface": "#f8f9ff",
+                "surface-dim": "#cbdbf5",
+                "outline-variant": "#c5c5d4",
+                "tertiary-container": "#006846",
+                "secondary": "#506071",
+                "surface-bright": "#f8f9ff",
+                "error-container": "#ffdad6",
+                "tertiary-fixed": "#6ffbbe",
+                "surface-container-low": "#eff4ff",
+                "on-secondary-fixed": "#0c1d2b",
+                "inverse-primary": "#b9c3ff",
+                "surface-variant": "#d3e4fe",
+                "primary": "#223999",
+                "on-error": "#ffffff",
+                "on-tertiary-fixed-variant": "#005236",
+                "on-surface": "#0b1c30",
+                "on-tertiary-fixed": "#002113",
+                "surface-tint": "#4157b6",
+                "surface-container": "#e5eeff",
+                "secondary-fixed": "#d3e4f9",
+                "inverse-on-surface": "#eaf1ff",
+                "on-secondary-fixed-variant": "#384858",
+                "secondary-fixed-dim": "#b7c8dc",
+                "on-secondary-container": "#566677",
+                "tertiary": "#004e33",
+                "surface-container-highest": "#d3e4fe",
+                "surface-container-high": "#dce9ff",
+                "outline": "#757684",
+                "primary-fixed-dim": "#b9c3ff",
+                "on-tertiary-container": "#5debaf",
+                "on-primary-fixed-variant": "#273d9d",
+                "on-background": "#0b1c30",
+                "tertiary-fixed-dim": "#4edea3",
+                "on-surface-variant": "#454652",
+                "on-primary": "#ffffff",
+                "primary-container": "#3d52b2",
+                "on-primary-container": "#c8d0ff",
+                "on-error-container": "#93000a",
+                "primary-fixed": "#dde1ff",
+                "on-secondary": "#ffffff"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+        },
+        "spacing": {},
+        "fontFamily": {
+                "headline": [
+                        "Manrope", "sans-serif"
+                ],
+                "display": [
+                        "Manrope", "sans-serif"
+                ],
+                "body": [
+                        "Inter", "sans-serif"
+                ],
+                "label": [
+                        "Inter", "sans-serif"
+                ]
+        },
+        "fontSize": {}
+},
+    },
+  }
+</script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8f9ff; color: #0b1c30; }
+        h1, h2, h3, h4, h5, h6, .font-headline { font-family: 'Manrope', sans-serif; }
+        .glass-header { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .btn-gradient { background: linear-gradient(135deg, #223999, #3d52b2); }
+        /* Hide scrollbar for horizontal scroll areas */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-surface antialiased pb-44">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md shadow-sm border-b border-outline-variant/10">
+<div class="flex justify-between items-center px-6 h-16 w-full max-w-md mx-auto">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-container text-on-primary flex items-center justify-center font-display font-bold text-xl shadow-sm">BS</div>
+<div class="flex flex-col">
+<span class="text-lg font-bold font-headline text-primary">Barber Studio</span>
+<span class="text-xs text-on-surface-variant font-label">Palermo · Hoy abierto hasta 20:00</span>
+</div>
+</div>
+</div>
+<!-- Progress Indicator -->
+<div class="w-full max-w-md mx-auto px-6 py-3 bg-surface-container-low border-b border-outline-variant/15">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="text-[11px] font-semibold text-primary font-label">Servicio</span>
+</div>
+<div class="w-4 h-px bg-primary/30"></div>
+<div class="flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="text-[11px] font-semibold text-primary font-label">Profesional</span>
+</div>
+<div class="w-4 h-px bg-primary/30"></div>
+<div class="flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="text-[11px] font-semibold text-primary font-label">Día y hora</span>
+</div>
+<div class="w-4 h-px bg-outline-variant/50"></div>
+<div class="flex items-center gap-1 opacity-50">
+<span class="w-2 h-2 rounded-full bg-outline-variant"></span>
+<span class="text-[11px] font-semibold text-on-surface-variant font-label">Datos</span>
+</div>
+</div>
+</div>
+</header>
+<main class="max-w-md mx-auto pt-28 px-4 space-y-8 pb-24">
+<!-- 1. Service Selection -->
+<section>
+<h2 class="font-headline text-xl font-bold text-on-surface mb-4">Elegí el servicio</h2>
+<div class="flex flex-col gap-3">
+<div class="bg-surface-container-lowest rounded-xl p-4 flex justify-between items-center border border-outline-variant/20">
+<div>
+<h3 class="font-body font-semibold text-on-surface">Corte clásico</h3>
+<p class="text-sm text-on-surface-variant">45 min</p>
+</div>
+<span class="font-headline font-bold text-primary">$9.500</span>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-4 flex justify-between items-center border border-outline-variant/20">
+<div>
+<h3 class="font-body font-semibold text-on-surface">Corte fade</h3>
+<p class="text-sm text-on-surface-variant">60 min</p>
+</div>
+<span class="font-headline font-bold text-primary">$11.500</span>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-4 flex justify-between items-center border border-outline-variant/20">
+<div>
+<h3 class="font-body font-semibold text-on-surface">Barba premium</h3>
+<p class="text-sm text-on-surface-variant">35 min</p>
+</div>
+<span class="font-headline font-bold text-primary">$7.000</span>
+</div>
+<!-- Selected Service -->
+<div class="bg-surface-container-low rounded-xl p-4 flex justify-between items-center relative overflow-hidden border border-primary/20">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
+<div class="pl-2">
+<h3 class="font-body font-semibold text-on-surface">Corte + barba</h3>
+<p class="text-sm text-on-surface-variant">90 min</p>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-headline font-bold text-primary">$16.500</span>
+</div>
+</div>
+</div>
+</section>
+<!-- 2. Professional Selection -->
+<section>
+<h2 class="font-headline text-xl font-bold text-on-surface mb-4">¿Con quién?</h2>
+<div class="flex overflow-x-auto no-scrollbar gap-3 pb-2 -mx-4 px-4">
+<div class="flex-none w-40 bg-surface-container-lowest border border-outline-variant/20 rounded-2xl p-4 flex flex-col items-center justify-center text-center">
+<div class="w-12 h-12 rounded-full bg-surface-container-low flex items-center justify-center mb-3">
+<span class="material-symbols-outlined text-on-surface-variant">group</span>
+</div>
+<span class="font-body text-sm font-medium text-on-surface">Cualquiera disponible</span>
+</div>
+<!-- Selected Pro -->
+<div class="flex-none w-40 bg-primary-fixed/10 outline outline-2 outline-primary rounded-2xl p-4 flex flex-col items-center text-center relative">
+<div class="absolute top-2 right-2">
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="w-16 h-16 rounded-full bg-cover bg-center mb-2 shadow-sm" data-alt="portrait of a male barber with a beard in a modern barbershop" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAR-mNjhokTXmVLZhqD6mzipxkhn5WJWb4a5ta8a3QEWMpgATpZiXHUEUCd1e4Z__oJN4BW5U4NRCdckvACDC8Gepk_dFOcSip0-Tfg_e2BFmeKpn0EcJODJR15daYN-RMzetjWGwyOB_ijHIPjSpb2rCw8cwt66LuMoPcQ44Cic_fyMUDnrOzidh99Imz6lRv4BArD08lg6ku0VDlRiEE0mAfEeSjx93t7WBGuQtJYbDK8luUdRkmSD6GeAsvdGlbjVCfY3-cjrE2b');"></div>
+<span class="font-body text-sm font-bold text-on-surface">Mateo Ruiz</span>
+<span class="text-xs text-on-surface-variant mt-1">Barbero senior</span>
+<span class="text-[10px] text-on-tertiary-fixed-variant bg-tertiary-fixed/20 px-2 py-0.5 rounded-full mt-2 font-medium">Disponible hoy</span>
+</div>
+<div class="flex-none w-40 bg-surface-container-lowest border border-outline-variant/20 rounded-2xl p-4 flex flex-col items-center text-center">
+<div class="w-16 h-16 rounded-full bg-cover bg-center mb-2 shadow-sm" data-alt="portrait of a young male barber with tattoos in a studio" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBTY4ALDPnD_Uq1FUDjpBzEpM7HpxMSsWjaY793W7GYskmC6MHkNWepeuk6zdYrx-vu-C74sXFgK3tjtZlGqcRf4ifYjWGn2NVsmw8LumoaTE7CoYAaqN9V7HRwAdEfq3OARM6L3rpp9vg_vuEpmd8K3xAjfkzmHCf7Xmv1v78IHUS1UFCQZ34lcNiCWmKL85ZVRi7_wLb6eGgjPWVAFK4tvidnxyOvRfIehFYBQDtFD_LHZ7ybYFRc3U8W5Fu3X93UcwhktoIqEUfg');"></div>
+<span class="font-body text-sm font-bold text-on-surface">Lucas Pereira</span>
+<span class="text-xs text-on-surface-variant mt-1">Especialista en fades</span>
+</div>
+</div>
+</section>
+<!-- 3. Date & Time -->
+<section>
+<h2 class="font-headline text-xl font-bold text-on-surface mb-4">Día y horario</h2>
+<!-- Dates -->
+<div class="flex overflow-x-auto no-scrollbar gap-2 mb-6 -mx-4 px-4 pb-1">
+<div class="flex-none bg-primary text-on-primary rounded-xl px-4 py-3 flex flex-col items-center justify-center min-w-[70px] shadow-sm shadow-primary/20">
+<span class="text-xs font-medium opacity-80 mb-1">Hoy</span>
+<span class="font-headline font-bold text-lg leading-none">28</span>
+<span class="text-xs mt-1">abr</span>
+</div>
+<div class="flex-none bg-surface-container-lowest text-on-surface border border-outline-variant/20 rounded-xl px-4 py-3 flex flex-col items-center justify-center min-w-[70px]">
+<span class="text-xs font-medium text-on-surface-variant mb-1">Mié</span>
+<span class="font-headline font-bold text-lg leading-none">29</span>
+<span class="text-xs text-on-surface-variant mt-1">abr</span>
+</div>
+<div class="flex-none bg-surface-container-lowest text-on-surface border border-outline-variant/20 rounded-xl px-4 py-3 flex flex-col items-center justify-center min-w-[70px]">
+<span class="text-xs font-medium text-on-surface-variant mb-1">Jue</span>
+<span class="font-headline font-bold text-lg leading-none">30</span>
+<span class="text-xs text-on-surface-variant mt-1">abr</span>
+</div>
+</div>
+<!-- Times -->
+<div>
+<h3 class="text-sm font-medium text-on-surface-variant mb-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">light_mode</span> Tarde
+                </h3>
+<div class="grid grid-cols-4 gap-2">
+<!-- Selected Time -->
+<div class="bg-primary text-on-primary rounded-lg py-2 text-center font-body font-semibold text-sm shadow-sm shadow-primary/20">
+                        15:30
+                    </div>
+<div class="bg-surface-container-lowest border border-outline-variant/20 text-on-surface rounded-lg py-2 text-center font-body font-medium text-sm">
+                        16:30
+                    </div>
+<div class="bg-surface-container-lowest border border-outline-variant/20 text-on-surface rounded-lg py-2 text-center font-body font-medium text-sm">
+                        17:00
+                    </div>
+<div class="bg-surface-container-lowest border border-outline-variant/20 text-on-surface rounded-lg py-2 text-center font-body font-medium text-sm">
+                        18:00
+                    </div>
+</div>
+</div>
+</section>
+<!-- 4. Client Data -->
+<section class="bg-surface-container-low rounded-2xl p-5 border border-outline-variant/15">
+<h2 class="font-headline text-lg font-bold text-on-surface mb-4">Tus datos</h2>
+<div class="space-y-4">
+<div class="relative">
+<label class="text-xs font-medium text-on-surface-variant absolute -top-2 left-3 bg-surface-container-low px-1 z-10">Nombre completo</label>
+<input class="w-full bg-surface-container-lowest border border-outline-variant/50 rounded-lg px-4 py-3 text-sm text-on-surface font-body focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors" type="text" value="Santiago Moreno"/>
+</div>
+<div class="relative">
+<label class="text-xs font-medium text-on-surface-variant absolute -top-2 left-3 bg-surface-container-low px-1 z-10">Teléfono</label>
+<input class="w-full bg-surface-container-lowest border border-outline-variant/50 rounded-lg px-4 py-3 text-sm text-on-surface font-body focus:outline-none focus:border-primary transition-colors focus:ring-1 focus:ring-primary" type="tel" value="+54 11 6123-4401"/>
+</div>
+<div class="relative">
+<label class="text-xs font-medium text-on-surface-variant absolute -top-2 left-3 bg-surface-container-low px-1 z-10">Email</label>
+<input class="w-full bg-surface-container-lowest border border-outline-variant/50 rounded-lg px-4 py-3 text-sm text-on-surface font-body focus:outline-none focus:border-primary transition-colors focus:ring-1 focus:ring-primary" type="email" value="santiago.moreno@mail.demo"/>
+</div>
+</div>
+</section>
+<!-- 5. Final Review -->
+<section class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm border border-outline-variant/15">
+<div class="flex justify-between items-start mb-4">
+<h2 class="font-headline text-lg font-bold text-on-surface">Resumen</h2>
+<button class="text-sm font-medium text-primary hover:text-primary-container transition-colors">Editar selección</button>
+</div>
+<div class="space-y-3 mb-5">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px] mt-0.5">content_cut</span>
+<div>
+<p class="font-medium text-on-surface text-sm">Corte + barba con Mateo Ruiz</p>
+<p class="text-xs text-on-surface-variant mt-0.5">90 min</p>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px] mt-0.5">calendar_month</span>
+<div>
+<p class="font-medium text-on-surface text-sm">Martes 28 de abril, 15:30 hs</p>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-low rounded-xl p-3 flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary text-[18px] mt-0.5">info</span>
+<p class="text-xs text-on-surface-variant leading-relaxed">Podés avisar cambios con 3 h de anticipación sin costo adicional.</p>
+</div>
+</section>
+<!-- 6. Pre-confirmation State -->
+<section class="bg-primary-container/10 border border-primary/20 rounded-2xl p-5 mb-8">
+<h3 class="font-headline text-lg font-bold text-on-surface mb-3">Reserva lista para confirmar</h3>
+<ul class="text-sm text-on-surface-variant space-y-1 mb-4 font-medium">
+<li><span class="text-on-surface font-semibold">Corte + barba</span> con Mateo Ruiz</li>
+<li>martes 28 de abril a las <span class="text-on-surface font-semibold">15:30</span></li>
+</ul>
+<p class="text-xs text-primary font-medium flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">mail</span>
+        Te enviaremos la confirmación por email
+    </p>
+</section>
+</main>
+<!-- 7. Sticky Bottom Bar -->
+<div class="fixed bottom-0 left-0 right-0 bg-surface-container-lowest border-t border-outline-variant/10 shadow-[0_-8px_30px_rgb(0,0,0,0.06)] z-40 pb-safe pt-4 px-4 rounded-t-3xl backdrop-blur-xl">
+<div class="max-w-md mx-auto pb-6">
+<div class="flex justify-between items-center mb-3 px-2">
+<div class="flex flex-col">
+<span class="text-xs font-medium text-on-surface-variant">Corte + barba · Mar 28 abr · 15:30</span>
+</div>
+<span class="font-headline font-bold text-lg text-on-surface">$16.500</span>
+</div>
+<button class="w-full btn-gradient text-on-primary font-headline font-bold text-base py-4 rounded-xl shadow-lg shadow-primary/20 active:scale-[0.98] transition-transform flex justify-center items-center gap-2">
+                Confirmar reserva
+                <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</body></html>

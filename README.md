@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Turnero Frontend
 
-## Getting Started
+Frontend web de Turnero, construido con Next.js. El MVP visual usa Stitch como fuente de diseño para admin, agenda, booking publico y estados principales.
 
-First, run the development server:
+## Desarrollo
+
+Instalar dependencias y levantar el servidor:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abrir [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Documentacion
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+La documentacion frontend vive en `docs/`:
 
-## Learn More
+- `docs/README.md` - indice de documentacion frontend.
+- `docs/proximos-pasos-mvp.md` - roadmap de implementacion frontend.
+- `docs/decisiones-diseno-mvp.md` - decisiones de producto y diseño.
+- `docs/handoff-implementacion-mvp.md` - guia para implementar UI.
+- `docs/stitch/progreso-stitch.md` - IDs vigentes y estado de pantallas en Stitch.
+- `docs/stitch/workflow-drift-stitch.md` - checklist para detectar drift visual.
+- `docs/referencias/datos-demo.md` - datos demo para pantallas.
 
-To learn more about Next.js, take a look at the following resources:
+## Scripts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run dev
+npm run lint
+npm run typecheck
+npm run test
+npm run build
+npm run start
+npm run test:e2e
+npm run check
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Fuente visual
 
-## Deploy on Vercel
+Proyecto Stitch:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+https://stitch.withgoogle.com/projects/10594197106398501653
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Las pantallas vigentes estan registradas en `docs/stitch/progreso-stitch.md`.

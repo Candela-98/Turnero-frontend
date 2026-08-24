@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Booking mobile - Confirmation Success</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed": "#0c1d2b",
+                    "on-secondary-container": "#566677",
+                    "error-container": "#ffdad6",
+                    "tertiary": "#004e33",
+                    "surface-tint": "#4157b6",
+                    "secondary": "#506071",
+                    "on-tertiary": "#ffffff",
+                    "secondary-container": "#d3e4f9",
+                    "on-primary-container": "#c8d0ff",
+                    "tertiary-fixed-dim": "#4edea3",
+                    "on-surface": "#0b1c30",
+                    "surface-variant": "#d3e4fe",
+                    "surface-container-high": "#dce9ff",
+                    "on-tertiary-container": "#5debaf",
+                    "surface-bright": "#f8f9ff",
+                    "on-secondary-fixed-variant": "#384858",
+                    "on-primary-fixed-variant": "#273d9d",
+                    "surface-container-lowest": "#ffffff",
+                    "outline": "#757684",
+                    "on-primary-fixed": "#001257",
+                    "surface-container": "#e5eeff",
+                    "primary-fixed-dim": "#b9c3ff",
+                    "on-tertiary-fixed-variant": "#005236",
+                    "secondary-fixed": "#d3e4f9",
+                    "on-tertiary-fixed": "#002113",
+                    "on-background": "#0b1c30",
+                    "inverse-primary": "#b9c3ff",
+                    "surface": "#f8f9ff",
+                    "inverse-on-surface": "#eaf1ff",
+                    "on-error-container": "#93000a",
+                    "primary-fixed": "#dde1ff",
+                    "primary-container": "#3d52b2",
+                    "on-secondary": "#ffffff",
+                    "outline-variant": "#c5c5d4",
+                    "on-surface-variant": "#454652",
+                    "error": "#ba1a1a",
+                    "on-primary": "#ffffff",
+                    "tertiary-fixed": "#6ffbbe",
+                    "primary": "#223999",
+                    "surface-dim": "#cbdbf5",
+                    "on-error": "#ffffff",
+                    "surface-container-highest": "#d3e4fe",
+                    "tertiary-container": "#006846",
+                    "inverse-surface": "#213145",
+                    "surface-container-low": "#eff4ff",
+                    "secondary-fixed-dim": "#b7c8dc",
+                    "background": "#f8f9ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {},
+            "fontFamily": {
+                    "headline": [
+                            "Manrope"
+                    ],
+                    "display": [
+                            "Manrope"
+                    ],
+                    "body": [
+                            "Inter"
+                    ],
+                    "label": [
+                            "Inter"
+                    ]
+            },
+            "fontSize": {}
+    },
+        },
+      }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body antialiased min-h-screen flex flex-col items-center justify-center p-4">
+<!-- Header / Brand -->
+<header class="flex flex-col items-center justify-center w-full max-w-md mb-8">
+<div class="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-primary-container flex items-center justify-center text-on-primary font-display font-bold text-lg mb-4 shadow-sm shadow-on-surface/5">
+            BS
+        </div>
+<h1 class="font-display font-bold text-xl text-primary mb-1">Barber Studio</h1>
+<p class="font-label text-sm text-on-surface-variant">Palermo · Hoy abierto hasta 20:00</p>
+</header>
+<!-- Success Message -->
+<section class="flex flex-col items-center justify-center w-full max-w-md text-center mb-8">
+<div class="w-14 h-14 rounded-full bg-tertiary-fixed flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-on-tertiary-fixed text-3xl" data-icon="check_circle">check_circle</span>
+</div>
+<h2 class="font-display font-bold text-2xl text-on-surface mb-2">Reserva confirmada</h2>
+<p class="font-body text-base text-on-surface-variant max-w-sm">Te esperamos en Barber Studio. Guardamos el turno con los datos seleccionados.</p>
+</section>
+<!-- Reservation Summary Card -->
+<article class="w-full max-w-md bg-surface-container-low rounded-xl p-6 mb-6">
+<h3 class="font-display font-semibold text-lg text-on-surface mb-4">Detalle del turno</h3>
+<ul class="flex flex-col gap-y-4">
+<li class="flex items-start gap-x-3">
+<span class="material-symbols-outlined text-secondary mt-0.5" data-icon="content_cut">content_cut</span>
+<div class="flex flex-col">
+<span class="font-label text-xs text-on-surface-variant">Servicio</span>
+<span class="font-body text-sm font-medium text-on-surface">Corte + barba</span>
+</div>
+</li>
+<li class="flex items-start gap-x-3">
+<span class="material-symbols-outlined text-secondary mt-0.5" data-icon="person">person</span>
+<div class="flex flex-col">
+<span class="font-label text-xs text-on-surface-variant">Profesional</span>
+<span class="font-body text-sm font-medium text-on-surface">Mateo Ruiz</span>
+</div>
+</li>
+<li class="flex items-start gap-x-3">
+<span class="material-symbols-outlined text-secondary mt-0.5" data-icon="calendar_today">calendar_today</span>
+<div class="flex flex-col">
+<span class="font-label text-xs text-on-surface-variant">Fecha y hora</span>
+<span class="font-body text-sm font-medium text-on-surface">Martes 28 de abril, 15:30 hs</span>
+</div>
+</li>
+<li class="flex items-start gap-x-3">
+<span class="material-symbols-outlined text-secondary mt-0.5" data-icon="location_on">location_on</span>
+<div class="flex flex-col">
+<span class="font-label text-xs text-on-surface-variant">Dirección</span>
+<span class="font-body text-sm font-medium text-on-surface">Av. Palermo 1842, Buenos Aires</span>
+</div>
+</li>
+<li class="flex items-start gap-x-3">
+<span class="material-symbols-outlined text-secondary mt-0.5" data-icon="account_circle">account_circle</span>
+<div class="flex flex-col">
+<span class="font-label text-xs text-on-surface-variant">Cliente</span>
+<span class="font-body text-sm font-medium text-on-surface">Santiago Moreno</span>
+</div>
+</li>
+<li class="flex items-start gap-x-3 pt-4 border-t border-outline-variant/15">
+<span class="material-symbols-outlined text-secondary mt-0.5" data-icon="payments">payments</span>
+<div class="flex flex-col w-full">
+<span class="font-label text-xs text-on-surface-variant">Total</span>
+<div class="flex justify-between items-center w-full">
+<span class="font-display text-lg font-bold text-on-surface">$16.500</span>
+</div>
+</div>
+</li>
+</ul>
+</article>
+<!-- Policy Note -->
+<p class="w-full max-w-md text-center font-label text-xs text-on-surface-variant mb-8 px-4">
+        Podés cancelar o reprogramar hasta 3 horas antes del turno.
+    </p>
+<!-- Actions -->
+<div class="w-full max-w-md flex flex-col gap-y-3">
+<button class="w-full py-3 px-4 rounded-lg bg-gradient-to-br from-primary to-primary-container text-on-primary font-body font-medium flex items-center justify-center gap-x-2 shadow-sm shadow-primary/20 hover:from-primary-container hover:to-primary transition-all">
+<span class="material-symbols-outlined text-xl" data-icon="event">event</span>
+            Agregar al calendario
+        </button>
+<button class="w-full py-3 px-4 rounded-lg border border-outline-variant text-on-surface font-body font-medium hover:bg-surface-container-high transition-colors">
+            Hacer otra reserva
+        </button>
+<button class="w-full py-3 px-4 rounded-lg text-secondary font-body font-medium hover:bg-surface-container-high transition-colors mt-2">
+            Volver al inicio
+        </button>
+</div>
+</body></html>
