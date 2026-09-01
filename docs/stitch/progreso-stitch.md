@@ -108,19 +108,9 @@ Pendientes antes de implementación:
 | Loading states MVP | Referencia aprobada | `b6235f4af54f41d8a6bfd18c23711949` | Pantalla de referencia para loading/skeleton states MVP. Incluye Dashboard, Agenda, listas admin, crear turno, booking y login. Shell/tokens verificados. |
 | Notificaciones admin mobile | Referencia aprobada | `6190510a5407468d9bd2a8246b11f4e3` | Pantalla de referencia mobile para notificaciones operativas. Shell mobile, tokens, badges, acciones, filtros y bottom nav verificados. |
 
-## Primera tanda recomendada
+## Uso de las referencias
 
-Orden inicial:
-
-1. Layout base.
-2. Agenda desktop día.
-3. Crear / editar turno.
-4. Booking mobile.
-5. Dashboard admin.
-
-Motivo:
-
-Estas pantallas validan el corazón visual del producto: operar agenda, crear turnos y reservar como cliente.
+Las pantallas de este documento sirven para validar el diseño y localizar su Stitch ID vigente. No determinan la prioridad de desarrollo: consultar `../tracking-implementacion-mvp.md` antes de iniciar una pantalla.
 
 ## Registro de avances
 

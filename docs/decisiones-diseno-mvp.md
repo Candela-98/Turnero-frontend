@@ -59,22 +59,6 @@ La dirección visual será Precision Concierge: clara, sobria, precisa y profesi
 13. Booking cliente sin login obligatorio.
 14. No crear detalle de notificación para MVP; las notificaciones deben llevar al contexto operativo correspondiente.
 
-### Prioridad de diseño
-
-Orden recomendado para bajar a pantallas finales:
-
-1. Tokens y componentes globales.
-2. Layout base.
-3. Agenda desktop día.
-4. Crear / editar turno.
-5. Booking mobile.
-6. Dashboard.
-7. Clientes + perfil.
-8. Servicios.
-9. Profesionales.
-10. Configuración.
-11. Login.
-
 ### Principios que no se deben perder
 
 - No convertir pantallas operativas en landing pages.
@@ -124,7 +108,8 @@ Usar como base:
 - `stitch/progreso-stitch.md` como fuente de IDs finales.
 - `decisiones-diseno-mvp.md` como fuente de reglas de producto y diseño.
 - `stitch/workflow-drift-stitch.md` como checklist para verificar y corregir drift de Stitch antes de aprobar pantallas.
-- `handoff-implementacion-mvp.md` como guia de componentes, orden de implementación y Definition of Done visual.
+- `handoff-implementacion-mvp.md` como guía de componentes y Definition of Done visual.
+- `tracking-implementacion-mvp.md` como fuente de la prioridad de implementación vigente.
 
 Reglas de implementación visual:
 
@@ -846,24 +831,9 @@ Antes de implementar, conviene diseñar o documentar:
 - Navegación mobile.
 - Breakpoints responsive.
 
-## Prioridad de revisión de diseño
+## Criterio de revisión de diseño
 
-Orden recomendado:
-
-1. Layout base.
-2. Agenda.
-3. Crear / editar turno.
-4. Dashboard.
-5. Booking mobile.
-6. Clientes + perfil.
-7. Servicios.
-8. Profesionales.
-9. Configuración.
-10. Estados globales y componentes compartidos.
-
-Motivo:
-
-Si agenda, turno y navegación quedan bien, el resto del producto se acomoda con mayor coherencia visual.
+Validar primero los elementos compartidos que afecten una pantalla en curso —shell, navegación, tokens, badges, filtros y estados— y luego la composición específica de esa pantalla. El orden de implementación no se decide aquí: consultar `tracking-implementacion-mvp.md`.
 
 ## Decisión 1: Layout base
 

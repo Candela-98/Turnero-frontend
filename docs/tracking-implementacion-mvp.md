@@ -1,27 +1,24 @@
 # Tracking de Implementacion Frontend MVP
 
-Actualizado: 2026-07-11
+Actualizado: 2026-08-31
 
 ## Proposito
 
-Este documento resume el avance real del frontend MVP.
+Este documento es la fuente única del avance operativo del frontend MVP: estado real, prioridades vigentes, dependencias y bloqueos.
 
-No reemplaza:
+No reemplaza `roadmap.md` (hitos de producto), `decisiones-diseno-mvp.md` (decisiones UX), `handoff-implementacion-mvp.md` (reglas de implementación) ni `stitch/progreso-stitch.md` (referencias visuales).
 
-- `proximos-pasos-mvp.md`
-- `decisiones-diseno-mvp.md`
-- `handoff-implementacion-mvp.md`
-- `stitch/progreso-stitch.md`
-
-Sirve para saber rapidamente que ya esta listo, que sigue, que puede avanzar con mocks y que debe esperar endpoints reales del backend.
+Los demás documentos deben enlazar este archivo cuando necesiten mencionar qué sigue; no deben duplicar su cola de trabajo.
 
 ## Estado general
 
 El frontend ya tiene una base limpia de Next.js, agenda/admin con mocks y flujo de crear turno alineados a las referencias principales de Stitch.
 
-Todavia no hay booking cliente, gestion admin restante ni integracion real con backend.
+Todavia no hay booking cliente, gestion admin restante ni integracion real con backend. La app solo renderiza la agenda mock en `/`; las rutas declaradas en la navegacion admin todavia no tienen pantallas.
 
-El siguiente foco recomendado es implementar booking cliente con mocks.
+El backend ya dispone de recursos admin para configuracion, servicios, profesionales, clientes y horarios. La integracion real debe empezar por una capa HTTP/adapters y por Configuracion, sin acoplar todavia agenda o crear turno a contratos de appointments que siguen incompletos.
+
+La prioridad actual es integrar primero los recursos administrativos cuyo contrato backend ya está disponible. Booking público sigue siendo una referencia visual y queda bloqueado para integración hasta que existan sus endpoints.
 
 ## Listo
 
@@ -108,57 +105,54 @@ El siguiente foco recomendado es implementar booking cliente con mocks.
 - `npm run test` pasa segun el estado reportado.
 - `npm run test:e2e` pasa segun el estado reportado; localmente requiere browsers de Playwright instalados y levantar Next fuera del sandbox si el bind del puerto esta restringido.
 - `npm run build` pasa fuera del sandbox segun el estado reportado; dentro del sandbox puede fallar por restriccion de Turbopack al bindear un puerto interno.
+- Se verifico que no existe todavia integracion HTTP:
+  - no hay `fetch`, cliente API, URL de backend, proxy Next ni manejo de `credentials`;
+  - no estan instalados ni usados TanStack Query, React Hook Form o Zod;
+  - no hay rutas admin adicionales, auth, guards o sesion real.
 
 ## Pendiente
 
-- Implementar booking cliente con mocks.
-- Implementar gestion admin restante con mocks.
-- Agregar integracion API progresiva cuando los endpoints backend esten completos.
-- Agregar formularios, validaciones, server state y cliente HTTP cuando existan flujos que los justifiquen.
+- Integrar la configuracion administrativa y los catalogos que el backend ya expone.
+- Implementar las rutas/pantallas de dashboard, clientes, servicios, profesionales y configuracion.
+- Cerrar contratos pendientes de agenda y appointments antes de conectarlos como fuente final.
+- Implementar auth, guards y sesión cuando exista el flujo backend real.
+- Implementar booking cliente real cuando estén disponibles sus endpoints públicos.
 
-## Proximo foco recomendado
+## Prioridades vigentes
 
-### FE 7 - Booking cliente con mocks
+Actualizar esta sección al cerrar cada PR. La prioridad y sus dependencias se registran aquí, no en el roadmap, handoff, decisiones ni documentos Stitch.
 
-Implementar booking cliente mobile-first usando mocks y componentes/layouts compartidos.
+### Ahora — I1: base HTTP e integración de configuración
 
-Alcance inicial:
+- Crear cliente HTTP centralizado, base URL por ambiente, credenciales/proxy o CORS y normalización del formato de error backend.
+- Incorporar adapters entre DTOs `snake_case` y modelos TypeScript de UI.
+- Implementar la ruta de Configuración conectada a `business`, `booking-settings` y `business-hours`.
+- Cubrir carga, error, guardado y reemplazo transaccional de horarios semanales.
 
-- Booking mobile single-page.
-- Confirmacion post-reserva.
-- Seleccion de servicio.
-- Seleccion de profesional o cualquiera disponible.
-- Seleccion de dia y horario.
-- Datos del cliente sin login.
-- Sticky inferior con resumen y CTA.
+Condición de cierre: configuración usable contra API real, sin acoplar agenda ni el formulario de turnos a contratos incompletos.
 
-Criterio:
+### Siguiente — I2: catálogos administrativos reales
 
-- Usar tokens de `app/globals.css`.
-- Usar componentes de `components/ui`.
-- Usar layouts de `components/layouts`.
-- Usar datos de `lib/demo`.
-- No depender de API real.
-- No mezclar booking cliente con navegacion admin.
-- No introducir cuenta cliente en MVP.
+- Crear rutas y flujos para servicios, profesionales y clientes sobre los endpoints admin disponibles.
+- Incorporar formularios, validación y server state cuando aporten valor al flujo real.
+- Mantener fuera de la UI los campos relacionales o métricas que el backend aún no expone.
 
-## Orden sugerido de PRs frontend chicos
+Condición de cierre: cada catálogo posee lectura, mutaciones soportadas por backend y estados loading/error/empty.
 
-| PR | Foco | Resultado esperado |
-| --- | --- | --- |
-| FE 0 | Tracking y docs | `tracking-implementacion-mvp.md` creado; README y roadmap apuntan al tracking sin duplicarlo. |
-| FE 1 | Fundacion visual | Completado: tokens, estilos globales y base responsive inicial listos, sin pantallas MVP. |
-| FE 2 | Tipos y mocks | Completado: entidades temporales, datos demo normalizados y helpers para alimentar pantallas. |
-| FE 3 | Componentes base | Completado: `Button`, `IconButton`, `Badge`, `FilterPill`, `Card`, `Input`, `Select`, `Textarea`, `Avatar`, `EmptyState`, `Skeleton`, `InlineAlert`. |
-| FE 4 | Layouts | Completado: `AdminShellDesktop`, `AdminMobileHeader`, `AdminMobileBottomNav`, `TaskMobileHeader`, `BookingPublicShell`. |
-| FE 5 | Agenda con mocks | Completado: agenda desktop dia, agenda mobile `Todos` y agenda mobile por profesional. |
-| FE 5.5 | Resiliencia base frontend | Completado: typecheck, Vitest, Playwright desktop/mobile, axe, error boundary, not-found y CI minimo. |
-| FE 6 | Crear/editar turno con mocks | Completado: drawer desktop y flujo mobile full-screen, sin integracion real. |
-| FE 6.5 | Correccion drift Stitch | Completado: paleta, shell, agenda diaria y crear turno realineados con referencias `layout-base`, agenda y crear-turno. |
-| FE 7 | Booking cliente con mocks | Booking mobile single-page y confirmacion post-reserva. |
-| FE 8 | Gestion admin con mocks | Dashboard, clientes, perfil, servicios, profesionales y configuracion. |
-| FE 9 | Estados y QA visual | Empty states, loading, errores, validaciones y notificaciones mobile. |
-| FE 10+ | Integracion API progresiva | Reemplazo de mocks por API real segun endpoints backend completos. |
+### Siguiente — I3: agenda y turnos con contratos confirmados
+
+- Conectar agenda y disponibilidad sólo cuando sus respuestas, filtros y reglas estén validadas contra el contrato final.
+- Integrar creación, edición y acciones de turno cuando el backend cubra cliente rápido, relación staff-service, cálculos y solapamientos.
+
+Condición de cierre: la agenda y el flujo de turnos comparten adapters y no duplican validaciones de negocio.
+
+### Después — I4: autenticación y navegación protegida
+
+Implementar sesión, guards y login administrativo cuando el backend entregue los endpoints de auth y el contrato de cookie/tokens.
+
+### Bloqueado por backend — I5: booking público
+
+Mantener booking cliente como referencia/mock visual. Integrarlo cuando existan endpoints públicos de perfil, servicios, disponibilidad, reserva y cancelación.
 
 ## Dependencias concretas con backend
 
@@ -171,6 +165,8 @@ Estado backend relevante:
 
 - PR A1-A4 completados.
 - PR 1-4 completados.
+- PRs 8-15 implementados en codigo; Availability y parte de su contrato aun requieren validacion.
+- PR 16 (`business`), PR 17 (`booking-settings`) y PR 18 (`business-hours`/TURN-55) completados y mergeados.
 - PR 5 / `TURN-41` parcial:
   - ya existe `/api/v1/appointments`;
   - creacion/listado base de appointments admin ya existe;
@@ -183,16 +179,17 @@ Dependencias por flujo frontend:
 | Fundacion visual | Si | No depende de backend. |
 | Componentes base | Si | No depende de backend. |
 | Layouts | Si | No depende de backend. |
-| Agenda diaria | Si | Cierre de PR 5 / `TURN-41`: filtros/rango, response enriquecido y reglas completas. |
+| Agenda diaria | Si | Puede hacer un piloto de solo lectura, pero la integracion final espera PR 5: filtros/rango, response enriquecido y reglas completas. |
 | Crear turno admin | Si | PR 5 completo para contrato final de create, cliente rapido, staff-service, calculos backend y solapamiento correcto. |
-| Editar turno | Si visualmente | PR 6. |
-| Confirmar/cancelar turno | Si visualmente | PR 7. |
-| Completar/no-show | Si visualmente | PR 7b. |
-| Slots reales admin | Si con mocks visuales | PR 8 availability admin. |
-| Service offerings admin | Si | Endpoints admin v1 ya disponibles para integracion progresiva. |
-| Staff members admin | Si | Endpoints admin v1 ya disponibles para integracion progresiva. |
+| Editar turno | Si visualmente | Endpoint existe, pero queda sujeto a validacion del alcance MVP junto con PR 5/6. |
+| Confirmar/cancelar | Si visualmente | Endpoints existen; integrar cuando la agenda real use el mismo adapter de appointments. |
+| Completar/no-show | Si visualmente | Endpoints existen; integrar cuando la agenda real use el mismo adapter de appointments. |
+| Slots reales admin | Si con mocks visuales | Endpoint existe, pero la respuesta actual es plana y requiere adapter/validacion contra contrato. |
+| Service offerings admin | Si | Endpoints admin v1 disponibles para integracion progresiva. |
+| Staff members admin | Si | CRUD, asociaciones y horarios disponibles para integracion progresiva. |
 | Staff-service offerings | Si | Endpoints v1 ya disponibles para integracion progresiva. |
 | Customers admin | Si | Endpoints admin v1 ya disponibles para integracion progresiva. |
+| Business/configuracion | Si | Endpoints de business, booking settings y business hours disponibles; primer candidato de integracion real. |
 | Auth Google admin | Si con estado mock | PRs 19-20. |
 | Booking publico | Si | PRs 21-24: profile, services, availability, public appointments y cancelacion. |
 
@@ -221,12 +218,12 @@ Dependencias por flujo frontend:
 
 ## Que debe esperar endpoints reales
 
-- Cliente HTTP definitivo.
+- Cliente HTTP, adapters DTO/UI y configuracion CORS/proxy.
 - Auth/session real.
 - Lectura real de agenda diaria.
 - Persistencia real de crear/editar turno.
-- Confirmar, cancelar, completar y no-show.
-- Availability calculada por backend.
+- Contrato final de confirmacion, cancelacion, complete/no-show integrado en agenda.
+- Contrato final de Availability calculada por backend.
 - Reglas reales de staff-service.
 - Reglas reales de solapamiento.
 - Public booking real.
@@ -278,6 +275,8 @@ Para cambios futuros de codigo:
 
 - No asumir que agenda diaria real esta lista hasta que PR 5 / `TURN-41` este cerrado.
 - No asumir auth Google disponible en frontend hasta PRs 19-20.
+- No asumir que los links de navegacion representan rutas implementadas: por ahora solo existe la agenda en `/`.
+- No asumir que booking publico puede conectarse: faltan sus endpoints backend.
 - No asumir booking publico real hasta PRs 21-24.
 - No crear reglas de negocio duplicadas en frontend si el backend debe validarlas.
 - No mezclar booking cliente con admin.
