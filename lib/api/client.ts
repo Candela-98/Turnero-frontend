@@ -1,26 +1,14 @@
-const BFF_BASE_PATH = "/api/backend";
-
-export type ApiErrorBody = {
-  code?: string;
-  details?: unknown;
-  error?: string;
-  message?: string;
-  status?: number;
-};
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export class ApiError extends Error {
-  readonly code: string | undefined;
-  readonly details: unknown;
-
   constructor(
     message: string,
     public readonly status: number,
+    public readonly statusText: string,
     public readonly body: unknown,
   ) {
     super(message);
     this.name = "ApiError";
-    this.code = isApiErrorBody(body) ? body.code : undefined;
-    this.details = isApiErrorBody(body) ? body.details : undefined;
   }
 }
 
@@ -30,22 +18,15 @@ export type ApiRequestOptions = {
   method?: "DELETE" | "GET" | "PATCH" | "POST" | "PUT";
 };
 
-function isApiErrorBody(value: unknown): value is ApiErrorBody {
-  return typeof value === "object" && value !== null;
-}
-
 function buildApiUrl(endpoint: string) {
-  if (!endpoint.startsWith("/api/v1/")) {
-    throw new Error("API endpoints must start with /api/v1/.");
+  if (!API_BASE_URL) {
+    throw new Error("NEXT_PUBLIC_API_BASE_URL is not configured.");
   }
 
-  const parsedEndpoint = new URL(endpoint, "https://turnero.invalid");
+  const normalizedBaseUrl = API_BASE_URL.endsWith("/") ? API_BASE_URL : `${API_BASE_URL}/`;
+  const normalizedEndpoint = endpoint.startsWith("/") ? endpoint.slice(1) : endpoint;
 
-  if (parsedEndpoint.origin !== "https://turnero.invalid" || parsedEndpoint.hash) {
-    throw new Error("API endpoints must be same-origin relative paths.");
-  }
-
-  return `${BFF_BASE_PATH}${parsedEndpoint.pathname}${parsedEndpoint.search}`;
+  return new URL(normalizedEndpoint, normalizedBaseUrl).toString();
 }
 
 async function readResponseBody(response: Response) {
@@ -53,18 +34,15 @@ async function readResponseBody(response: Response) {
     return undefined;
   }
 
+  const contentType = response.headers.get("content-type");
   const text = await response.text();
 
   if (!text) {
     return undefined;
   }
 
-  if (response.headers.get("content-type")?.includes("application/json")) {
-    try {
-      return JSON.parse(text) as unknown;
-    } catch {
-      return text;
-    }
+  if (contentType?.includes("application/json")) {
+    return JSON.parse(text);
   }
 
   return text;
@@ -83,14 +61,16 @@ export async function apiFetch<TResponse>(
     },
     method,
   });
+
   const responseBody = await readResponseBody(response);
 
   if (!response.ok) {
-    const message = isApiErrorBody(responseBody) && responseBody.message
-      ? responseBody.message
-      : `Request failed with status ${response.status}.`;
-
-    throw new ApiError(message, response.status, responseBody);
+    throw new ApiError(
+      `Request failed with status ${response.status}.`,
+      response.status,
+      response.statusText,
+      responseBody,
+    );
   }
 
   return responseBody as TResponse;
