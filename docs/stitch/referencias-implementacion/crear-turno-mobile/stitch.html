@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Crear turno - Barber Studio</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary": "#223999",
+                    "tertiary-fixed-dim": "#4edea3",
+                    "tertiary-fixed": "#6ffbbe",
+                    "on-tertiary-container": "#5debaf",
+                    "on-secondary-fixed-variant": "#384858",
+                    "error-container": "#ffdad6",
+                    "on-error-container": "#93000a",
+                    "surface-variant": "#d3e4fe",
+                    "secondary-fixed-dim": "#b7c8dc",
+                    "on-surface-variant": "#454652",
+                    "surface": "#f8f9ff",
+                    "inverse-on-surface": "#eaf1ff",
+                    "inverse-surface": "#213145",
+                    "on-surface": "#0b1c30",
+                    "on-background": "#0b1c30",
+                    "tertiary": "#004e33",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-fixed-variant": "#273d9d",
+                    "surface-container": "#e5eeff",
+                    "secondary-container": "#d3e4f9",
+                    "surface-container-highest": "#d3e4fe",
+                    "on-primary": "#ffffff",
+                    "outline": "#757684",
+                    "on-tertiary-fixed": "#002113",
+                    "inverse-primary": "#b9c3ff",
+                    "surface-tint": "#4157b6",
+                    "on-secondary-container": "#566677",
+                    "primary-container": "#3d52b2",
+                    "on-error": "#ffffff",
+                    "error": "#ba1a1a",
+                    "on-primary-fixed": "#001257",
+                    "primary-fixed": "#dde1ff",
+                    "secondary": "#506071",
+                    "on-primary-container": "#c8d0ff",
+                    "tertiary-container": "#006846",
+                    "on-tertiary": "#ffffff",
+                    "surface-bright": "#f8f9ff",
+                    "on-tertiary-fixed-variant": "#005236",
+                    "background": "#f8f9ff",
+                    "on-secondary-fixed": "#0c1d2b",
+                    "on-secondary": "#ffffff",
+                    "surface-dim": "#cbdbf5",
+                    "surface-container-high": "#dce9ff",
+                    "outline-variant": "#c5c5d4",
+                    "secondary-fixed": "#d3e4f9",
+                    "primary-fixed-dim": "#b9c3ff",
+                    "surface-container-low": "#eff4ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "display": ["Manrope"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body antialiased min-h-screen flex flex-col">
+<!-- Top Navigation (Admin Header Pattern) -->
+<header class="fixed top-0 w-full z-50 backdrop-blur-xl bg-surface/80 shadow-sm shadow-on-surface/5 flex justify-between items-center px-6 h-16 w-full">
+<button class="flex items-center justify-center text-on-surface-variant p-2 -ml-2 rounded-full hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-2xl">arrow_back</span>
+</button>
+<div class="flex flex-col items-center">
+<span class="font-headline text-lg font-bold text-on-surface">Crear turno</span>
+<span class="font-label text-[10px] font-medium text-on-surface-variant">Martes 28 de abril · 10:15 · Mateo Ruiz</span>
+</div>
+<div class="w-10"></div> <!-- Spacer for centering -->
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 px-4 pt-24 pb-32">
+<!-- Summary Card -->
+<section class="bg-surface-container-lowest rounded-xl p-4 mb-6 shadow-[0_4px_24px_rgba(11,28,48,0.04)] relative overflow-hidden group">
+<div class="flex justify-between items-start mb-2">
+<h2 class="font-headline text-base font-bold text-on-surface">Martes 28 de abril</h2>
+<span class="bg-tertiary-fixed/20 text-on-tertiary-fixed-variant px-2.5 py-1 rounded-full font-label text-xs font-semibold">Horario disponible</span>
+</div>
+<p class="font-body text-sm text-on-surface-variant">10:15 · Mateo Ruiz</p>
+<div class="absolute top-0 left-0 h-full w-1 bg-tertiary-fixed-dim"></div>
+</section>
+<!-- Form Sections -->
+<form class="space-y-6">
+<!-- Cliente -->
+<fieldset class="space-y-3">
+<label class="block font-headline text-sm font-semibold text-on-surface">Cliente</label>
+<div class="bg-surface-container-lowest rounded-xl p-4 flex items-center justify-between border border-outline-variant/15 focus-within:border-primary focus-within:border-b-2 transition-all">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-headline font-bold text-sm">
+                            SM
+                        </div>
+<div>
+<p class="font-body text-sm font-medium text-on-surface">Santiago Moreno</p>
+<p class="font-label text-xs text-on-surface-variant">+54 9 11 2345-6789</p>
+</div>
+</div>
+<button class="text-primary p-2 hover:bg-surface-container-high rounded-full transition-colors" type="button">
+<span class="material-symbols-outlined text-xl">search</span>
+</button>
+</div>
+</fieldset>
+<!-- Servicio -->
+<fieldset class="space-y-3">
+<label class="block font-headline text-sm font-semibold text-on-surface">Servicio</label>
+<div class="bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/15 flex justify-between items-center cursor-pointer hover:bg-surface-container-high/50 transition-colors">
+<div>
+<p class="font-body text-sm font-medium text-on-surface">Corte + barba</p>
+<p class="font-label text-xs text-on-surface-variant">60 min</p>
+</div>
+<div class="text-right">
+<p class="font-body text-sm font-semibold text-primary">$16.500</p>
+<span class="material-symbols-outlined text-on-surface-variant text-sm mt-1">edit</span>
+</div>
+</div>
+</fieldset>
+<!-- Profesional -->
+<fieldset class="space-y-3">
+<label class="block font-headline text-sm font-semibold text-on-surface">Profesional</label>
+<div class="bg-surface-container-lowest rounded-xl p-3 border border-outline-variant/15 flex items-center gap-3">
+<img alt="Profile" class="w-8 h-8 rounded-full object-cover" data-alt="A close-up portrait of a professional barber with a neat beard, looking directly at the camera. The lighting is soft and natural, emphasizing a modern, clean barbershop environment. The overall aesthetic aligns with a premium, slate-toned digital interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBk37gZwvtpTZT2uZZud6Z1P1yA59IdgXZnLi79DaoY7wzDCuFaDPIhcD2XYBVxhKz-Cv64MTZGw8lVJLFBH2JxyZ1zLgiOxVQK7vhnzDN71OeCjGotjQsAYTc7zbPV-4npSMFvSwSgNoPQYTI6ESqi65VmWV6GMBPdKLpq2pIgkFljRJXZGGEl3NE9ma4rrnUJEPW6qVCi2MJk1Jdr06vBOScslBjXsOVJRsuBnN9YRs7nbXWEYLd2oGelifutfezU4BVmVSaCO6jZ"/>
+<p class="font-body text-sm font-medium text-on-surface flex-1">Mateo Ruiz</p>
+<span class="material-symbols-outlined text-primary text-xl">check_circle</span>
+</div>
+</fieldset>
+<!-- Horario -->
+<fieldset class="space-y-3">
+<div class="flex justify-between items-end">
+<label class="block font-headline text-sm font-semibold text-on-surface">Horario</label>
+<span class="font-label text-xs text-on-surface-variant">Otras opciones</span>
+</div>
+<div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+<button class="shrink-0 bg-primary-container text-on-primary-container font-body text-sm font-medium py-2 px-4 rounded-lg" type="button">10:15</button>
+<button class="shrink-0 bg-surface-container-lowest border border-outline-variant/15 text-on-surface font-body text-sm py-2 px-4 rounded-lg hover:bg-surface-container-high transition-colors" type="button">10:30</button>
+<button class="shrink-0 bg-surface-container-lowest border border-outline-variant/15 text-on-surface font-body text-sm py-2 px-4 rounded-lg hover:bg-surface-container-high transition-colors" type="button">10:45</button>
+<button class="shrink-0 bg-surface-container-lowest border border-outline-variant/15 text-on-surface font-body text-sm py-2 px-4 rounded-lg hover:bg-surface-container-high transition-colors" type="button">11:15</button>
+</div>
+</fieldset>
+<!-- Notas -->
+<fieldset class="space-y-3">
+<label class="block font-headline text-sm font-semibold text-on-surface">Notas internas</label>
+<textarea class="w-full bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/15 focus:border-primary focus:ring-0 focus:border-b-2 font-body text-sm text-on-surface placeholder:text-on-surface-variant/60 resize-none h-24 transition-all" placeholder="Agregar nota para el equipo"></textarea>
+</fieldset>
+<!-- Validation -->
+<div class="flex items-center gap-2 bg-tertiary-fixed/10 p-3 rounded-lg">
+<span class="material-symbols-outlined text-tertiary-container text-sm">verified</span>
+<p class="font-label text-xs font-medium text-tertiary-container">Sin conflictos detectados</p>
+</div>
+</form>
+</main>
+<!-- Sticky Footer -->
+<footer class="fixed bottom-0 w-full bg-surface-container-lowest/95 backdrop-blur-md border-t border-outline-variant/10 px-4 py-4 pb-6 z-50">
+<div class="flex justify-between items-center mb-4 px-2">
+<span class="font-body text-sm text-on-surface-variant">Total</span>
+<span class="font-headline text-lg font-bold text-on-surface">$16.500</span>
+</div>
+<div class="flex flex-col gap-3">
+<button class="w-full bg-gradient-to-br from-primary to-primary-container text-on-primary font-headline font-semibold text-base py-3.5 rounded-xl shadow-[0_8px_16px_rgba(34,57,153,0.15)] active:scale-[0.98] transition-transform">
+                Crear turno
+            </button>
+<button class="w-full text-on-surface-variant font-body text-sm font-medium py-2 hover:bg-surface-container-high rounded-lg transition-colors">
+                Cancelar
+            </button>
+</div>
+</footer>
+</body></html>

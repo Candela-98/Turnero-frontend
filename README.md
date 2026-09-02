@@ -1,37 +1,46 @@
-# Barberia Turnos - Frontend
-Frontend de la aplicacion de gestion de turnos para barberoa.
+# Turnero Frontend
 
-Este proyecto forma parte de una aplicacion fullstack desarrollada con:
+Frontend web de Turnero, construido con Next.js. El MVP visual usa Stitch como fuente de diseño para admin, agenda, booking publico y estados principales.
 
-- Backend: Spring Boot (API REST)
-- Frontend: React (en desarrollo)
-- Base de datos: MySQL / H2
-- Arquitectura: REST + separacion por capas
+## Desarrollo
 
----
+Instalar dependencias y levantar el servidor:
 
-## Objetivo del Proyecto
+```bash
+npm run dev
+```
 
-Permitir a los clientes:
+Abrir [http://localhost:3000](http://localhost:3000).
 
-- Registrarse e iniciar sesion
-- Reservar turnos online
-- Cancelar turnos
-- Seleccionar barbero y servicio
+## Documentacion
 
-Permitir al administrador:
+La documentacion frontend vive en `docs/`:
 
-- Gestionar turnos
-- Gestionar servicios
-- Gestionar barberos
-- Visualizar agenda diaria
+- `docs/README.md` - indice de documentacion frontend.
+- `docs/roadmap.md` - roadmap de producto frontend.
+- `docs/decisiones-diseno-mvp.md` - decisiones de producto y diseño.
+- `docs/handoff-implementacion-mvp.md` - guia para implementar UI.
+- `docs/stitch/progreso-stitch.md` - IDs vigentes y estado de pantallas en Stitch.
+- `docs/stitch/workflow-drift-stitch.md` - checklist para detectar drift visual.
+- `docs/referencias/datos-demo.md` - datos demo para pantallas.
 
----
+## Scripts
 
-## Tecnologias
+```bash
+npm run dev
+npm run lint
+npm run typecheck
+npm run test
+npm run build
+npm run start
+npm run test:e2e
+npm run check
+```
 
-- React (Vite)
-- Axios
-- React Router
-- CSS / Tailwind (a definir)
-- Git & GitHub
+## Fuente visual
+
+Proyecto Stitch:
+
+https://stitch.withgoogle.com/projects/10594197106398501653
+
+Las pantallas vigentes estan registradas en `docs/stitch/progreso-stitch.md`.

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Agenda móvil Todos - Refined Consistency</title>
+<!-- Google Fonts: Manrope (Headline/Display) & Inter (Body/Label) -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline": "#757684",
+                        "error": "#ba1a1a",
+                        "on-secondary": "#ffffff",
+                        "tertiary": "#004e33",
+                        "primary-fixed": "#dde1ff",
+                        "on-tertiary-fixed-variant": "#005236",
+                        "on-tertiary": "#ffffff",
+                        "secondary": "#506071",
+                        "background": "#f8f9ff",
+                        "surface-container-low": "#eff4ff",
+                        "on-surface": "#0b1c30",
+                        "inverse-on-surface": "#eaf1ff",
+                        "on-error-container": "#93000a",
+                        "inverse-surface": "#213145",
+                        "surface-bright": "#f8f9ff",
+                        "on-tertiary-container": "#5debaf",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-primary": "#ffffff",
+                        "primary-fixed-dim": "#b9c3ff",
+                        "tertiary-fixed": "#6ffbbe",
+                        "tertiary-container": "#006846",
+                        "on-surface-variant": "#454652",
+                        "inverse-primary": "#b9c3ff",
+                        "surface-dim": "#cbdbf5",
+                        "tertiary-fixed-dim": "#4edea3",
+                        "surface-tint": "#4157b6",
+                        "surface": "#f8f9ff",
+                        "surface-container": "#e5eeff",
+                        "on-secondary-fixed-variant": "#384858",
+                        "outline-variant": "#c5c5d4",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed": "#002113",
+                        "primary": "#223999",
+                        "on-primary-fixed": "#001257",
+                        "on-secondary-container": "#566677",
+                        "on-primary-fixed-variant": "#273d9d",
+                        "secondary-fixed-dim": "#b7c8dc",
+                        "on-primary-container": "#c8d0ff",
+                        "primary-container": "#3d52b2",
+                        "on-background": "#0b1c30",
+                        "surface-variant": "#d3e4fe",
+                        "on-secondary-fixed": "#0c1d2b",
+                        "secondary-fixed": "#d3e4f9",
+                        "surface-container-high": "#dce9ff",
+                        "surface-container-lowest": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "secondary-container": "#d3e4f9"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "display": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, h4, h5, h6, .font-headline { font-family: 'Manrope', sans-serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface antialiased min-h-screen flex flex-col pb-32 selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- TopAppBar -->
+<header class="docked full-width top-0 z-50 fixed w-full bg-surface-container-lowest/90 backdrop-blur-xl flex justify-between items-center px-6 py-3 border-b border-outline-variant/30">
+<div class="flex items-center gap-3"><div class="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-primary to-primary-container flex items-center justify-center text-on-primary font-headline font-bold text-lg shadow-sm">BS</div><div class="flex flex-col"><h1 class="font-headline text-lg font-black leading-tight text-primary">Barber Studio</h1><span class="text-xs font-body text-on-surface-variant font-medium">Agenda de hoy</span></div></div>
+<!-- Right Actions -->
+<div class="flex items-center gap-2">
+<button class="relative text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-95 duration-200 p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-95 duration-200 p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+<img alt="Profile" class="w-8 h-8 rounded-full object-cover ml-1" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDiYdNHP0VIuTCB3jmDB11oWZ90oDlYxNWg4WcZGDJ5-9y2nNSeOrl2YvrKy-FlGmaKooWVcY3m3rQ4G7AXU1edtbMokQ2vz-CFYGwn1fFf8QIV-AMmuymbUKsCY88Ek-wG7sbXB5WFO-BZOpGwb7sEyrM2DwcJ4DJBqad71imoMwvYWK3JAEwIX_lLxqNz_2K0XszB7e41b3lt8KEabHwMTlgMRWDmNWWSbDPNKDpc8NNV7kJIMuULigmRmWj8kXbPJsGo43UMwG4M"/>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 pt-24 px-4 max-w-2xl mx-auto w-full">
+<!-- Context Header -->
+<section class="mb-6 px-2">
+<!-- Date Row -->
+<div class="flex items-center gap-4 px-6 py-4">
+<button class="p-2 rounded-lg bg-surface-container-low text-primary hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<span class="font-headline text-lg font-bold text-on-surface flex-1">
+    Hoy, Martes 28 de abril
+  </span>
+<button class="p-2 rounded-lg bg-surface-container-low text-primary hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+<button class="p-2 rounded-lg bg-surface-container-low text-primary hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">calendar_today</span>
+</button>
+</div>
+<!-- Filters (Chips) -->
+<div class="flex gap-2 pb-2 scrollbar-hide -mx-2 px-2"><div class="flex flex-col gap-4 w-full">
+<div class="flex flex-col gap-2">
+<span class="font-label text-xs font-medium text-on-surface-variant/80 px-2">Profesionales</span>
+<div class="flex flex-wrap gap-2 px-2">
+<button class="px-4 py-1.5 rounded-full bg-primary-fixed text-on-primary-fixed font-label text-sm font-medium transition-colors">Todos</button>
+<button class="px-4 py-1.5 rounded-full bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high font-label text-sm font-medium transition-colors">Mateo</button>
+<button class="px-4 py-1.5 rounded-full bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high font-label text-sm font-medium transition-colors">Lucas</button>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<span class="font-label text-xs font-medium text-on-surface-variant/80 px-2">Estados</span>
+<div class="flex flex-wrap gap-2 px-2">
+<button class="px-4 py-1.5 rounded-full bg-primary-fixed text-on-primary-fixed font-label text-sm font-medium transition-colors">Todos</button>
+<button class="px-4 py-1.5 rounded-full bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high font-label text-sm font-medium transition-colors">Pendientes</button>
+<button class="px-4 py-1.5 rounded-full bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high font-label text-sm font-medium transition-colors">Confirmados</button>
+</div>
+</div>
+</div></div>
+<!-- Operational Summary -->
+<div class="flex gap-4 mt-2 px-2 text-sm font-label text-on-surface-variant"><span>8 turnos</span><span>•</span><span>2 pendientes</span><span>•</span><span>3 disponibles</span></div>
+</section>
+<!-- Time Blocks -->
+<section class="flex flex-col gap-6 pb-32 px-2">
+<!-- 09:30 Block -->
+<div class="flex gap-6">
+<div class="font-headline font-bold text-lg text-on-surface w-14 shrink-0 pt-1">09:30</div>
+<div class="flex flex-col gap-3 flex-1"><!-- Card 1: Santiago Moreno -->
+<article class="bg-surface-container-lowest rounded-lg p-4 pl-5 shadow-sm relative overflow-hidden flex flex-col gap-2">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-tertiary-fixed-dim rounded-l-lg"></div>
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-headline font-semibold text-on-surface font-bold text-lg">Santiago Moreno</h3>
+<p class="font-body text-sm text-on-surface-variant mt-0.5">Corte + barba <span class="mx-1 text-outline-variant">|</span> Mateo Ruiz</p>
+</div>
+<span class="inline-flex items-center px-2 py-0.5 rounded-md bg-tertiary-fixed/20 text-on-tertiary-fixed-variant font-label text-xs font-medium shrink-0">Confirmado</span>
+</div>
+<div class="flex justify-end gap-2 mt-1">
+<button class="w-9 h-9 rounded-lg flex items-center justify-center text-primary bg-surface-container-low hover:bg-surface-container-high transition-colors"><span class="material-symbols-outlined text-[20px]">chat_bubble</span></button>
+<button class="w-9 h-9 rounded-lg flex items-center justify-center text-on-surface-variant bg-surface-container-low hover:bg-surface-container-high transition-colors"><span class="material-symbols-outlined text-[20px]">edit</span></button>
+</div>
+</article>
+<!-- Card 2: Diego Alvarez -->
+<article class="bg-surface-container-lowest rounded-lg p-4 pl-5 shadow-sm relative overflow-hidden flex flex-col gap-2">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-tertiary-fixed-dim rounded-l-lg"></div>
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-headline font-semibold text-on-surface font-bold text-lg">Diego Alvarez</h3>
+<p class="font-body text-sm text-on-surface-variant mt-0.5">Corte clásico <span class="mx-1 text-outline-variant">|</span> Lucas Ferrer</p>
+</div>
+<span class="inline-flex items-center px-2 py-0.5 rounded-md bg-tertiary-fixed/20 text-on-tertiary-fixed-variant font-label text-xs font-medium shrink-0">Confirmado</span>
+</div>
+<div class="flex justify-end gap-2 mt-1">
+<button class="w-9 h-9 rounded-lg flex items-center justify-center text-primary bg-surface-container-low hover:bg-surface-container-high transition-colors"><span class="material-symbols-outlined text-[20px]">chat_bubble</span></button>
+<button class="w-9 h-9 rounded-lg flex items-center justify-center text-on-surface-variant bg-surface-container-low hover:bg-surface-container-high transition-colors"><span class="material-symbols-outlined text-[20px]">edit</span></button>
+</div>
+</article></div>
+</div>
+<!-- 10:15 Block -->
+<div class="flex gap-6">
+<div class="font-headline font-bold text-lg text-on-surface w-14 shrink-0 pt-1">10:15</div>
+<div class="flex flex-col gap-3 flex-1">
+<!-- Card 1 -->
+<article class="bg-surface-container-lowest rounded-lg p-4 pl-5 shadow-sm relative overflow-hidden flex flex-col gap-2">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary-fixed-dim rounded-l-lg"></div>
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-headline font-semibold text-on-surface font-bold text-lg">Nicolas Vega</h3>
+<p class="font-body text-sm text-on-surface-variant mt-0.5">Corte clásico <span class="mx-1 text-outline-variant">|</span> Lucas Ferrer</p>
+<div class="mt-2 flex items-center gap-1 text-xs font-body text-on-surface-variant bg-surface-container-low px-2 py-1 rounded-md inline-flex w-fit">
+<span class="material-symbols-outlined text-[14px]">info</span> Confirmar por WhatsApp
+      </div>
+</div>
+<span class="inline-flex items-center px-2 py-0.5 rounded-md bg-primary-fixed/40 text-primary font-label text-xs font-medium shrink-0">Pendiente</span>
+</div>
+<div class="flex justify-end gap-2 mt-1">
+<button class="w-9 h-9 rounded-lg flex items-center justify-center text-primary bg-surface-container-low hover:bg-surface-container-high transition-colors"><span class="material-symbols-outlined text-[20px]">chat_bubble</span></button>
+<button class="px-3 h-9 rounded-lg flex items-center justify-center gap-1.5 text-on-primary bg-primary hover:bg-primary-container transition-colors font-label text-xs font-medium"><span class="material-symbols-outlined text-[18px]">check_circle</span> Confirmar</button>
+<button class="w-9 h-9 rounded-lg flex items-center justify-center text-on-surface-variant bg-surface-container-low hover:bg-surface-container-high transition-colors"><span class="material-symbols-outlined text-[20px]">edit</span></button>
+</div>
+</article>
+<!-- Card 2 -->
+<article class="flex-1 flex items-center justify-between p-4 rounded-xl border-2 border-dashed border-outline-variant/50 bg-surface-container-low/30 hover:bg-surface-container-low transition-colors cursor-pointer group">
+<div class="flex flex-col">
+<h3 class="font-headline font-bold text-on-surface text-base">Disponible</h3>
+<p class="font-body text-sm text-on-surface-variant">30 min</p>
+</div>
+<button class="flex items-center gap-1.5 text-primary font-label text-sm font-semibold">
+<span class="material-symbols-outlined text-[20px]">add_circle</span>
+    Crear turno
+  </button>
+</article>
+</div>
+</div>
+<!-- 11:00 Block -->
+<div class="flex gap-6">
+<div class="font-headline font-bold text-lg text-on-surface w-14 shrink-0 pt-1">11:00</div>
+<div class="flex flex-col gap-3 flex-1">
+<!-- Card 1 -->
+<article class="bg-surface-container-lowest rounded-lg p-4 pl-5 shadow-sm relative overflow-hidden flex flex-col gap-2">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-tertiary-fixed-dim rounded-l-lg"></div>
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-headline font-semibold text-on-surface font-bold text-lg">Santiago Moreno</h3>
+<p class="font-body text-sm text-on-surface-variant mt-0.5">Corte + barba <span class="mx-1 text-outline-variant">|</span> Mateo Ruiz</p>
+</div>
+<span class="inline-flex items-center px-2 py-0.5 rounded-md bg-tertiary-fixed/20 text-on-tertiary-fixed-variant font-label text-xs font-medium shrink-0">Confirmado</span>
+</div>
+<div class="flex justify-end gap-2 mt-1">
+<button class="w-9 h-9 rounded-lg flex items-center justify-center text-primary bg-surface-container-low hover:bg-surface-container-high transition-colors"><span class="material-symbols-outlined text-[20px]">chat_bubble</span></button>
+<button class="w-9 h-9 rounded-lg flex items-center justify-center text-on-surface-variant bg-surface-container-low hover:bg-surface-container-high transition-colors"><span class="material-symbols-outlined text-[20px]">edit</span></button>
+</div>
+</article>
+<!-- Card 2 -->
+<article class="bg-transparent py-1 px-1 flex flex-col justify-center"><h3 class="font-headline font-bold text-on-surface-variant/60 text-sm">Lucas Ferrer</h3><p class="font-body text-xs text-on-surface-variant/50 italic">Ocupado hasta 11:45</p></article>
+</div>
+</div>
+<!-- 12:30 Block -->
+<div class="flex gap-6">
+<div class="font-headline font-bold text-lg text-on-surface w-14 shrink-0 pt-1">12:30</div>
+<div class="flex flex-col gap-3 flex-1">
+<!-- Card 1 -->
+<article class="flex-1 flex items-center justify-between p-4 rounded-xl border-2 border-dashed border-outline-variant/50 bg-surface-container-low/30 hover:bg-surface-container-low transition-colors cursor-pointer group">
+<div class="flex flex-col">
+<h3 class="font-headline font-bold text-on-surface text-base">Disponible</h3>
+<p class="font-body text-sm text-on-surface-variant">30 min</p>
+</div>
+<button class="flex items-center gap-1.5 text-primary font-label text-sm font-semibold">
+<span class="material-symbols-outlined text-[20px]">add_circle</span>
+    Crear turno
+  </button>
+</article>
+</div>
+</div>
+<!-- 15:30 Block -->
+<div class="flex gap-6">
+<div class="font-headline font-bold text-lg text-on-surface w-14 shrink-0 pt-1">15:30</div>
+<div class="flex flex-col gap-3 flex-1">
+<!-- Card 1 -->
+<article class="bg-surface-container-lowest rounded-lg p-4 pl-5 shadow-sm relative overflow-hidden flex flex-col gap-2">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-tertiary-fixed-dim rounded-l-lg"></div>
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-headline font-semibold text-on-surface font-bold text-lg">Santiago Moreno</h3>
+<p class="font-body text-sm text-on-surface-variant mt-0.5">Corte + barba <span class="mx-1 text-outline-variant">|</span> Mateo Ruiz</p>
+</div>
+<span class="inline-flex items-center px-2 py-0.5 rounded-md bg-tertiary-fixed/20 text-on-tertiary-fixed-variant font-label text-xs font-medium shrink-0">Confirmado</span>
+</div>
+<div class="flex justify-end gap-2 mt-1">
+<button class="w-9 h-9 rounded-lg flex items-center justify-center text-primary bg-surface-container-low hover:bg-surface-container-high transition-colors"><span class="material-symbols-outlined text-[20px]">chat_bubble</span></button>
+<button class="w-9 h-9 rounded-lg flex items-center justify-center text-on-surface-variant bg-surface-container-low hover:bg-surface-container-high transition-colors"><span class="material-symbols-outlined text-[20px]">edit</span></button>
+</div>
+</article>
+<!-- Card 2 -->
+<article class="flex-1 flex items-center justify-between p-4 rounded-xl border-2 border-dashed border-outline-variant/50 bg-surface-container-low/30 hover:bg-surface-container-low transition-colors cursor-pointer group">
+<div class="flex flex-col">
+<h3 class="font-headline font-bold text-on-surface text-base">Disponible</h3>
+<p class="font-body text-sm text-on-surface-variant">30 min</p>
+</div>
+<button class="flex items-center gap-1.5 text-primary font-label text-sm font-semibold">
+<span class="material-symbols-outlined text-[20px]">add_circle</span>
+    Crear turno
+  </button>
+</article>
+</div>
+</div>
+</section>
+</main>
+<!-- Sticky Action Button -->
+<div class="fixed bottom-[88px] left-0 w-full px-4 z-40 bg-gradient-to-t from-surface via-surface/90 to-transparent pt-8 pb-4">
+<button class="w-full max-w-2xl mx-auto h-14 text-on-primary rounded-xl flex items-center justify-center gap-2 font-label font-bold text-lg shadow-lg hover:shadow-xl active:scale-95 transition-all bg-gradient-to-br from-primary to-primary-container">
+<span class="material-symbols-outlined">add</span>
+        Nuevo turno
+    </button>
+</div>
+<!-- BottomNavBar (Shared Component) -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-2 pt-3 pb-6 bg-surface border-t border-outline-variant/30 z-50 md:hidden">
+<!-- Active: Agenda -->
+<button class="flex flex-col items-center justify-center text-primary px-4 py-1.5 bg-surface-container-low rounded-xl transition-all active:scale-95">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">calendar_today</span>
+<span class="font-label text-xs font-medium">Agenda</span>
+</button>
+<!-- Inactive: Clientes -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant/80 px-4 py-1.5 transition-all active:scale-95 hover:text-primary">
+<span class="material-symbols-outlined mb-1">group</span>
+<span class="font-label text-xs font-medium">Clientes</span>
+</button>
+<!-- Inactive: Servicios -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant/80 px-4 py-1.5 transition-all active:scale-95 hover:text-primary">
+<span class="material-symbols-outlined mb-1">content_cut</span>
+<span class="font-label text-xs font-medium">Servicios</span>
+</button>
+<!-- Inactive: Más -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant/80 px-4 py-1.5 transition-all active:scale-95 hover:text-primary">
+<span class="material-symbols-outlined mb-1">more_horiz</span>
+<span class="font-label text-xs font-medium">Más</span>
+</button>
+</nav>
+</body></html>
