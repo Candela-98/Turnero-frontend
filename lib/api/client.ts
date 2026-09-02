@@ -1,5 +1,3 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-
 export class ApiError extends Error {
   constructor(
     message: string,
@@ -19,11 +17,13 @@ export type ApiRequestOptions = {
 };
 
 function buildApiUrl(endpoint: string) {
-  if (!API_BASE_URL) {
+  const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+  if (!apiBaseUrl) {
     throw new Error("NEXT_PUBLIC_API_BASE_URL is not configured.");
   }
 
-  const normalizedBaseUrl = API_BASE_URL.endsWith("/") ? API_BASE_URL : `${API_BASE_URL}/`;
+  const normalizedBaseUrl = apiBaseUrl.endsWith("/") ? apiBaseUrl : `${apiBaseUrl}/`;
   const normalizedEndpoint = endpoint.startsWith("/") ? endpoint.slice(1) : endpoint;
 
   return new URL(normalizedEndpoint, normalizedBaseUrl).toString();
