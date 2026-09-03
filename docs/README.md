@@ -16,11 +16,12 @@ Este archivo es el indice de documentacion frontend. No reemplaza a los document
 ### Para implementar pantallas
 
 1. `tracking-implementacion-mvp.md`
-2. `roadmap.md`
-3. `handoff-implementacion-mvp.md`
-4. `decisiones-diseno-mvp.md`
-5. `stitch/progreso-stitch.md`
-6. `../Turnero-api/docs/mvp/tracking-implementacion-mvp.md` para saber que endpoints backend ya estan disponibles.
+2. `integracion-api-mvp.md` si la pantalla consume backend.
+3. `roadmap.md`
+4. `handoff-implementacion-mvp.md`
+5. `decisiones-diseno-mvp.md`
+6. `stitch/progreso-stitch.md`
+7. `../../Turnero-api/docs/mvp/tracking-implementacion-mvp.md` para saber que endpoints backend ya estan disponibles.
 
 ### Para trabajar con Stitch
 
@@ -73,6 +74,15 @@ Fuente para avance real frontend:
 - Dependencias concretas con backend.
 - Que puede hacerse con mocks.
 - Que debe esperar endpoints reales.
+
+### `integracion-api-mvp.md`
+
+Fuente para arquitectura de integración:
+
+- BFF/proxy same-origin de Next.
+- Cliente HTTP, cookies y sesión.
+- Errores y adapters DTO/UI.
+- Server state, fechas y criterios de Ready.
 
 ### `stitch/progreso-stitch.md`
 

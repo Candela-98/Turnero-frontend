@@ -18,6 +18,7 @@ La documentacion frontend vive en `docs/`:
 
 - `docs/README.md` - indice de documentacion frontend.
 - `docs/roadmap.md` - roadmap de producto frontend.
+- `docs/integracion-api-mvp.md` - arquitectura de integracion con Turnero API.
 - `docs/decisiones-diseno-mvp.md` - decisiones de producto y diseño.
 - `docs/handoff-implementacion-mvp.md` - guia para implementar UI.
 - `docs/stitch/progreso-stitch.md` - IDs vigentes y estado de pantallas en Stitch.
