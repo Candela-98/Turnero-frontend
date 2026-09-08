@@ -1,6 +1,6 @@
 # Integración API Frontend MVP
 
-Actualizado: 2026-09-03
+Actualizado: 2026-09-08
 
 ## Propósito
 
@@ -33,9 +33,16 @@ El proxy acepta únicamente rutas conocidas bajo `/api/v1`; no recibe hosts o UR
 - Aplicar timeouts y convertir fallos de red a un error frontend normalizado.
 - No registrar cookies, ID tokens ni bodies sensibles.
 
+Implementacion base de TURN-97:
+
+- El BFF vive bajo `/api/backend/[...path]` y solo permite rutas y metodos registrados del contrato `/api/v1`; nunca acepta un host, URL o destino elegido por el navegador.
+- Reenvia `Accept`, `Content-Type`, `Cookie` y `User-Agent`; conserva `Content-Type`, `Cache-Control`, `X-Request-Id` y cada `Set-Cookie` de la respuesta upstream.
+- Toda request upstream usa `cache: "no-store"` y un timeout de 10 segundos.
+- Si el upstream no esta configurado o no responde, el BFF devuelve errores JSON comunes `UPSTREAM_UNAVAILABLE` (`502`) o `UPSTREAM_TIMEOUT` (`504`) sin exponer configuracion interna.
+
 ## Cliente HTTP frontend
 
-La UI consume un único cliente tipado sobre `/api/backend`, no usa `fetch` directo en cada pantalla.
+La UI consume un unico cliente tipado sobre `/api/backend`, no usa `fetch` directo en cada pantalla. El cliente solo acepta endpoints relativos bajo `/api/v1/`, por lo que no puede recibir una URL externa ni acceder al backend sin pasar por el BFF.
 
 El cliente debe:
 
