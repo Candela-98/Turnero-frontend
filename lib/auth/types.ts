@@ -1,15 +1,20 @@
-export type UserRole = "OWNER" | "ADMIN" | "RECEPTIONIST" | "STAFF" | "CUSTOMER";
+export type UserRole = "OWNER";
 
-export type AuthMeResponse = {
-  userId: number;
+export type AuthUser = {
+  id: number;
   name: string;
   email: string;
   role: UserRole;
-  businessId: number;
-  businessName: string;
-  businessSlug: string;
+  avatar_url: string | null;
 };
 
-export type LoginWithGoogleRequest = {
-  idToken: string;
+export type AuthBusiness = {
+  id: number;
+  name: string;
+  slug: string;
+  onboarding_status: string;
 };
+
+export type AuthSession = { user: AuthUser; business: AuthBusiness };
+
+export type LoginWithGoogleRequest = { id_token: string };

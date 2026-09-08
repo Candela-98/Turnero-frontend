@@ -1,6 +1,7 @@
 import { Bell, CircleHelp } from "lucide-react";
 
-import { Avatar, IconButton } from "@/components/ui";
+import { IconButton } from "@/components/ui";
+import { AccountMenu } from "@/components/auth";
 import { cn } from "@/lib/utils";
 
 import { BrandMark } from "./brand-mark";
@@ -8,15 +9,11 @@ import { BrandMark } from "./brand-mark";
 export type AdminMobileHeaderProps = {
   className?: string;
   subtitle: string;
-  userInitials?: string;
-  userName?: string;
 };
 
 export function AdminMobileHeader({
   className,
   subtitle,
-  userInitials = "MR",
-  userName = "Mateo Ruiz",
 }: AdminMobileHeaderProps) {
   return (
     <header
@@ -33,7 +30,7 @@ export function AdminMobileHeader({
         <IconButton label="Ayuda" size="sm" variant="ghost">
           <CircleHelp />
         </IconButton>
-        <Avatar initials={userInitials} name={userName} size="sm" />
+        <AccountMenu />
       </div>
     </header>
   );

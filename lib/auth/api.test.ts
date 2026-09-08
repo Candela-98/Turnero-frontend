@@ -1,27 +1,29 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { getCurrentUser, loginWithGoogle } from "./api";
+import { getCurrentUser, loginWithGoogle, logout } from "./api";
 
 describe("auth api", () => {
   afterEach(() => {
     vi.restoreAllMocks();
-    vi.unstubAllEnvs();
   });
 
-  it("logs in with Google by sending the idToken and accepting an empty body", async () => {
-    vi.stubEnv("NEXT_PUBLIC_API_BASE_URL", "https://api.turnero.test");
+  it("logs in with Google by sending id_token and receiving a session", async () => {
+    const session = {
+      business: { id: 10, name: "Barber Studio", onboarding_status: "COMPLETED", slug: "barber-studio" },
+      user: { avatar_url: null, email: "juan@example.com", id: 1, name: "Juan Perez", role: "OWNER" as const },
+    };
     const fetchMock = vi.fn().mockResolvedValue(
-      new Response("", {
+        new Response(JSON.stringify(session), {
         headers: { "Content-Type": "application/json" },
         status: 200,
       }),
     );
     vi.stubGlobal("fetch", fetchMock);
 
-    await expect(loginWithGoogle("google-id-token")).resolves.toBeUndefined();
+    await expect(loginWithGoogle("google-id-token")).resolves.toEqual(session);
 
-    expect(fetchMock).toHaveBeenCalledWith("https://api.turnero.test/api/v1/auth/google", {
-      body: JSON.stringify({ idToken: "google-id-token" }),
+    expect(fetchMock).toHaveBeenCalledWith("/api/backend/api/v1/auth/google", {
+      body: JSON.stringify({ id_token: "google-id-token" }),
       credentials: "include",
       headers: { "Content-Type": "application/json" },
       method: "POST",
@@ -29,15 +31,9 @@ describe("auth api", () => {
   });
 
   it("returns the authenticated user from /auth/me", async () => {
-    vi.stubEnv("NEXT_PUBLIC_API_BASE_URL", "https://api.turnero.test");
     const currentUser = {
-      businessId: 10,
-      businessName: "Barber Studio",
-      businessSlug: "barber-studio",
-      email: "juan@example.com",
-      name: "Juan Perez",
-      role: "ADMIN",
-      userId: 1,
+      business: { id: 10, name: "Barber Studio", onboarding_status: "COMPLETED", slug: "barber-studio" },
+      user: { avatar_url: null, email: "juan@example.com", id: 1, name: "Juan Perez", role: "OWNER" },
     };
     vi.stubGlobal(
       "fetch",
@@ -53,7 +49,6 @@ describe("auth api", () => {
   });
 
   it("rejects when the session is invalid or expired", async () => {
-    vi.stubEnv("NEXT_PUBLIC_API_BASE_URL", "https://api.turnero.test");
     vi.stubGlobal(
       "fetch",
       vi.fn().mockResolvedValue(
@@ -67,5 +62,10 @@ describe("auth api", () => {
     await expect(getCurrentUser()).rejects.toMatchObject({
       status: 401,
     });
+  });
+
+  it("accepts logout with an empty 204 response", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(null, { status: 204 })));
+    await expect(logout()).resolves.toBeUndefined();
   });
 });

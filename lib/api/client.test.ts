@@ -1,66 +1,65 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { apiFetch, ApiError } from "./client";
+import { apiFetch } from "./client";
+
+const originalFetch = global.fetch;
+
+afterEach(() => {
+  global.fetch = originalFetch;
+});
 
 describe("apiFetch", () => {
-  afterEach(() => {
-    vi.restoreAllMocks();
-    vi.unstubAllEnvs();
-  });
-
-  it("uses the configured backend URL and includes credentials", async () => {
-    vi.stubEnv("NEXT_PUBLIC_API_BASE_URL", "https://api.turnero.test");
+  it("uses the same-origin BFF and includes credentials", async () => {
     const fetchMock = vi.fn().mockResolvedValue(
-      new Response(JSON.stringify({ ok: true }), {
-        headers: { "Content-Type": "application/json" },
-        status: 200,
+      new Response(JSON.stringify({ data: [] }), {
+        headers: { "content-type": "application/json" },
       }),
     );
-    vi.stubGlobal("fetch", fetchMock);
+    global.fetch = fetchMock;
 
-    const result = await apiFetch<{ ok: boolean }>("/api/v1/auth/me");
+    const response = await apiFetch<{ data: unknown[] }>("/api/v1/customers?page=0", {
+      body: { name: "Ana" },
+      method: "POST",
+    });
 
-    expect(result).toEqual({ ok: true });
-    expect(fetchMock).toHaveBeenCalledWith("https://api.turnero.test/api/v1/auth/me", {
-      body: undefined,
+    expect(response).toEqual({ data: [] });
+    expect(fetchMock).toHaveBeenCalledWith("/api/backend/api/v1/customers?page=0", {
+      body: JSON.stringify({ name: "Ana" }),
       credentials: "include",
-      headers: {},
-      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      method: "POST",
     });
   });
 
-  it("returns undefined for an empty successful JSON response", async () => {
-    vi.stubEnv("NEXT_PUBLIC_API_BASE_URL", "https://api.turnero.test");
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockResolvedValue(
-        new Response("", {
-          headers: { "Content-Type": "application/json" },
-          status: 200,
-        }),
-      ),
-    );
+  it("returns undefined for successful empty responses", async () => {
+    global.fetch = vi.fn().mockResolvedValue(new Response(null, { status: 204 }));
 
-    await expect(apiFetch<void>("/api/v1/auth/google", { method: "POST" })).resolves.toBeUndefined();
+    await expect(apiFetch<void>("/api/v1/auth/logout", { method: "POST" })).resolves.toBeUndefined();
   });
 
-  it("throws ApiError for unsuccessful responses", async () => {
-    vi.stubEnv("NEXT_PUBLIC_API_BASE_URL", "https://api.turnero.test");
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockResolvedValue(
-        new Response(JSON.stringify({ message: "Invalid session" }), {
-          headers: { "Content-Type": "application/json" },
-          status: 401,
-          statusText: "Unauthorized",
-        }),
+  it("exposes normalized API errors", async () => {
+    global.fetch = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({ code: "UPSTREAM_TIMEOUT", details: [], message: "Intenta nuevamente." }),
+        { headers: { "content-type": "application/json" }, status: 504 },
       ),
     );
 
     await expect(apiFetch("/api/v1/auth/me")).rejects.toMatchObject({
-      body: { message: "Invalid session" },
-      status: 401,
-      statusText: "Unauthorized",
-    } satisfies Partial<ApiError>);
+      code: "UPSTREAM_TIMEOUT",
+      details: [],
+      message: "Intenta nuevamente.",
+      status: 504,
+    });
+  });
+
+  it("rejects endpoints outside the API namespace or absolute URLs", async () => {
+    await expect(apiFetch("/api/backend/api/v1/auth/me")).rejects.toThrow(
+      "/api/v1/",
+    );
+    await expect(apiFetch("https://example.com/api/v1/auth/me")).rejects.toThrow(
+      "/api/v1/",
+    );
+    await expect(apiFetch("/api/v1/auth/me#fragment")).rejects.toThrow("same-origin");
   });
 });

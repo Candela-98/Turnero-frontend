@@ -3,11 +3,11 @@
 import type { ReactNode } from "react";
 
 import { LoginPage } from "@/components/auth/login-page";
-import { InlineAlert, Skeleton } from "@/components/ui";
+import { Button, InlineAlert, Skeleton } from "@/components/ui";
 import { useAuth } from "@/components/auth/auth-provider";
 
 export function ProtectedAdmin({ children }: { children: ReactNode }) {
-  const { error, status } = useAuth();
+  const { error, refreshUser, status } = useAuth();
 
   if (status === "loading") {
     return (
@@ -25,11 +25,24 @@ export function ProtectedAdmin({ children }: { children: ReactNode }) {
     return <LoginPage />;
   }
 
+  if (status === "forbidden") {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-surface px-5 py-10 text-on-surface">
+        <section className="w-full max-w-md">
+          <InlineAlert tone="error">{error}</InlineAlert>
+        </section>
+      </main>
+    );
+  }
+
   if (status === "error") {
     return (
       <main className="flex min-h-screen items-center justify-center bg-surface px-5 py-10 text-on-surface">
         <section className="w-full max-w-md">
           <InlineAlert tone="error">{error}</InlineAlert>
+          <Button className="mt-4" onClick={() => void refreshUser()}>
+            Reintentar
+          </Button>
         </section>
       </main>
     );

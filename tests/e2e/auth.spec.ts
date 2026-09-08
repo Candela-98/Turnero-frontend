@@ -1,18 +1,14 @@
 import { expect, test } from "@playwright/test";
 
 const apiBaseUrl = "http://127.0.0.1:3000";
-const authGoogleUrl = `${apiBaseUrl}/api/v1/auth/google`;
-const authMeUrl = `${apiBaseUrl}/api/v1/auth/me`;
+const authGoogleUrl = `${apiBaseUrl}/api/backend/api/v1/auth/google`;
+const authMeUrl = `${apiBaseUrl}/api/backend/api/v1/auth/me`;
+const authLogoutUrl = `${apiBaseUrl}/api/backend/api/v1/auth/logout`;
 const googleScriptUrl = "https://accounts.google.com/gsi/client";
 
 const currentUser = {
-  businessId: 10,
-  businessName: "Barber Studio",
-  businessSlug: "barber-studio",
-  email: "juan@example.com",
-  name: "Juan Perez",
-  role: "ADMIN",
-  userId: 1,
+  business: { id: 10, name: "Barber Studio", onboarding_status: "COMPLETED", slug: "barber-studio" },
+  user: { avatar_url: null, email: "juan@example.com", id: 1, name: "Juan Perez", role: "OWNER" },
 };
 
 test.describe("admin authentication", () => {
@@ -88,13 +84,14 @@ test.describe("admin authentication", () => {
 
     await page.route(authGoogleUrl, async (route) => {
       expect(route.request().method()).toBe("POST");
-      expect(route.request().postDataJSON()).toEqual({ idToken: "google-id-token" });
+      expect(route.request().postDataJSON()).toEqual({ id_token: "google-id-token" });
 
       await route.fulfill({
-        body: "",
+        contentType: "application/json",
         headers: {
           "Set-Cookie": "turnero_session=test-session; HttpOnly; Path=/",
         },
+        json: currentUser,
         status: 200,
       });
     });
@@ -133,5 +130,34 @@ test.describe("admin authentication", () => {
     }
 
     await expect(page.getByRole("banner").getByTitle("Juan Perez")).toBeVisible();
+  });
+
+  test("shows access denied without clearing a forbidden session", async ({ page }) => {
+    await page.route(authMeUrl, (route) => route.fulfill({ contentType: "application/json", json: { message: "Forbidden" }, status: 403 }));
+    await page.goto("/");
+    await expect(page.getByText("Tu usuario no tiene acceso al panel administrativo")).toBeVisible();
+  });
+
+  test("offers retry after a network failure", async ({ page }, testInfo) => {
+    let attempts = 0;
+    await page.route(authMeUrl, async (route) => {
+      attempts += 1;
+      if (attempts === 1) { await route.abort("failed"); return; }
+      await route.fulfill({ contentType: "application/json", json: currentUser, status: 200 });
+    });
+    await page.goto("/");
+    await expect(page.getByRole("button", { name: "Reintentar" })).toBeVisible();
+    await page.getByRole("button", { name: "Reintentar" }).click();
+    await expect(testInfo.project.name === "mobile" ? page.getByText("Agenda de hoy") : page.getByRole("heading", { name: "Agenda" })).toBeVisible();
+  });
+
+  test("logs out and returns to login even when logout reports an expired session", async ({ page }) => {
+    await page.route(authMeUrl, (route) => route.fulfill({ contentType: "application/json", json: currentUser, status: 200 }));
+    await page.route(authLogoutUrl, (route) => route.fulfill({ contentType: "application/json", json: { message: "Expired" }, status: 401 }));
+    await page.goto("/");
+    await page.getByRole("button", { name: "Abrir menú de cuenta" }).click();
+    await page.getByRole("menuitem", { name: "Cerrar sesión" }).click();
+    await expect(page).toHaveURL(/\/login$/);
+    await expect(page.getByRole("heading", { name: "Ingresar al panel" })).toBeVisible();
   });
 });

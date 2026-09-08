@@ -4,6 +4,10 @@ export function isUnauthorizedError(error: unknown) {
   return error instanceof ApiError && error.status === 401;
 }
 
+export function isForbiddenError(error: unknown) {
+  return error instanceof ApiError && error.status === 403;
+}
+
 export function getAuthErrorMessage(error: unknown) {
   if (error instanceof ApiError) {
     if (error.status === 401) {
@@ -17,9 +21,5 @@ export function getAuthErrorMessage(error: unknown) {
     return "No pudimos conectar con Turnero. Intentá nuevamente en unos segundos.";
   }
 
-  if (error instanceof Error && error.message === "NEXT_PUBLIC_API_BASE_URL is not configured.") {
-    return "Falta configurar la URL del backend de Turnero.";
-  }
-
-  return "Ocurrió un error inesperado. Intentá nuevamente.";
+  return "No pudimos conectar con Turnero. Intentá nuevamente en unos segundos.";
 }

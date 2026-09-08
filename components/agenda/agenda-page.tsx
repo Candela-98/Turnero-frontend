@@ -20,7 +20,6 @@ import {
   AdminShellDesktop,
 } from "@/components/layouts";
 import { Avatar, Badge, Button, FilterPill, IconButton } from "@/components/ui";
-import { useAuth } from "@/components/auth";
 import {
   demoStaffMembers,
   formatDuration,
@@ -116,7 +115,6 @@ function buildTimeline(
 }
 
 export function AgendaPage() {
-  const { user } = useAuth();
   const [staffFilter, setStaffFilter] = useState<StaffFilter>("all");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
   const [isAppointmentFlowOpen, setIsAppointmentFlowOpen] = useState(false);
@@ -154,21 +152,11 @@ export function AgendaPage() {
     setSelectedSlot(null);
   }
 
-  const userInitials = user?.name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join("")
-    .toUpperCase();
-
   return (
     <>
       <div className="hidden md:block">
         <AdminShellDesktop
           onNewAppointment={() => openAppointmentFlow()}
-          userInitials={userInitials}
-          userName={user?.name}
         >
           <AgendaDesktop
             appointments={appointments}
@@ -183,7 +171,7 @@ export function AgendaPage() {
       </div>
 
       <div className="min-h-screen bg-surface pb-36 text-on-surface md:hidden">
-        <AdminMobileHeader subtitle="Agenda de hoy" userInitials={userInitials} userName={user?.name} />
+        <AdminMobileHeader subtitle="Agenda de hoy" />
         <main className="px-5 py-5">
           <MobileDateNav />
           <AgendaMobileFilters

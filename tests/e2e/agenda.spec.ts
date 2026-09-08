@@ -1,7 +1,7 @@
 import { AxeBuilder } from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
-const authMeUrl = "http://127.0.0.1:3000/api/v1/auth/me";
+const authMeUrl = "http://127.0.0.1:3000/api/backend/api/v1/auth/me";
 
 test.describe("agenda smoke", () => {
   test.beforeEach(async ({ page }) => {
@@ -9,13 +9,8 @@ test.describe("agenda smoke", () => {
       await route.fulfill({
         contentType: "application/json",
         json: {
-          businessId: 10,
-          businessName: "Barber Studio",
-          businessSlug: "barber-studio",
-          email: "juan@example.com",
-          name: "Juan Perez",
-          role: "ADMIN",
-          userId: 1,
+          business: { id: 10, name: "Barber Studio", onboarding_status: "COMPLETED", slug: "barber-studio" },
+          user: { avatar_url: null, email: "juan@example.com", id: 1, name: "Juan Perez", role: "OWNER" },
         },
         status: 200,
       });
