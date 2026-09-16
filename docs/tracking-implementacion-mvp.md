@@ -1,6 +1,6 @@
 # Tracking de Implementacion Frontend MVP
 
-Actualizado: 2026-08-31
+Actualizado: 2026-09-16
 
 ## Proposito
 
@@ -12,11 +12,11 @@ Los demás documentos deben enlazar este archivo cuando necesiten mencionar qué
 
 ## Estado general
 
-El frontend ya tiene una base limpia de Next.js, agenda/admin con mocks y flujo de crear turno alineados a las referencias principales de Stitch.
+El frontend ya tiene una base limpia de Next.js, agenda/admin con mocks, flujo de crear turno alineado a Stitch y autenticación administrativa real mediante el BFF same-origin.
 
-Todavia no hay booking cliente, gestion admin restante ni integracion real con backend. La app solo renderiza la agenda mock en `/`; las rutas declaradas en la navegacion admin todavia no tienen pantallas.
+Todavía no hay booking cliente ni integración real de agenda, catálogo, clientes, profesionales, configuración o dashboard. La agenda en `/` sigue usando mocks; las rutas declaradas en la navegación administrativa todavía no tienen pantallas propias.
 
-El backend ya dispone de recursos admin para configuracion, servicios, profesionales, clientes y horarios. La integracion real debe empezar por una capa HTTP/adapters y por Configuracion, sin acoplar todavia agenda o crear turno a contratos de appointments que siguen incompletos.
+El backend ya dispone de auth Google/sesión convergente con el contrato canónico y de recursos admin para configuración, servicios, profesionales, clientes y horarios. La autenticación real quedó validada con la cookie HTTP-only local.
 
 La prioridad actual es integrar primero los recursos administrativos cuyo contrato backend ya está disponible. Booking público sigue siendo una referencia visual y queda bloqueado para integración hasta que existan sus endpoints.
 
@@ -105,17 +105,18 @@ La prioridad actual es integrar primero los recursos administrativos cuyo contra
 - `npm run test` pasa segun el estado reportado.
 - `npm run test:e2e` pasa segun el estado reportado; localmente requiere browsers de Playwright instalados y levantar Next fuera del sandbox si el bind del puerto esta restringido.
 - `npm run build` pasa fuera del sandbox segun el estado reportado; dentro del sandbox puede fallar por restriccion de Turbopack al bindear un puerto interno.
-- Se verifico que no existe todavia integracion HTTP:
-  - no hay `fetch`, cliente API, URL de backend, proxy Next ni manejo de `credentials`;
-  - no estan instalados ni usados TanStack Query, React Hook Form o Zod;
-  - no hay rutas admin adicionales, auth, guards o sesion real.
+- Autenticación administrativa real completada mediante TURN-97, TURN-88 y TURN-69:
+  - BFF same-origin y cliente HTTP tipado para auth;
+  - login Google con `id_token`, cookie HTTP-only y restauración de sesión;
+  - acceso protegido, estado de acceso denegado, logout y menú de cuenta;
+  - validación manual local de login, recarga, acceso protegido y logout;
+  - E2E desktop/mobile de login limpio, errores explícitos y flujo de sesión.
 
 ## Pendiente
 
 - Integrar la configuracion administrativa y los catalogos que el backend ya expone.
 - Implementar las rutas/pantallas de dashboard, clientes, servicios, profesionales y configuracion.
 - Cerrar contratos pendientes de agenda y appointments antes de conectarlos como fuente final.
-- Implementar auth, guards y sesión cuando exista el flujo backend real.
 - Implementar booking cliente real cuando estén disponibles sus endpoints públicos.
 
 ## Prioridades vigentes
@@ -146,9 +147,9 @@ Condición de cierre: cada catálogo posee lectura, mutaciones soportadas por ba
 
 Condición de cierre: la agenda y el flujo de turnos comparten adapters y no duplican validaciones de negocio.
 
-### Después — I4: autenticación y navegación protegida
+### Entregado — I4: autenticación y navegación protegida
 
-Implementar sesión, guards y login administrativo cuando el backend entregue los endpoints de auth y el contrato de cookie/tokens.
+TURN-69 quedó mergeado en [PR #1](https://github.com/Candela-98/Turnero-frontend/pull/1) y validado contra TURN-88: login Google, cookie HTTP-only, restauración de sesión, acceso protegido y logout. La segregación posterior de layouts y rutas administrativas queda para TURN-94.
 
 ### Bloqueado por backend — I5: booking público
 
@@ -167,6 +168,7 @@ Estado backend relevante:
 - PR 1-4 completados.
 - PRs 8-15 implementados en codigo; Availability y parte de su contrato aun requieren validacion.
 - PR 16 (`business`), PR 17 (`booking-settings`) y PR 18 (`business-hours`/TURN-55) completados y mergeados.
+- TURN-88 alineó auth/sesión/protección admin al contrato canónico; TURN-69 quedó validado contra backend local.
 - PR 5 / `TURN-41` parcial:
   - ya existe `/api/v1/appointments`;
   - creacion/listado base de appointments admin ya existe;
@@ -190,7 +192,7 @@ Dependencias por flujo frontend:
 | Staff-service offerings | Si | Endpoints v1 ya disponibles para integracion progresiva. |
 | Customers admin | Si | Endpoints admin v1 ya disponibles para integracion progresiva. |
 | Business/configuracion | Si | Endpoints de business, booking settings y business hours disponibles; primer candidato de integracion real. |
-| Auth Google admin | Si con estado mock | PRs 19-20. |
+| Auth Google admin | No requiere mocks | TURN-97 + TURN-88 + TURN-69 entregados: BFF, contrato canónico y aprovisionamiento local. |
 | Booking publico | Si | PRs 21-24: profile, services, availability, public appointments y cancelacion. |
 
 ## Que se puede hacer con mocks
@@ -219,7 +221,6 @@ Dependencias por flujo frontend:
 ## Que debe esperar endpoints reales
 
 - Cliente HTTP, adapters DTO/UI y configuracion CORS/proxy.
-- Auth/session real.
 - Lectura real de agenda diaria.
 - Persistencia real de crear/editar turno.
 - Contrato final de confirmacion, cancelacion, complete/no-show integrado en agenda.
@@ -274,7 +275,6 @@ Para cambios futuros de codigo:
 ## No asumir todavia
 
 - No asumir que agenda diaria real esta lista hasta que PR 5 / `TURN-41` este cerrado.
-- No asumir auth Google disponible en frontend hasta PRs 19-20.
 - No asumir que los links de navegacion representan rutas implementadas: por ahora solo existe la agenda en `/`.
 - No asumir que booking publico puede conectarse: faltan sus endpoints backend.
 - No asumir booking publico real hasta PRs 21-24.
