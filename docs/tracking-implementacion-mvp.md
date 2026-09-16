@@ -1,26 +1,24 @@
 # Tracking de Implementacion Frontend MVP
 
-Actualizado: 2026-09-03
+Actualizado: 2026-09-16
 
 ## Proposito
 
 Este documento es la fuente única del avance operativo del frontend MVP: estado real, prioridades vigentes, dependencias y bloqueos.
 
-No reemplaza `roadmap.md` (hitos de producto), `integracion-api-mvp.md` (arquitectura de integración), `decisiones-diseno-mvp.md` (decisiones UX), `handoff-implementacion-mvp.md` (reglas de implementación) ni `stitch/progreso-stitch.md` (referencias visuales).
+No reemplaza `roadmap.md` (hitos de producto), `decisiones-diseno-mvp.md` (decisiones UX), `handoff-implementacion-mvp.md` (reglas de implementación) ni `stitch/progreso-stitch.md` (referencias visuales).
 
 Los demás documentos deben enlazar este archivo cuando necesiten mencionar qué sigue; no deben duplicar su cola de trabajo.
 
 ## Estado general
 
-El frontend ya tiene una base limpia de Next.js, agenda/admin con mocks y flujo de crear turno alineados a las referencias principales de Stitch.
+El frontend ya tiene una base limpia de Next.js, agenda/admin con mocks, flujo de crear turno alineado a Stitch y autenticación administrativa real mediante el BFF same-origin.
 
-Todavia no hay booking cliente, gestion admin restante ni integracion real con backend. La app solo renderiza la agenda mock en `/`; las rutas declaradas en la navegacion admin todavia no tienen pantallas.
+Todavía no hay booking cliente ni integración real de agenda, catálogo, clientes, profesionales, configuración o dashboard. La agenda en `/` sigue usando mocks; las rutas declaradas en la navegación administrativa todavía no tienen pantallas propias.
 
-El backend ya dispone de auth Google/sesion y recursos admin para configuracion, servicios, profesionales, clientes y horarios. Antes de integrar pantallas debe converger su implementación de auth con el contrato canónico y corregir la protección de `business-hours`.
+El backend ya dispone de auth Google/sesión convergente con el contrato canónico y de recursos admin para configuración, servicios, profesionales, clientes y horarios. La autenticación real quedó validada con la cookie HTTP-only local.
 
-En Jira, TURN-68 fue acotada a acceso e infraestructura administrativa. TURN-97 separa el BFF y cliente HTTP base de TURN-69, cuyo PR frontend #1 continúa `In Progress`; TURN-70 también está en curso bajo la historia de agenda TURN-84 y su conexión final sigue condicionada por TURN-90.
-
-La gestión administrativa quedó dividida por resultado: TURN-84 agenda/turnos, TURN-85 configuración, TURN-86 catálogo operativo y TURN-87 dashboard. Booking público continúa bloqueado hasta que existan sus endpoints.
+La prioridad actual es integrar primero los recursos administrativos cuyo contrato backend ya está disponible. Booking público sigue siendo una referencia visual y queda bloqueado para integración hasta que existan sus endpoints.
 
 ## Listo
 
@@ -107,94 +105,62 @@ La gestión administrativa quedó dividida por resultado: TURN-84 agenda/turnos,
 - `npm run test` pasa segun el estado reportado.
 - `npm run test:e2e` pasa segun el estado reportado; localmente requiere browsers de Playwright instalados y levantar Next fuera del sandbox si el bind del puerto esta restringido.
 - `npm run build` pasa fuera del sandbox segun el estado reportado; dentro del sandbox puede fallar por restriccion de Turbopack al bindear un puerto interno.
-- Se verifico que no existe todavia integracion HTTP:
-  - no hay `fetch`, cliente API, URL de backend, proxy Next ni manejo de `credentials`;
-  - no estan instalados ni usados TanStack Query, React Hook Form o Zod;
-  - no hay rutas admin adicionales, auth, guards o sesion real.
+- Autenticación administrativa real completada mediante TURN-97, TURN-88 y TURN-69:
+  - BFF same-origin y cliente HTTP tipado para auth;
+  - login Google con `id_token`, cookie HTTP-only y restauración de sesión;
+  - acceso protegido, estado de acceso denegado, logout y menú de cuenta;
+  - validación manual local de login, recarga, acceso protegido y logout;
+  - E2E desktop/mobile de login limpio, errores explícitos y flujo de sesión.
 
 ## Pendiente
 
 - Integrar la configuracion administrativa y los catalogos que el backend ya expone.
 - Implementar las rutas/pantallas de dashboard, clientes, servicios, profesionales y configuracion.
 - Cerrar contratos pendientes de agenda y appointments antes de conectarlos como fuente final.
-- Implementar TURN-97 y cerrar TURN-69 sobre el BFF same-origin después de resolver TURN-88.
 - Implementar booking cliente real cuando estén disponibles sus endpoints públicos.
 
-## Cola priorizada autogestionada
+## Prioridades vigentes
 
-Esta es la única lista ordenada de próximos PRs del frontend. Jira conserva el detalle, estado y asignación de cada ticket; el roadmap sólo conserva hitos de producto.
+Actualizar esta sección al cerrar cada PR. La prioridad y sus dependencias se registran aquí, no en el roadmap, handoff, decisiones ni documentos Stitch.
 
-Convención de uso:
+### Ahora — I1: base HTTP e integración de configuración
 
-- `[ ]`: tarea todavía no tomada.
-- `[x]`: tarea tomada. Al marcarla, pasarla a `In Progress` en Jira y agregar responsable y PR; si el PR todavía no existe, indicar `PR pendiente`.
-- Cuando el PR se mergea, quitar la tarea de esta cola y registrar el resultado en `Listo`.
-- Tomar la primera tarea sin marcar cuyos bloqueos estén resueltos. Dentro de una misma ola pueden avanzar varias personas en paralelo.
-- Cada subtarea corresponde, en lo posible, a un PR. Si el alcance real excede el ticket, dividirlo antes de implementar.
-- Los tickets backend nombrados entre paréntesis son bloqueos; su avance se consulta en Jira y en el tracking backend.
+- Crear cliente HTTP centralizado, base URL por ambiente, credenciales/proxy o CORS y normalización del formato de error backend.
+- Incorporar adapters entre DTOs `snake_case` y modelos TypeScript de UI.
+- Implementar la ruta de Configuración conectada a `business`, `booking-settings` y `business-hours`.
+- Cubrir carga, error, guardado y reemplazo transaccional de horarios semanales.
 
-### I0 — acceso e infraestructura administrativa
+Condición de cierre: configuración usable contra API real, sin acoplar agenda ni el formulario de turnos a contratos incompletos.
 
-- [x] [TURN-97](https://turnero-app.atlassian.net/browse/TURN-97) — BFF same-origin y cliente HTTP base mergeados.
-- [ ] [TURN-69](https://turnero-app.atlassian.net/browse/TURN-69) — integrar autenticación de administrador — Candela — [PR #1](https://github.com/Candela-98/Turnero-frontend/pull/1) — `In Progress`; validar contra TURN-88 antes de cerrar.
-- [ ] [TURN-94](https://turnero-app.atlassian.net/browse/TURN-94) — estructurar rutas y navegación administrativa — después de TURN-69.
+### Siguiente — I2: catálogos administrativos reales
 
-Condición de cierre de la ola: login, recarga, acceso protegido, navegación y logout funcionan sin exponer tokens ni la URL backend a JavaScript.
+- Crear rutas y flujos para servicios, profesionales y clientes sobre los endpoints admin disponibles.
+- Incorporar formularios, validación y server state cuando aporten valor al flujo real.
+- Mantener fuera de la UI los campos relacionales o métricas que el backend aún no expone.
 
-### I1 — configuración y recursos independientes
+Condición de cierre: cada catálogo posee lectura, mutaciones soportadas por backend y estados loading/error/empty.
 
-Después de I0, tomar de arriba hacia abajo; las líneas sin dependencia entre sí pueden hacerse en paralelo.
+### Siguiente — I3: agenda y turnos con contratos confirmados
 
-- [ ] [TURN-81](https://turnero-app.atlassian.net/browse/TURN-81) — gestionar datos del negocio.
-- [ ] [TURN-83](https://turnero-app.atlassian.net/browse/TURN-83) — gestionar reglas de reserva.
-- [ ] [TURN-82](https://turnero-app.atlassian.net/browse/TURN-82) — gestionar horarios del negocio — bloqueada por TURN-89.
-- [ ] [TURN-76](https://turnero-app.atlassian.net/browse/TURN-76) — listar servicios.
-- [ ] [TURN-96](https://turnero-app.atlassian.net/browse/TURN-96) — crear y editar servicios — después de TURN-76.
-- [ ] [TURN-98](https://turnero-app.atlassian.net/browse/TURN-98) — ver detalle y desactivar servicios — después de TURN-76.
-- [ ] [TURN-77](https://turnero-app.atlassian.net/browse/TURN-77) — listar profesionales.
-- [ ] [TURN-99](https://turnero-app.atlassian.net/browse/TURN-99) — crear y editar profesionales — después de TURN-77.
-- [ ] [TURN-101](https://turnero-app.atlassian.net/browse/TURN-101) — ver detalle y desactivar profesionales — después de TURN-77.
-- [ ] [TURN-80](https://turnero-app.atlassian.net/browse/TURN-80) — listar clientes.
-- [ ] [TURN-100](https://turnero-app.atlassian.net/browse/TURN-100) — crear y editar clientes — después de TURN-80.
-- [ ] [TURN-102](https://turnero-app.atlassian.net/browse/TURN-102) — ver detalle y desactivar clientes — después de TURN-80.
-- [ ] [TURN-78](https://turnero-app.atlassian.net/browse/TURN-78) — gestionar servicios por profesional — después de TURN-76 y TURN-77.
-- [ ] [TURN-79](https://turnero-app.atlassian.net/browse/TURN-79) — gestionar horarios de profesionales — después de TURN-77.
+- Conectar agenda y disponibilidad sólo cuando sus respuestas, filtros y reglas estén validadas contra el contrato final.
+- Integrar creación, edición y acciones de turno cuando el backend cubra cliente rápido, relación staff-service, cálculos y solapamientos.
 
-Condición de cierre de la ola: configuración y catálogos usan API real, adapters y server state compartidos, con mutaciones e invalidaciones verificadas.
+Condición de cierre: la agenda y el flujo de turnos comparten adapters y no duplican validaciones de negocio.
 
-### I2 — agenda y turnos
+### Entregado — I4: autenticación y navegación protegida
 
-- [x] [TURN-70](https://turnero-app.atlassian.net/browse/TURN-70) — integrar agenda con turnos reales — Candela — PR pendiente — no cerrar hasta TURN-90.
-- [ ] [TURN-73](https://turnero-app.atlassian.net/browse/TURN-73) — ver detalle de un turno — después de TURN-70.
-- [ ] [TURN-75](https://turnero-app.atlassian.net/browse/TURN-75) — gestionar estados — después de TURN-73.
-- [ ] [TURN-71](https://turnero-app.atlassian.net/browse/TURN-71) — integrar disponibilidad real — bloqueada por TURN-92.
-- [ ] [TURN-72](https://turnero-app.atlassian.net/browse/TURN-72) — crear turnos — después de TURN-71; bloqueada por TURN-105 y TURN-92.
-- [ ] [TURN-74](https://turnero-app.atlassian.net/browse/TURN-74) — editar turnos — después de TURN-73 y TURN-71; bloqueada por TURN-109 y TURN-92.
+TURN-69 quedó mergeado en [PR #1](https://github.com/Candela-98/Turnero-frontend/pull/1) y validado contra TURN-88: login Google, cookie HTTP-only, restauración de sesión, acceso protegido y logout. La segregación posterior de layouts y rutas administrativas queda para TURN-94.
 
-TURN-70 puede adelantarse con estructura, mocks y tests de red, pero no debe acoplarse al shape transitorio del backend ni declararse integrado antes de TURN-90.
-
-Condición de cierre de la ola: agenda, detalle, estados, disponibilidad y escrituras comparten adapters e invalidaciones sin duplicar reglas de negocio.
-
-### I3 — dashboard operativo
-
-- [ ] [TURN-95](https://turnero-app.atlassian.net/browse/TURN-95) — implementar dashboard base del período Hoy — después de TURN-94 y TURN-73; bloqueada por TURN-108 y TURN-107.
-- [ ] [TURN-104](https://turnero-app.atlassian.net/browse/TURN-104) — agregar períodos — después de TURN-95.
-- [ ] [TURN-103](https://turnero-app.atlassian.net/browse/TURN-103) — integrar secciones operativas y acciones — después de TURN-95 y de los flujos destino correspondientes.
-
-Condición de cierre de la ola: dashboard responsive con datos reales, sin recalcular ocupación o ingresos en el navegador.
-
-### I4 — booking público bloqueado por backend
+### Bloqueado por backend — I5: booking público
 
 Mantener booking cliente como referencia/mock visual. Integrarlo cuando existan endpoints públicos de perfil, servicios, disponibilidad, reserva y cancelación.
-
-Un ticket puede adelantarse visualmente con mocks sin declarar resuelta su integración real.
 
 ## Dependencias concretas con backend
 
 Fuente de verdad backend:
 
-- Avance real: `../../Turnero-api/docs/mvp/tracking-implementacion-mvp.md`.
-- Contratos: `../../Turnero-api/docs/mvp/api-contracts-mvp.md`.
+- Avance real: `../Turnero-api/docs/mvp/tracking-implementacion-mvp.md`.
+- Contratos: `../Turnero-api/docs/mvp/api-contracts-mvp.md`.
 
 Estado backend relevante:
 
@@ -202,8 +168,7 @@ Estado backend relevante:
 - PR 1-4 completados.
 - PRs 8-15 implementados en codigo; Availability y parte de su contrato aun requieren validacion.
 - PR 16 (`business`), PR 17 (`booking-settings`) y PR 18 (`business-hours`/TURN-55) completados y mergeados.
-- PR 19 y PR 20 de auth/sesion/proteccion admin mergeados en PRs backend #61 y #62; pendientes de converger con el contrato canonico antes de cerrar TURN-69.
-- TURN-88 a TURN-93 registran las dependencias backend detectadas durante la división de la gestión administrativa; TURN-91 se entrega mediante TURN-105/109 y TURN-93 mediante TURN-106/108/107.
+- TURN-88 alineó auth/sesión/protección admin al contrato canónico; TURN-69 quedó validado contra backend local.
 - PR 5 / `TURN-41` parcial:
   - ya existe `/api/v1/appointments`;
   - creacion/listado base de appointments admin ya existe;
@@ -216,19 +181,18 @@ Dependencias por flujo frontend:
 | Fundacion visual | Si | No depende de backend. |
 | Componentes base | Si | No depende de backend. |
 | Layouts | Si | No depende de backend. |
-| Agenda diaria | Si | TURN-90: filtros/rango, timezone y response enriquecido. |
-| Crear turno admin | Si | TURN-105 y TURN-92: invariantes de creación y availability estable. |
-| Editar turno | Si visualmente | TURN-109 y TURN-92; reutiliza detalle y availability con exclusión. |
+| Agenda diaria | Si | Puede hacer un piloto de solo lectura, pero la integracion final espera PR 5: filtros/rango, response enriquecido y reglas completas. |
+| Crear turno admin | Si | PR 5 completo para contrato final de create, cliente rapido, staff-service, calculos backend y solapamiento correcto. |
+| Editar turno | Si visualmente | Endpoint existe, pero queda sujeto a validacion del alcance MVP junto con PR 5/6. |
 | Confirmar/cancelar | Si visualmente | Endpoints existen; integrar cuando la agenda real use el mismo adapter de appointments. |
 | Completar/no-show | Si visualmente | Endpoints existen; integrar cuando la agenda real use el mismo adapter de appointments. |
-| Slots reales admin | Si con mocks visuales | TURN-92: respuesta diaria/rango canónica. |
+| Slots reales admin | Si con mocks visuales | Endpoint existe, pero la respuesta actual es plana y requiere adapter/validacion contra contrato. |
 | Service offerings admin | Si | Endpoints admin v1 disponibles para integracion progresiva. |
 | Staff members admin | Si | CRUD, asociaciones y horarios disponibles para integracion progresiva. |
 | Staff-service offerings | Si | Endpoints v1 ya disponibles para integracion progresiva. |
 | Customers admin | Si | Endpoints admin v1 ya disponibles para integracion progresiva. |
-| Business/configuracion | Si | Business y booking settings disponibles; TURN-89 bloquea business hours. |
-| Auth Google admin | Si con estado mock | TURN-97 + TURN-88 + TURN-69: BFF, convergencia contractual y aprovisionamiento local. |
-| Dashboard | Si | TURN-106/108/107 deben cerrar contrato, resumen y métricas antes de TURN-95. |
+| Business/configuracion | Si | Endpoints de business, booking settings y business hours disponibles; primer candidato de integracion real. |
+| Auth Google admin | No requiere mocks | TURN-97 + TURN-88 + TURN-69 entregados: BFF, contrato canónico y aprovisionamiento local. |
 | Booking publico | Si | PRs 21-24: profile, services, availability, public appointments y cancelacion. |
 
 ## Que se puede hacer con mocks
@@ -254,10 +218,9 @@ Dependencias por flujo frontend:
 - Errores y validaciones visuales.
 - Notificaciones mobile como referencia visual.
 
-## Que debe esperar contratos o endpoints reales
+## Que debe esperar endpoints reales
 
-- Auth frontend debe esperar la convergencia del wire contract backend; la sesion ya esta implementada.
-- Business hours debe esperar la correccion de su proteccion admin.
+- Cliente HTTP, adapters DTO/UI y configuracion CORS/proxy.
 - Lectura real de agenda diaria.
 - Persistencia real de crear/editar turno.
 - Contrato final de confirmacion, cancelacion, complete/no-show integrado en agenda.
@@ -312,7 +275,6 @@ Para cambios futuros de codigo:
 ## No asumir todavia
 
 - No asumir que agenda diaria real esta lista hasta que PR 5 / `TURN-41` este cerrado.
-- No asumir auth disponible en frontend hasta que TURN-97 y TURN-69 estén mergeados; los PRs backend 19-20 ya existen y TURN-88 debe converger su contrato.
 - No asumir que los links de navegacion representan rutas implementadas: por ahora solo existe la agenda en `/`.
 - No asumir que booking publico puede conectarse: faltan sus endpoints backend.
 - No asumir booking publico real hasta PRs 21-24.
