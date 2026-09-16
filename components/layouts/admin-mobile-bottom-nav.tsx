@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
 import { CalendarDays, Ellipsis, Scissors, UsersRound } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -36,7 +37,7 @@ export function AdminMobileBottomNav({
     >
       <div className="grid grid-cols-4 gap-1">
         {items.map((item) => (
-          <a
+            <Link
             aria-current={item.active ? "page" : undefined}
             className={cn(
               "flex min-h-touch flex-col items-center justify-center gap-1 rounded-xl px-2 text-xs font-medium text-on-surface-variant transition-colors hover:bg-surface-container-low focus-visible:outline-focus-ring [&_svg]:size-5",
@@ -47,7 +48,7 @@ export function AdminMobileBottomNav({
           >
             {item.icon}
             <span>{item.label}</span>
-          </a>
+            </Link>
         ))}
       </div>
     </nav>

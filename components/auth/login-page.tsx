@@ -17,7 +17,7 @@ export function LoginPage() {
 
   useEffect(() => {
     if (status === "authenticated") {
-      router.replace("/");
+      router.replace("/agenda");
     }
   }, [router, status]);
 
@@ -27,7 +27,7 @@ export function LoginPage() {
 
       try {
         await signInWithGoogle(idToken);
-        router.replace("/");
+        router.replace("/agenda");
       } catch (error) {
         setLoginError(getAuthErrorMessage(error));
       }
