@@ -11,8 +11,38 @@ const currentUser = {
   user: { avatar_url: null, email: "juan@example.com", id: 1, name: "Juan Perez", role: "OWNER" },
 };
 
+async function mockGoogleIdentityButton(page: import("@playwright/test").Page) {
+  await page.route(googleScriptUrl, async (route) => {
+    await route.fulfill({
+      contentType: "application/javascript",
+      body: `
+        window.google = {
+          accounts: {
+            id: {
+              initialize: function(options) {
+                window.__turneroGoogleCallback = options.callback;
+              },
+              renderButton: function(parent, options) {
+                var button = document.createElement("button");
+                button.type = "button";
+                button.textContent = "Continuar con Google";
+                button.style.width = options.width + "px";
+                button.style.height = "40px";
+                button.onclick = function() {
+                  window.__turneroGoogleCallback({ credential: "google-id-token" });
+                };
+                parent.appendChild(button);
+              }
+            }
+          }
+        };
+      `,
+    });
+  });
+}
+
 test.describe("admin authentication", () => {
-  test("shows login when there is no session", async ({ page }) => {
+  test("shows a clean login when there is no session", async ({ page }) => {
     await page.route(authMeUrl, async (route) => {
       await route.fulfill({
         contentType: "application/json",
@@ -28,11 +58,11 @@ test.describe("admin authentication", () => {
     await page.goto("/");
 
     await expect(page.getByRole("heading", { name: "Ingresar al panel" })).toBeVisible();
-    await expect(page.getByText("Iniciá sesión para continuar")).toBeVisible();
+    await expect(page.getByText("Iniciá sesión para continuar")).not.toBeVisible();
     await expect(page.getByRole("heading", { name: "Agenda" })).not.toBeVisible();
   });
 
-  test("shows login when the session is invalid or expired", async ({ page }) => {
+  test("does not show an error alert while restoring an invalid or expired session", async ({ page }) => {
     await page.route(authMeUrl, async (route) => {
       await route.fulfill({
         contentType: "application/json",
@@ -48,7 +78,41 @@ test.describe("admin authentication", () => {
     await page.goto("/");
 
     await expect(page.getByRole("heading", { name: "Ingresar al panel" })).toBeVisible();
-    await expect(page.getByText("Si tu sesión venció")).toBeVisible();
+    await expect(page.getByText("Si tu sesión venció")).not.toBeVisible();
+  });
+
+  test("keeps the Stitch login composition at every supported viewport", async ({ page }) => {
+    await mockGoogleIdentityButton(page);
+    await page.route(authMeUrl, async (route) => {
+      await route.fulfill({
+        contentType: "application/json",
+        json: {
+          code: "UNAUTHORIZED",
+          message: "Session token is required",
+          status: 401,
+        },
+        status: 401,
+      });
+    });
+
+    await page.goto("/");
+
+    await expect(page.getByText("Barber Studio")).toBeVisible();
+    await expect(page.getByText("Agenda premium")).toBeVisible();
+    await expect(page.getByText("Al continuar aceptás las políticas del negocio.")).toBeVisible();
+    await expect(page.getByRole("listitem")).toHaveText(["Agenda del día", "Clientes", "Servicios"]);
+    await expect(page.getByRole("button", { name: "Continuar con Google" })).toBeVisible();
+  });
+
+  test("shows an error alert after an explicit Google login fails", async ({ page }) => {
+    await mockGoogleIdentityButton(page);
+    await page.route(authMeUrl, (route) => route.fulfill({ contentType: "application/json", json: { message: "No session" }, status: 401 }));
+    await page.route(authGoogleUrl, (route) => route.fulfill({ contentType: "application/json", json: { message: "Invalid Google identity" }, status: 401 }));
+
+    await page.goto("/");
+    await page.getByRole("button", { name: "Continuar con Google" }).click();
+
+    await expect(page.getByText("Iniciá sesión para continuar")).toBeVisible();
   });
 
   test("allows a valid admin to log in with Google and access the agenda", async ({
@@ -56,31 +120,7 @@ test.describe("admin authentication", () => {
   }, testInfo) => {
     let authMeCalls = 0;
 
-    await page.route(googleScriptUrl, async (route) => {
-      await route.fulfill({
-        contentType: "application/javascript",
-        body: `
-          window.google = {
-            accounts: {
-              id: {
-                initialize: function(options) {
-                  window.__turneroGoogleCallback = options.callback;
-                },
-                renderButton: function(parent) {
-                  var button = document.createElement("button");
-                  button.type = "button";
-                  button.textContent = "Continuar con Google";
-                  button.onclick = function() {
-                    window.__turneroGoogleCallback({ credential: "google-id-token" });
-                  };
-                  parent.appendChild(button);
-                }
-              }
-            }
-          };
-        `,
-      });
-    });
+    await mockGoogleIdentityButton(page);
 
     await page.route(authGoogleUrl, async (route) => {
       expect(route.request().method()).toBe("POST");

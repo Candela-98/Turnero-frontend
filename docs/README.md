@@ -23,6 +23,11 @@ Este archivo es el indice de documentacion frontend. No reemplaza a los document
 6. `stitch/progreso-stitch.md`
 7. `../../Turnero-api/docs/mvp/tracking-implementacion-mvp.md` para saber que endpoints backend ya estan disponibles.
 
+### Para probar el acceso administrativo real en local
+
+1. `pruebas-locales-google-auth.md`
+2. `integracion-api-mvp.md`
+
 ### Para trabajar con Stitch
 
 1. `stitch/progreso-stitch.md`
@@ -83,6 +88,10 @@ Fuente para arquitectura de integración:
 - Cliente HTTP, cookies y sesión.
 - Errores y adapters DTO/UI.
 - Server state, fechas y criterios de Ready.
+
+### `pruebas-locales-google-auth.md`
+
+Fuente operativa para que cada desarrollador configure Google OAuth, aprovisione su cuenta local como `OWNER` y valide login, restauración de sesión y logout sin exponer credenciales.
 
 ### `stitch/progreso-stitch.md`
 

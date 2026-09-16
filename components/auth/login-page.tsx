@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { CalendarDays, Scissors, UsersRound } from "lucide-react";
 
 import { BrandMark } from "@/components/layouts/brand-mark";
 import { GoogleLoginButton } from "@/components/auth/google-login-button";
@@ -38,12 +39,12 @@ export function LoginPage() {
   const isLoading = status === "loading";
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-surface px-5 py-10 text-on-surface">
-      <section className="w-full max-w-sm">
-        <BrandMark className="justify-center" />
+    <main className="flex min-h-screen items-center justify-center bg-surface px-4 py-8 text-on-surface sm:px-8 sm:py-12">
+      <section className="flex w-full max-w-[440px] flex-col gap-8">
+        <BrandMark variant="login" />
 
-        <div className="mt-8 rounded-lg border border-outline-variant bg-surface-container-lowest p-6 shadow-panel">
-          <div>
+        <div className="relative rounded-lg border border-outline-variant/15 bg-surface-container-lowest p-8 shadow-panel sm:p-10">
+          <div className="text-center">
             <h1 className="text-xl font-bold">Ingresar al panel</h1>
             <p className="mt-2 text-sm leading-6 text-on-surface-variant">
               Usá tu cuenta autorizada de Google para administrar Turnero.
@@ -56,7 +57,7 @@ export function LoginPage() {
             </InlineAlert>
           ) : null}
 
-          <div className="mt-6 flex justify-center">
+          <div className="mt-6">
             <GoogleLoginButton
               disabled={isLoading}
               onError={setLoginError}
@@ -73,7 +74,26 @@ export function LoginPage() {
               Google no configurado
             </Button>
           ) : null}
+
+          <p className="mt-8 border-t border-outline-variant/15 pt-6 text-center text-xs text-on-surface-variant/80">
+            Al continuar aceptás las políticas del negocio.
+          </p>
         </div>
+
+        <ul className="flex flex-wrap justify-center gap-x-8 gap-y-3 px-4 text-xs font-medium text-secondary/60">
+          <li className="flex items-center gap-2">
+            <CalendarDays aria-hidden="true" className="size-[18px]" />
+            Agenda del día
+          </li>
+          <li className="flex items-center gap-2">
+            <UsersRound aria-hidden="true" className="size-[18px]" />
+            Clientes
+          </li>
+          <li className="flex items-center gap-2">
+            <Scissors aria-hidden="true" className="size-[18px]" />
+            Servicios
+          </li>
+        </ul>
       </section>
     </main>
   );

@@ -90,12 +90,40 @@ export function GoogleLoginButton({
   onIdToken: (idToken: string) => void;
 }) {
   const buttonRef = useRef<HTMLDivElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const [isReady, setIsReady] = useState(false);
+  const [buttonWidth, setButtonWidth] = useState(0);
   const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+
+  useEffect(() => {
+    const container = containerRef.current;
+
+    if (!container) {
+      return;
+    }
+
+    const updateWidth = () => {
+      setButtonWidth(Math.floor(container.getBoundingClientRect().width));
+    };
+
+    updateWidth();
+    if (typeof ResizeObserver === "undefined") {
+      return;
+    }
+
+    const resizeObserver = new ResizeObserver(updateWidth);
+    resizeObserver.observe(container);
+
+    return () => resizeObserver.disconnect();
+  }, []);
 
   useEffect(() => {
     if (!googleClientId) {
       onError("Falta configurar el Client ID de Google.");
+      return;
+    }
+
+    if (buttonWidth === 0) {
       return;
     }
 
@@ -125,7 +153,7 @@ export function GoogleLoginButton({
           size: "large",
           text: "continue_with",
           theme: "outline",
-          width: 320,
+          width: buttonWidth,
         });
         setIsReady(true);
       })
@@ -137,10 +165,14 @@ export function GoogleLoginButton({
       isMounted = false;
       scriptLoad.cleanup();
     };
-  }, [googleClientId, onError, onIdToken]);
+  }, [buttonWidth, googleClientId, onError, onIdToken]);
 
   return (
-    <div aria-busy={!isReady || disabled} className={disabled ? "pointer-events-none opacity-60" : undefined}>
+    <div
+      ref={containerRef}
+      aria-busy={!isReady || disabled}
+      className={disabled ? "pointer-events-none w-full opacity-60" : "w-full"}
+    >
       <div ref={buttonRef} />
     </div>
   );

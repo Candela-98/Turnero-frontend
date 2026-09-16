@@ -42,15 +42,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setStatus("authenticated");
   }, []);
 
-  const handleAuthError = useCallback((authError: unknown) => {
-    setError(getAuthErrorMessage(authError));
+  const handleAuthError = useCallback((authError: unknown, { silentUnauthorized = false } = {}) => {
     if (isUnauthorizedError(authError)) {
       setUser(null);
       setBusiness(null);
+      setError(silentUnauthorized ? null : getAuthErrorMessage(authError));
       setStatus("unauthenticated");
     } else if (isForbiddenError(authError)) {
+      setError(getAuthErrorMessage(authError));
       setStatus("forbidden");
     } else {
+      setError(getAuthErrorMessage(authError));
       setStatus("error");
     }
   }, []);
@@ -109,7 +111,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return;
         }
 
-        handleAuthError(refreshError);
+        handleAuthError(refreshError, { silentUnauthorized: true });
       }
     }
 
