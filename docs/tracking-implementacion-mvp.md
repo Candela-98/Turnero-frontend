@@ -135,8 +135,8 @@ Convención de uso:
 
 ### I0 — acceso e infraestructura administrativa
 
-- [ ] [TURN-97](https://turnero-app.atlassian.net/browse/TURN-97) — implementar BFF y cliente HTTP base.
-- [x] [TURN-69](https://turnero-app.atlassian.net/browse/TURN-69) — integrar autenticación de administrador — Candela — [PR #1](https://github.com/Candela-98/Turnero-frontend/pull/1) — no cerrar hasta TURN-97 y TURN-88.
+- [x] [TURN-97](https://turnero-app.atlassian.net/browse/TURN-97) — BFF same-origin y cliente HTTP base mergeados.
+- [ ] [TURN-69](https://turnero-app.atlassian.net/browse/TURN-69) — integrar autenticación de administrador — Candela — [PR #1](https://github.com/Candela-98/Turnero-frontend/pull/1) — `In Progress`; validar contra TURN-88 antes de cerrar.
 - [ ] [TURN-94](https://turnero-app.atlassian.net/browse/TURN-94) — estructurar rutas y navegación administrativa — después de TURN-69.
 
 Condición de cierre de la ola: login, recarga, acceso protegido, navegación y logout funcionan sin exponer tokens ni la URL backend a JavaScript.

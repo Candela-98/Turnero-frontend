@@ -155,7 +155,9 @@ export function AgendaPage() {
   return (
     <>
       <div className="hidden md:block">
-        <AdminShellDesktop onNewAppointment={() => openAppointmentFlow()}>
+        <AdminShellDesktop
+          onNewAppointment={() => openAppointmentFlow()}
+        >
           <AgendaDesktop
             appointments={appointments}
             onCreateAppointment={openAppointmentFlow}

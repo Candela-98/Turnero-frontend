@@ -1,7 +1,22 @@
 import { AxeBuilder } from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
+const authMeUrl = "http://127.0.0.1:3000/api/backend/api/v1/auth/me";
+
 test.describe("agenda smoke", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route(authMeUrl, async (route) => {
+      await route.fulfill({
+        contentType: "application/json",
+        json: {
+          business: { id: 10, name: "Barber Studio", onboarding_status: "COMPLETED", slug: "barber-studio" },
+          user: { avatar_url: null, email: "juan@example.com", id: 1, name: "Juan Perez", role: "OWNER" },
+        },
+        status: 200,
+      });
+    });
+  });
+
   test("renders the desktop agenda and exposes core operational content", async ({
     page,
   }, testInfo) => {

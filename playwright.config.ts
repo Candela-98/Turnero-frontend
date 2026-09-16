@@ -1,5 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
+process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ??= "test-google-client-id";
+
 export default defineConfig({
   expect: {
     timeout: 5_000,

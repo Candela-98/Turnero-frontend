@@ -5,6 +5,7 @@ export type BrandMarkProps = {
   logoClassName?: string;
   showSubtitle?: boolean;
   subtitle?: string;
+  variant?: "default" | "login";
 };
 
 export function BrandMark({
@@ -12,7 +13,29 @@ export function BrandMark({
   logoClassName,
   showSubtitle = true,
   subtitle = "Agenda premium",
+  variant = "default",
 }: BrandMarkProps) {
+  if (variant === "login") {
+    return (
+      <div className={cn("flex flex-col items-center gap-3 text-center", className)}>
+        <div
+          className={cn(
+            "relative flex size-16 items-center justify-center overflow-hidden rounded-lg border border-outline-variant/15 bg-surface-container-lowest text-2xl font-bold text-primary shadow-soft before:absolute before:inset-0 before:bg-gradient-to-br before:from-primary/5 before:to-transparent",
+            logoClassName,
+          )}
+        >
+          <span className="relative">BS</span>
+        </div>
+        <div>
+          <p className="text-2xl font-extrabold leading-8 text-on-surface">Barber Studio</p>
+          {showSubtitle ? (
+            <p className="mt-1 text-sm font-medium text-primary/80">{subtitle}</p>
+          ) : null}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={cn("flex min-w-0 items-center gap-3", className)}>
       <div

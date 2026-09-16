@@ -11,7 +11,8 @@ import {
   UsersRound,
 } from "lucide-react";
 
-import { Avatar, Button, IconButton, Input } from "@/components/ui";
+import { Button, IconButton, Input } from "@/components/ui";
+import { AccountMenu } from "@/components/auth";
 import { cn } from "@/lib/utils";
 
 import { BrandMark } from "./brand-mark";
@@ -28,8 +29,6 @@ export type AdminShellDesktopProps = {
   className?: string;
   navItems?: AdminNavItem[];
   onNewAppointment?: () => void;
-  userInitials?: string;
-  userName?: string;
 };
 
 export const defaultAdminNavItems: AdminNavItem[] = [
@@ -46,8 +45,6 @@ export function AdminShellDesktop({
   className,
   navItems = defaultAdminNavItems,
   onNewAppointment,
-  userInitials = "MR",
-  userName = "Mateo Ruiz",
 }: AdminShellDesktopProps) {
   return (
     <div className="min-h-screen bg-surface text-on-surface">
@@ -100,7 +97,7 @@ export function AdminShellDesktop({
           <IconButton label="Ayuda" variant="ghost">
             <CircleHelp />
           </IconButton>
-          <Avatar initials={userInitials} name={userName} size="sm" />
+          <AccountMenu />
         </header>
 
         <main className={cn("mx-auto w-full max-w-[var(--content-max-width)] px-10 py-10", className)}>
