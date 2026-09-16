@@ -12,6 +12,8 @@ npm run dev
 
 Abrir [http://localhost:3000](http://localhost:3000).
 
+Los logs de desarrollo incluyen una hora local por línea para facilitar el seguimiento de requests y errores.
+
 ## Documentacion
 
 La documentacion frontend vive en `docs/`:
