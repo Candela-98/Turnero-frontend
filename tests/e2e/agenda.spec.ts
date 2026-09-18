@@ -22,7 +22,7 @@ test.describe("agenda smoke", () => {
   }, testInfo) => {
     test.skip(testInfo.project.name !== "desktop", "Desktop-only smoke.");
 
-    await page.goto("/");
+    await page.goto("/agenda");
 
     const board = page.getByTestId("desktop-agenda-board");
 
@@ -37,7 +37,7 @@ test.describe("agenda smoke", () => {
   test("renders the mobile agenda and filters pending appointments", async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== "mobile", "Mobile-only smoke.");
 
-    await page.goto("/");
+    await page.goto("/agenda");
 
     await expect(page.getByText("Agenda de hoy")).toBeVisible();
     await expect(page.getByRole("navigation", { name: "Navegación principal" })).toBeVisible();
@@ -53,7 +53,7 @@ test.describe("agenda smoke", () => {
   test("filters the mobile agenda by staff member", async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== "mobile", "Mobile-only smoke.");
 
-    await page.goto("/");
+    await page.goto("/agenda");
 
     await page.getByRole("button", { name: "Mateo" }).click();
 
@@ -64,7 +64,7 @@ test.describe("agenda smoke", () => {
   });
 
   test("has no critical accessibility violations", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/agenda");
 
     const results = await new AxeBuilder({ page })
       .disableRules(["color-contrast"])
@@ -79,7 +79,7 @@ test.describe("agenda smoke", () => {
   }, testInfo) => {
     test.skip(testInfo.project.name !== "desktop", "Desktop-only smoke.");
 
-    await page.goto("/");
+    await page.goto("/agenda");
 
     await page.getByRole("button", { name: "Nuevo turno" }).click();
 
@@ -100,7 +100,7 @@ test.describe("agenda smoke", () => {
   }, testInfo) => {
     test.skip(testInfo.project.name !== "mobile", "Mobile-only smoke.");
 
-    await page.goto("/");
+    await page.goto("/agenda");
 
     await page.getByRole("button", { name: "Nuevo turno" }).click();
 

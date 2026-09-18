@@ -57,6 +57,7 @@ test.describe("admin authentication", () => {
 
     await page.goto("/");
 
+    await expect(page).toHaveURL(/\/login$/);
     await expect(page.getByRole("heading", { name: "Ingresar al panel" })).toBeVisible();
     await expect(page.getByText("Iniciá sesión para continuar")).not.toBeVisible();
     await expect(page.getByRole("heading", { name: "Agenda" })).not.toBeVisible();
@@ -75,7 +76,7 @@ test.describe("admin authentication", () => {
       });
     });
 
-    await page.goto("/");
+    await page.goto("/agenda");
 
     await expect(page.getByRole("heading", { name: "Ingresar al panel" })).toBeVisible();
     await expect(page.getByText("Si tu sesión venció")).not.toBeVisible();
@@ -95,7 +96,7 @@ test.describe("admin authentication", () => {
       });
     });
 
-    await page.goto("/");
+    await page.goto("/login");
 
     await expect(page.getByText("Barber Studio")).toBeVisible();
     await expect(page.getByText("Agenda premium")).toBeVisible();
@@ -109,7 +110,7 @@ test.describe("admin authentication", () => {
     await page.route(authMeUrl, (route) => route.fulfill({ contentType: "application/json", json: { message: "No session" }, status: 401 }));
     await page.route(authGoogleUrl, (route) => route.fulfill({ contentType: "application/json", json: { message: "Invalid Google identity" }, status: 401 }));
 
-    await page.goto("/");
+    await page.goto("/login");
     await page.getByRole("button", { name: "Continuar con Google" }).click();
 
     await expect(page.getByText("Iniciá sesión para continuar")).toBeVisible();
@@ -174,7 +175,7 @@ test.describe("admin authentication", () => {
 
   test("shows access denied without clearing a forbidden session", async ({ page }) => {
     await page.route(authMeUrl, (route) => route.fulfill({ contentType: "application/json", json: { message: "Forbidden" }, status: 403 }));
-    await page.goto("/");
+    await page.goto("/agenda");
     await expect(page.getByText("Tu usuario no tiene acceso al panel administrativo")).toBeVisible();
   });
 
@@ -185,7 +186,7 @@ test.describe("admin authentication", () => {
       if (attempts === 1) { await route.abort("failed"); return; }
       await route.fulfill({ contentType: "application/json", json: currentUser, status: 200 });
     });
-    await page.goto("/");
+    await page.goto("/agenda");
     await expect(page.getByRole("button", { name: "Reintentar" })).toBeVisible();
     await page.getByRole("button", { name: "Reintentar" }).click();
     await expect(testInfo.project.name === "mobile" ? page.getByText("Agenda de hoy") : page.getByRole("heading", { name: "Agenda" })).toBeVisible();
@@ -194,10 +195,29 @@ test.describe("admin authentication", () => {
   test("logs out and returns to login even when logout reports an expired session", async ({ page }) => {
     await page.route(authMeUrl, (route) => route.fulfill({ contentType: "application/json", json: currentUser, status: 200 }));
     await page.route(authLogoutUrl, (route) => route.fulfill({ contentType: "application/json", json: { message: "Expired" }, status: 401 }));
-    await page.goto("/");
+    await page.goto("/agenda");
     await page.getByRole("button", { name: "Abrir menú de cuenta" }).click();
     await page.getByRole("menuitem", { name: "Cerrar sesión" }).click();
     await expect(page).toHaveURL(/\/login$/);
     await expect(page.getByRole("heading", { name: "Ingresar al panel" })).toBeVisible();
+  });
+
+  test("keeps administrative navigation reachable while sections are pending", async ({ page }, testInfo) => {
+    await page.route(authMeUrl, (route) =>
+      route.fulfill({ contentType: "application/json", json: currentUser, status: 200 }),
+    );
+    await page.goto("/agenda");
+
+    if (testInfo.project.name === "mobile") {
+      await page.getByRole("link", { name: "Más" }).click();
+      await expect(page).toHaveURL(/\/mas$/);
+      await expect(page.getByRole("heading", { name: "Más opciones" })).toBeVisible();
+      await page.getByRole("link", { name: /Servicios/ }).click();
+    } else {
+      await page.getByRole("navigation", { name: "Principal" }).getByRole("link", { name: "Clientes" }).click();
+    }
+
+    await expect(page).toHaveURL(/\/(clientes|servicios)$/);
+    await expect(page.getByText("Esta sección estará disponible próximamente.")).toBeVisible();
   });
 });

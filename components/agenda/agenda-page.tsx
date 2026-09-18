@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   CalendarDays,
   CheckCircle2,
@@ -14,11 +15,6 @@ import {
 } from "lucide-react";
 
 import { AppointmentDrawer, AppointmentMobileScreen } from "@/components/appointments";
-import {
-  AdminMobileBottomNav,
-  AdminMobileHeader,
-  AdminShellDesktop,
-} from "@/components/layouts";
 import { Avatar, Badge, Button, FilterPill, IconButton } from "@/components/ui";
 import {
   demoStaffMembers,
@@ -115,6 +111,8 @@ function buildTimeline(
 }
 
 export function AgendaPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [staffFilter, setStaffFilter] = useState<StaffFilter>("all");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
   const [isAppointmentFlowOpen, setIsAppointmentFlowOpen] = useState(false);
@@ -142,6 +140,20 @@ export function AgendaPage() {
       ? null
       : activeStaffMembers.find((staffMember) => staffMember.id === staffFilter) ?? null;
 
+  useEffect(() => {
+    if (searchParams.get("new") !== "1") {
+      return;
+    }
+
+    const frame = requestAnimationFrame(() => {
+      setSelectedSlot(null);
+      setIsAppointmentFlowOpen(true);
+      router.replace("/agenda", { scroll: false });
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [router, searchParams]);
+
   function openAppointmentFlow(slot?: AvailabilitySlot) {
     setSelectedSlot(slot ?? null);
     setIsAppointmentFlowOpen(true);
@@ -155,23 +167,18 @@ export function AgendaPage() {
   return (
     <>
       <div className="hidden md:block">
-        <AdminShellDesktop
-          onNewAppointment={() => openAppointmentFlow()}
-        >
-          <AgendaDesktop
-            appointments={appointments}
-            onCreateAppointment={openAppointmentFlow}
-            pendingAppointments={pendingAppointments}
-            slots={slots}
-          />
-        </AdminShellDesktop>
+        <AgendaDesktop
+          appointments={appointments}
+          onCreateAppointment={openAppointmentFlow}
+          pendingAppointments={pendingAppointments}
+          slots={slots}
+        />
         {isAppointmentFlowOpen ? (
           <AppointmentDrawer initialSlot={selectedSlot} onClose={closeAppointmentFlow} />
         ) : null}
       </div>
 
-      <div className="min-h-screen bg-surface pb-36 text-on-surface md:hidden">
-        <AdminMobileHeader subtitle="Agenda de hoy" />
+      <div className="min-h-[calc(100vh-4rem)] bg-surface pb-36 text-on-surface md:hidden">
         <main className="px-5 py-5">
           <MobileDateNav />
           <AgendaMobileFilters
@@ -223,7 +230,6 @@ export function AgendaPage() {
           <Plus />
           Nuevo turno
         </Button>
-        <AdminMobileBottomNav />
         {isAppointmentFlowOpen ? (
           <AppointmentMobileScreen initialSlot={selectedSlot} onClose={closeAppointmentFlow} />
         ) : null}

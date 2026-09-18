@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
 import {
   Bell,
   CalendarDays,
@@ -55,7 +56,7 @@ export function AdminShellDesktop({
 
         <nav aria-label="Principal" className="flex-1 space-y-3 px-5 pt-4">
           {navItems.map((item) => (
-            <a
+            <Link
               aria-current={item.active ? "page" : undefined}
               className={cn(
                 "flex min-h-touch items-center gap-4 rounded-lg px-4 text-lg font-medium text-on-surface-variant transition-colors hover:bg-surface-container-lowest hover:text-on-surface focus-visible:outline-focus-ring [&_svg]:size-5",
@@ -66,7 +67,7 @@ export function AdminShellDesktop({
             >
               {item.icon}
               <span>{item.label}</span>
-            </a>
+            </Link>
           ))}
         </nav>
 

@@ -1,13 +1,21 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
-import { LoginPage } from "@/components/auth/login-page";
 import { Button, InlineAlert, Skeleton } from "@/components/ui";
 import { useAuth } from "@/components/auth/auth-provider";
 
 export function ProtectedAdmin({ children }: { children: ReactNode }) {
   const { error, refreshUser, status } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.replace("/login");
+    }
+  }, [router, status]);
 
   if (status === "loading") {
     return (
@@ -22,7 +30,15 @@ export function ProtectedAdmin({ children }: { children: ReactNode }) {
   }
 
   if (status === "unauthenticated") {
-    return <LoginPage />;
+    return (
+      <main className="min-h-screen bg-surface px-6 py-10 text-on-surface">
+        <section className="mx-auto w-full max-w-5xl">
+          <Skeleton className="h-12 w-56" />
+          <Skeleton className="mt-8 h-16 w-full" />
+          <Skeleton className="mt-6 h-[32rem] w-full" />
+        </section>
+      </main>
+    );
   }
 
   if (status === "forbidden") {
