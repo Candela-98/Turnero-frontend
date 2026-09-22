@@ -30,8 +30,9 @@ export function AdminMobileBottomNav({
   return (
     <nav
       aria-label="Navegación principal"
+      style={{ minHeight: "calc(4.75rem + env(safe-area-inset-bottom))" }}
       className={cn(
-        "fixed inset-x-0 bottom-0 z-30 border-t border-outline-variant bg-surface/96 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 backdrop-blur md:hidden",
+        "fixed inset-x-0 bottom-0 z-40 border-t border-outline-variant bg-surface/96 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 backdrop-blur md:hidden",
         className,
       )}
     >

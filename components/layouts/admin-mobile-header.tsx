@@ -7,11 +7,13 @@ import { cn } from "@/lib/utils";
 import { BrandMark } from "./brand-mark";
 
 export type AdminMobileHeaderProps = {
+  businessName?: string;
   className?: string;
   subtitle: string;
 };
 
 export function AdminMobileHeader({
+  businessName,
   className,
   subtitle,
 }: AdminMobileHeaderProps) {
@@ -22,7 +24,7 @@ export function AdminMobileHeader({
         className,
       )}
     >
-      <BrandMark subtitle={subtitle} />
+      <BrandMark name={businessName} subtitle={subtitle} />
       <div className="flex shrink-0 items-center gap-1">
         <IconButton label="Notificaciones" size="sm" variant="ghost">
           <Bell />

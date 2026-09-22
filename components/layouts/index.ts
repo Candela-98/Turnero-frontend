@@ -4,6 +4,7 @@ export type {
   AdminMobileBottomNavProps,
 } from "./admin-mobile-bottom-nav";
 export { AdminMobileHeader, type AdminMobileHeaderProps } from "./admin-mobile-header";
+export { AdminMobileStickyAction, type AdminMobileStickyActionProps } from "./admin-mobile-sticky-action";
 export { AdminAppShell } from "./admin-app-shell";
 export { AdminShellDesktop, defaultAdminNavItems } from "./admin-shell-desktop";
 export type { AdminNavItem, AdminShellDesktopProps } from "./admin-shell-desktop";

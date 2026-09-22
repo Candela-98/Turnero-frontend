@@ -20,6 +20,7 @@ import {
   type AdminMobileBottomNavItem,
   type AdminNavItem,
 } from "@/components/layouts";
+import { useAuth } from "@/components/auth/auth-provider";
 
 type AdminRoute = {
   href: string;
@@ -52,6 +53,7 @@ function isRouteActive(pathname: string, href: string) {
 }
 
 export function AdminAppShell({ children }: { children: ReactNode }) {
+  const { business } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
   const [isDesktop, setIsDesktop] = useState<boolean | null>(null);
@@ -89,7 +91,7 @@ export function AdminAppShell({ children }: { children: ReactNode }) {
 
   if (isDesktop) {
     return (
-      <AdminShellDesktop navItems={desktopNavItems} onNewAppointment={openNewAppointment}>
+      <AdminShellDesktop businessName={business?.name} navItems={desktopNavItems} onNewAppointment={openNewAppointment}>
         {children}
       </AdminShellDesktop>
     );
@@ -97,8 +99,13 @@ export function AdminAppShell({ children }: { children: ReactNode }) {
 
   return (
     <>
-      <AdminMobileHeader subtitle={currentRoute?.subtitle ?? "Panel administrativo"} />
-      {children}
+      <AdminMobileHeader businessName={business?.name} subtitle={currentRoute?.subtitle ?? "Panel administrativo"} />
+      <div
+        className="min-h-[calc(100vh-4rem)] md:contents"
+        style={{ paddingBottom: "calc(4.75rem + env(safe-area-inset-bottom))" }}
+      >
+        {children}
+      </div>
       <AdminMobileBottomNav items={mobileNavItems} />
     </>
   );

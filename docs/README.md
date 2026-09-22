@@ -19,9 +19,10 @@ Este archivo es el indice de documentacion frontend. No reemplaza a los document
 2. `integracion-api-mvp.md` si la pantalla consume backend.
 3. `roadmap.md`
 4. `handoff-implementacion-mvp.md`
-5. `decisiones-diseno-mvp.md`
-6. `stitch/progreso-stitch.md`
-7. `../../Turnero-api/docs/mvp/tracking-implementacion-mvp.md` para saber que endpoints backend ya estan disponibles.
+5. `patrones-mobile.md` al implementar una variante mobile.
+6. `decisiones-diseno-mvp.md`
+7. `stitch/progreso-stitch.md`
+8. `../../Turnero-api/docs/mvp/tracking-implementacion-mvp.md` para saber que endpoints backend ya estan disponibles.
 
 ### Para probar el acceso administrativo real en local
 
@@ -59,6 +60,15 @@ Fuente para implementar UI:
 - Headers y bottom nav mobile.
 - Badges, filtros, cards y estados.
 - Definition of Done visual.
+
+### `patrones-mobile.md`
+
+Fuente para implementar y revisar experiencias mobile:
+
+- Elección de shell admin, task o booking.
+- Safe areas, bottom nav y acciones primarias fijas.
+- Densidad, controles y formato temporal.
+- QA en viewports mobile de referencia.
 
 ### `roadmap.md`
 
