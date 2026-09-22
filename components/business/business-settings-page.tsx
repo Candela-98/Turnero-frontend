@@ -1,6 +1,7 @@
 "use client";
 
-import { Building2, CheckCircle2, Clock3, Save, X } from "lucide-react";
+import { Building2, CheckCircle2, Clock3, Save, SlidersHorizontal, X } from "lucide-react";
+import Link from "next/link";
 import { type FormEvent, useCallback, useEffect, useId, useMemo, useState } from "react";
 
 import { useAuth } from "@/components/auth/auth-provider";
@@ -238,6 +239,13 @@ export function BusinessSettingsPage() {
         <p className="mt-2 max-w-2xl text-sm leading-6 text-on-surface-variant sm:mt-3 sm:text-base sm:leading-7">
           Actualizá la información que se mostrará a tus clientes y la referencia horaria del negocio.
         </p>
+        <Link
+          className="mt-4 inline-flex min-h-touch items-center gap-2 rounded-lg border border-outline bg-surface-container-lowest px-3 text-sm font-semibold text-primary shadow-soft transition-colors hover:bg-surface-container-low"
+          href="/configuracion/reservas"
+        >
+          <SlidersHorizontal aria-hidden="true" className="size-4" />
+          Configurar reglas de reserva
+        </Link>
       </header>
 
       <form className="rounded-xl bg-surface-container-lowest p-5 shadow-panel sm:p-8" id={formId} noValidate onSubmit={handleSubmit}>
