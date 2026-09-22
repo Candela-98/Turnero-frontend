@@ -1,6 +1,6 @@
 # Tracking de Implementacion Frontend MVP
 
-Actualizado: 2026-09-16
+Actualizado: 2026-09-22
 
 ## Proposito
 
@@ -14,11 +14,11 @@ Los demás documentos deben enlazar este archivo cuando necesiten mencionar qué
 
 El frontend ya tiene una base limpia de Next.js, agenda/admin con mocks, flujo de crear turno alineado a Stitch y autenticación administrativa real mediante el BFF same-origin.
 
-Todavía no hay booking cliente ni integración real de agenda, catálogo, clientes, profesionales, configuración o dashboard. La agenda en `/` sigue usando mocks; las rutas declaradas en la navegación administrativa todavía no tienen pantallas propias.
+Todavía no hay booking cliente ni integración real de agenda, catálogo, clientes, profesionales, configuración o dashboard. La agenda en `/agenda` sigue usando mocks; TURN-94 agregó las rutas administrativas y sus estados de transición, que se reemplazarán progresivamente por pantallas funcionales.
 
 El backend ya dispone de auth Google/sesión convergente con el contrato canónico y de recursos admin para configuración, servicios, profesionales, clientes y horarios. La autenticación real quedó validada con la cookie HTTP-only local.
 
-La prioridad actual es integrar primero los recursos administrativos cuyo contrato backend ya está disponible. Booking público sigue siendo una referencia visual y queda bloqueado para integración hasta que existan sus endpoints.
+La prioridad actual es integrar primero los recursos administrativos cuyo contrato backend ya está disponible. Booking público ya dispone de perfil y servicios, pero sigue bloqueado para un flujo completo hasta que existan availability, creación y cancelación.
 
 ## Listo
 
@@ -111,6 +111,7 @@ La prioridad actual es integrar primero los recursos administrativos cuyo contra
   - acceso protegido, estado de acceso denegado, logout y menú de cuenta;
   - validación manual local de login, recarga, acceso protegido y logout;
   - E2E desktop/mobile de login limpio, errores explícitos y flujo de sesión.
+- TURN-94 mergeado en PR #4: rutas públicas y administrativas separadas, navegación desktop/mobile consistente y estados transitorios para Dashboard, Clientes, Servicios, Profesionales y Configuración.
 
 ## Pendiente
 
@@ -123,11 +124,10 @@ La prioridad actual es integrar primero los recursos administrativos cuyo contra
 
 Actualizar esta sección al cerrar cada PR. La prioridad y sus dependencias se registran aquí, no en el roadmap, handoff, decisiones ni documentos Stitch.
 
-### Ahora — I1: base HTTP e integración de configuración
+### Ahora — I1: integración de configuración
 
-- Crear cliente HTTP centralizado, base URL por ambiente, credenciales/proxy o CORS y normalización del formato de error backend.
-- Incorporar adapters entre DTOs `snake_case` y modelos TypeScript de UI.
-- Implementar la ruta de Configuración conectada a `business`, `booking-settings` y `business-hours`.
+- Integrar la ruta de Configuración conectada a `business`, `booking-settings` y `business-hours`.
+- Incorporar adapters entre DTOs `snake_case` y modelos TypeScript de UI cuando cada pantalla real lo necesite.
 - Cubrir carga, error, guardado y reemplazo transaccional de horarios semanales.
 
 Condición de cierre: configuración usable contra API real, sin acoplar agenda ni el formulario de turnos a contratos incompletos.
@@ -149,7 +149,7 @@ Condición de cierre: la agenda y el flujo de turnos comparten adapters y no dup
 
 ### Entregado — I4: autenticación y navegación protegida
 
-TURN-69 quedó mergeado en [PR #1](https://github.com/Candela-98/Turnero-frontend/pull/1) y validado contra TURN-88: login Google, cookie HTTP-only, restauración de sesión, acceso protegido y logout. La segregación posterior de layouts y rutas administrativas queda para TURN-94.
+TURN-69 quedó mergeado en [PR #1](https://github.com/Candela-98/Turnero-frontend/pull/1) y validado contra TURN-88: login Google, cookie HTTP-only, restauración de sesión, acceso protegido y logout. TURN-94 quedó mergeado en [PR #4](https://github.com/Candela-98/Turnero-frontend/pull/4): segregó layouts/rutas y dejó la navegación administrativa operativa.
 
 ### Bloqueado por backend — I5: booking público
 
@@ -191,9 +191,9 @@ Dependencias por flujo frontend:
 | Staff members admin | Si | CRUD, asociaciones y horarios disponibles para integracion progresiva. |
 | Staff-service offerings | Si | Endpoints v1 ya disponibles para integracion progresiva. |
 | Customers admin | Si | Endpoints admin v1 ya disponibles para integracion progresiva. |
-| Business/configuracion | Si | Endpoints de business, booking settings y business hours disponibles; primer candidato de integracion real. |
+| Business/configuracion | Si | Endpoints de business, booking settings y business hours disponibles; TURN-89 ya protege business hours y TURN-82 puede integrarlos. |
 | Auth Google admin | No requiere mocks | TURN-97 + TURN-88 + TURN-69 entregados: BFF, contrato canónico y aprovisionamiento local. |
-| Booking publico | Si | PRs 21-24: profile, services, availability, public appointments y cancelacion. |
+| Booking publico | Si | TURN-58 ya expone perfil y servicios; TURN-59 a TURN-61 deben completar availability, reserva y cancelación. |
 
 ## Que se puede hacer con mocks
 
@@ -220,7 +220,6 @@ Dependencias por flujo frontend:
 
 ## Que debe esperar endpoints reales
 
-- Cliente HTTP, adapters DTO/UI y configuracion CORS/proxy.
 - Lectura real de agenda diaria.
 - Persistencia real de crear/editar turno.
 - Contrato final de confirmacion, cancelacion, complete/no-show integrado en agenda.
@@ -275,9 +274,8 @@ Para cambios futuros de codigo:
 ## No asumir todavia
 
 - No asumir que agenda diaria real esta lista hasta que PR 5 / `TURN-41` este cerrado.
-- No asumir que los links de navegacion representan rutas implementadas: por ahora solo existe la agenda en `/`.
-- No asumir que booking publico puede conectarse: faltan sus endpoints backend.
-- No asumir booking publico real hasta PRs 21-24.
+- No asumir que los estados de transición de TURN-94 equivalen a pantallas funcionales; las rutas existen, pero cada flujo conserva su ticket de implementación.
+- No asumir que booking público está completo: faltan availability, creación y cancelación en TURN-59 a TURN-61.
 - No crear reglas de negocio duplicadas en frontend si el backend debe validarlas.
 - No mezclar booking cliente con admin.
 - No implementar portal cliente, portal profesional, multi-business, vista mes ni analytics avanzado en MVP.
