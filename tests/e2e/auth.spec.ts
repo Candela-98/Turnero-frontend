@@ -6,6 +6,10 @@ const authMeUrl = `${apiBaseUrl}/api/backend/api/v1/auth/me`;
 const authLogoutUrl = `${apiBaseUrl}/api/backend/api/v1/auth/logout`;
 const googleScriptUrl = "https://accounts.google.com/gsi/client";
 
+function isMobileProject(projectName: string) {
+  return projectName.startsWith("mobile");
+}
+
 const currentUser = {
   business: { id: 10, name: "Barber Studio", onboarding_status: "COMPLETED", slug: "barber-studio" },
   user: { avatar_url: null, email: "juan@example.com", id: 1, name: "Juan Perez", role: "OWNER" },
@@ -164,7 +168,7 @@ test.describe("admin authentication", () => {
 
     await page.getByRole("button", { name: "Continuar con Google" }).click();
 
-    if (testInfo.project.name === "mobile") {
+    if (isMobileProject(testInfo.project.name)) {
       await expect(page.getByText("Agenda de hoy")).toBeVisible();
     } else {
       await expect(page.getByRole("heading", { name: "Agenda" })).toBeVisible();
@@ -189,7 +193,7 @@ test.describe("admin authentication", () => {
     await page.goto("/agenda");
     await expect(page.getByRole("button", { name: "Reintentar" })).toBeVisible();
     await page.getByRole("button", { name: "Reintentar" }).click();
-    await expect(testInfo.project.name === "mobile" ? page.getByText("Agenda de hoy") : page.getByRole("heading", { name: "Agenda" })).toBeVisible();
+    await expect(isMobileProject(testInfo.project.name) ? page.getByText("Agenda de hoy") : page.getByRole("heading", { name: "Agenda" })).toBeVisible();
   });
 
   test("logs out and returns to login even when logout reports an expired session", async ({ page }) => {
@@ -208,7 +212,7 @@ test.describe("admin authentication", () => {
     );
     await page.goto("/agenda");
 
-    if (testInfo.project.name === "mobile") {
+    if (isMobileProject(testInfo.project.name)) {
       await page.getByRole("link", { name: "Más" }).click();
       await expect(page).toHaveURL(/\/mas$/);
       await expect(page.getByRole("heading", { name: "Más opciones" })).toBeVisible();

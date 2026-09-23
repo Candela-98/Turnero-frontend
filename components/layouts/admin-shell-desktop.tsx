@@ -26,6 +26,7 @@ export type AdminNavItem = {
 };
 
 export type AdminShellDesktopProps = {
+  businessName?: string;
   children: ReactNode;
   className?: string;
   navItems?: AdminNavItem[];
@@ -42,6 +43,7 @@ export const defaultAdminNavItems: AdminNavItem[] = [
 ];
 
 export function AdminShellDesktop({
+  businessName,
   children,
   className,
   navItems = defaultAdminNavItems,
@@ -51,7 +53,7 @@ export function AdminShellDesktop({
     <div className="min-h-screen bg-surface text-on-surface">
       <aside className="fixed inset-y-0 left-0 hidden w-80 flex-col border-r border-outline-variant bg-surface md:flex">
         <div className="px-7 py-8">
-          <BrandMark />
+          <BrandMark name={businessName} />
         </div>
 
         <nav aria-label="Principal" className="flex-1 space-y-3 px-5 pt-4">

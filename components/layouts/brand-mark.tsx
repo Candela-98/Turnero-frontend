@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 export type BrandMarkProps = {
   className?: string;
   logoClassName?: string;
+  name?: string;
   showSubtitle?: boolean;
   subtitle?: string;
   variant?: "default" | "login";
@@ -11,6 +12,7 @@ export type BrandMarkProps = {
 export function BrandMark({
   className,
   logoClassName,
+  name = "Barber Studio",
   showSubtitle = true,
   subtitle = "Agenda premium",
   variant = "default",
@@ -27,7 +29,7 @@ export function BrandMark({
           <span className="relative">BS</span>
         </div>
         <div>
-          <p className="text-2xl font-extrabold leading-8 text-on-surface">Barber Studio</p>
+          <p className="text-2xl font-extrabold leading-8 text-on-surface">{name}</p>
           {showSubtitle ? (
             <p className="mt-1 text-sm font-medium text-primary/80">{subtitle}</p>
           ) : null}
@@ -47,7 +49,7 @@ export function BrandMark({
         BS
       </div>
       <div className="min-w-0">
-        <p className="truncate text-sm font-bold leading-5 text-primary md:text-xl md:leading-6">Barber Studio</p>
+        <p className="truncate text-sm font-bold leading-5 text-primary md:text-xl md:leading-6">{name}</p>
         {showSubtitle ? (
           <p className="truncate text-xs leading-4 text-on-surface-variant">{subtitle}</p>
         ) : null}

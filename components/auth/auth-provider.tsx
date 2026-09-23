@@ -23,6 +23,7 @@ type AuthContextValue = {
   signInWithGoogle: (idToken: string) => Promise<AuthSession>;
   signOut: () => Promise<void>;
   status: AuthStatus;
+  updateBusiness: (business: AuthSession["business"]) => void;
   user: AuthSession["user"] | null;
   business: AuthSession["business"] | null;
 };
@@ -40,6 +41,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(session.user);
     setBusiness(session.business);
     setStatus("authenticated");
+  }, []);
+
+  const updateBusiness = useCallback((nextBusiness: AuthSession["business"]) => {
+    setBusiness(nextBusiness);
   }, []);
 
   const handleAuthError = useCallback((authError: unknown, { silentUnauthorized = false } = {}) => {
@@ -130,9 +135,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signInWithGoogle,
       signOut,
       status,
+      updateBusiness,
       user,
     }),
-    [business, error, refreshUser, signInWithGoogle, signOut, status, user],
+    [business, error, refreshUser, signInWithGoogle, signOut, status, updateBusiness, user],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

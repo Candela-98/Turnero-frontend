@@ -3,6 +3,10 @@ import { expect, test } from "@playwright/test";
 
 const authMeUrl = "http://127.0.0.1:3000/api/backend/api/v1/auth/me";
 
+function isMobileProject(projectName: string) {
+  return projectName.startsWith("mobile");
+}
+
 test.describe("agenda smoke", () => {
   test.beforeEach(async ({ page }) => {
     await page.route(authMeUrl, async (route) => {
@@ -35,7 +39,7 @@ test.describe("agenda smoke", () => {
   });
 
   test("renders the mobile agenda and filters pending appointments", async ({ page }, testInfo) => {
-    test.skip(testInfo.project.name !== "mobile", "Mobile-only smoke.");
+    test.skip(!isMobileProject(testInfo.project.name), "Mobile-only smoke.");
 
     await page.goto("/agenda");
 
@@ -51,7 +55,7 @@ test.describe("agenda smoke", () => {
   });
 
   test("filters the mobile agenda by staff member", async ({ page }, testInfo) => {
-    test.skip(testInfo.project.name !== "mobile", "Mobile-only smoke.");
+    test.skip(!isMobileProject(testInfo.project.name), "Mobile-only smoke.");
 
     await page.goto("/agenda");
 
@@ -98,7 +102,7 @@ test.describe("agenda smoke", () => {
   test("opens the mobile appointment screen and validates quick customer fields", async ({
     page,
   }, testInfo) => {
-    test.skip(testInfo.project.name !== "mobile", "Mobile-only smoke.");
+    test.skip(!isMobileProject(testInfo.project.name), "Mobile-only smoke.");
 
     await page.goto("/agenda");
 
