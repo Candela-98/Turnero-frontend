@@ -40,6 +40,7 @@ test.describe("business settings", () => {
     await expect(page.getByLabel("Nombre del negocio")).toHaveValue("Barber Studio");
     await expect(page.getByLabel("Correo electrónico")).toHaveValue("hola@barberstudio.demo");
     await expect(page.getByLabel("Zona horaria")).toHaveValue("America/Argentina/Buenos_Aires");
+    await expect(page.getByRole("link", { name: "Configurar reglas de reserva" })).toHaveAttribute("href", "/configuracion/reservas");
     await expect(page.getByTestId("business-time-reference")).toContainText(
       isMobileProject(testInfo.project.name) ? "Argentina — Buenos Aires" : "Hora actual de referencia en Argentina — Buenos Aires:",
     );
