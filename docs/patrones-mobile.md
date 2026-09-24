@@ -32,7 +32,7 @@ No mezclar shell administrativo con booking público. Las tablas desktop se conv
 - Mantener padding horizontal de `16–20px` para contenido; cards pueden ocupar todo el ancho si preservan padding interno.
 - Nombres de negocio se truncan en header antes de desplazar acciones.
 - Fechas/horas largas tienen variante compacta en mobile; la versión completa puede mantenerse desde `md`.
-- Mensajes de éxito/error se descartan o dejan una acción clara; nunca deben tapar controles críticos.
+- Para respuestas de guardado, usar `FloatingAlert` por encima de la acción fija y la navegación: éxito visible sin scroll, descartable y con cierre automático a los 6 s; error de guardado persistente con cierre y reintento. El aviso no debe tapar controles críticos. Los errores de validación siguen junto a los campos.
 
 ## QA obligatorio
 

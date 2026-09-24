@@ -1,12 +1,12 @@
 "use client";
 
-import { Building2, CheckCircle2, Clock3, Save, SlidersHorizontal, X } from "lucide-react";
+import { Building2, CheckCircle2, Clock3, Save, SlidersHorizontal } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useCallback, useEffect, useId, useMemo, useState } from "react";
 
 import { useAuth } from "@/components/auth/auth-provider";
 import { AdminMobileStickyAction } from "@/components/layouts";
-import { Button, InlineAlert, Input, Select, Skeleton } from "@/components/ui";
+import { Button, FloatingAlert, InlineAlert, Input, Select, Skeleton } from "@/components/ui";
 import { ApiError } from "@/lib/api/client";
 import {
   getBusiness,
@@ -246,6 +246,13 @@ export function BusinessSettingsPage() {
           <SlidersHorizontal aria-hidden="true" className="size-4" />
           Configurar reglas de reserva
         </Link>
+        <Link
+          className="mt-3 inline-flex min-h-touch items-center gap-2 rounded-lg border border-outline bg-surface-container-lowest px-3 text-sm font-semibold text-primary shadow-soft transition-colors hover:bg-surface-container-low sm:ml-3 sm:mt-4"
+          href="/configuracion/horarios"
+        >
+          <Clock3 aria-hidden="true" className="size-4" />
+          Configurar horarios de atención
+        </Link>
       </header>
 
       <form className="rounded-xl bg-surface-container-lowest p-5 shadow-panel sm:p-8" id={formId} noValidate onSubmit={handleSubmit}>
@@ -347,28 +354,6 @@ export function BusinessSettingsPage() {
           </div>
         </div>
 
-        {saveError ? (
-          <InlineAlert className="mt-6" title="No pudimos guardar los cambios" tone="error">
-            <p>{saveError}</p>
-            <Button className="mt-3" onClick={() => void save(values)} size="sm" variant="outline">
-              Reintentar
-            </Button>
-          </InlineAlert>
-        ) : null}
-        {hasSaved ? (
-          <InlineAlert className="relative mt-6 pr-12" title="Cambios guardados" tone="positive">
-            <span className="inline-flex items-center gap-2"><CheckCircle2 aria-hidden="true" className="size-4" />La información del negocio está actualizada.</span>
-            <button
-              aria-label="Cerrar confirmación"
-              className="absolute right-4 top-3 rounded-sm p-1 text-on-tertiary-fixed-variant transition-colors hover:bg-tertiary-fixed-dim/40 focus-visible:outline-focus-ring"
-              onClick={() => setHasSaved(false)}
-              type="button"
-            >
-              <X aria-hidden="true" className="size-4" />
-            </button>
-          </InlineAlert>
-        ) : null}
-
         <div className="mt-7 hidden justify-end border-t border-outline-variant pt-6 md:flex">
           <Button disabled={isSaving} type="submit">
             <Save aria-hidden="true" />
@@ -382,6 +367,17 @@ export function BusinessSettingsPage() {
           {isSaving ? "Guardando..." : "Guardar cambios"}
         </Button>
       </AdminMobileStickyAction>
+      {saveError ? (
+        <FloatingAlert dismissLabel="Cerrar error" onDismiss={() => setSaveError(null)} title="No pudimos guardar los cambios" tone="error">
+          <p>{saveError}</p>
+          <Button className="mt-3" disabled={isSaving} onClick={() => void save(values)} size="sm" variant="outline">Reintentar</Button>
+        </FloatingAlert>
+      ) : null}
+      {hasSaved ? (
+        <FloatingAlert dismissLabel="Cerrar confirmación" onDismiss={() => setHasSaved(false)} title="Cambios guardados" tone="positive">
+          <span className="inline-flex items-center gap-2"><CheckCircle2 aria-hidden="true" className="size-4" />La información del negocio está actualizada.</span>
+        </FloatingAlert>
+      ) : null}
     </section>
   );
 }

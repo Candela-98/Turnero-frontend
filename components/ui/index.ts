@@ -11,6 +11,7 @@ export {
 } from "./card";
 export { EmptyState, type EmptyStateProps } from "./empty-state";
 export { FilterPill, type FilterPillProps } from "./filter-pill";
+export { FloatingAlert, type FloatingAlertProps } from "./floating-alert";
 export { IconButton, iconButtonVariants, type IconButtonProps } from "./icon-button";
 export { InlineAlert, type InlineAlertProps } from "./inline-alert";
 export { Input, type InputProps } from "./input";

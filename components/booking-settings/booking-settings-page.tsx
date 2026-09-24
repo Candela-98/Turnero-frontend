@@ -1,11 +1,11 @@
 "use client";
 
-import { CheckCircle2, ChevronLeft, Save, SlidersHorizontal, X } from "lucide-react";
+import { CheckCircle2, ChevronLeft, Save, SlidersHorizontal } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useCallback, useEffect, useId, useState } from "react";
 
 import { AdminMobileStickyAction } from "@/components/layouts";
-import { Button, InlineAlert, Input, Select, Skeleton } from "@/components/ui";
+import { Button, FloatingAlert, InlineAlert, Input, Select, Skeleton } from "@/components/ui";
 import { Switch } from "@/components/ui/switch";
 import { ApiError } from "@/lib/api/client";
 import {
@@ -339,28 +339,6 @@ export function BookingSettingsPage() {
           </Field>
         </div>
 
-        {saveError ? (
-          <InlineAlert className="mt-6" title="No pudimos guardar las reglas" tone="error">
-            <p>{saveError}</p>
-            <Button className="mt-3" onClick={() => void save(values)} size="sm" variant="outline">
-              Reintentar
-            </Button>
-          </InlineAlert>
-        ) : null}
-        {hasSaved ? (
-          <InlineAlert className="relative mt-6 pr-12" title="Cambios guardados" tone="positive">
-            <span className="inline-flex items-center gap-2"><CheckCircle2 aria-hidden="true" className="size-4" />Las reglas de reserva están actualizadas.</span>
-            <button
-              aria-label="Cerrar confirmación"
-              className="absolute right-4 top-3 rounded-sm p-1 text-on-tertiary-fixed-variant transition-colors hover:bg-tertiary-fixed-dim/40 focus-visible:outline-focus-ring"
-              onClick={() => setHasSaved(false)}
-              type="button"
-            >
-              <X aria-hidden="true" className="size-4" />
-            </button>
-          </InlineAlert>
-        ) : null}
-
         <div className="mt-7 hidden justify-end border-t border-outline-variant pt-6 md:flex">
           <Button disabled={isSaving} type="submit">
             <Save aria-hidden="true" />
@@ -374,6 +352,17 @@ export function BookingSettingsPage() {
           {isSaving ? "Guardando..." : "Guardar cambios"}
         </Button>
       </AdminMobileStickyAction>
+      {saveError ? (
+        <FloatingAlert dismissLabel="Cerrar error" onDismiss={() => setSaveError(null)} title="No pudimos guardar las reglas" tone="error">
+          <p>{saveError}</p>
+          <Button className="mt-3" disabled={isSaving} onClick={() => void save(values)} size="sm" variant="outline">Reintentar</Button>
+        </FloatingAlert>
+      ) : null}
+      {hasSaved ? (
+        <FloatingAlert dismissLabel="Cerrar confirmación" onDismiss={() => setHasSaved(false)} title="Cambios guardados" tone="positive">
+          <span className="inline-flex items-center gap-2"><CheckCircle2 aria-hidden="true" className="size-4" />Las reglas de reserva están actualizadas.</span>
+        </FloatingAlert>
+      ) : null}
     </section>
   );
 }
