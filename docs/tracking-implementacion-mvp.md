@@ -1,6 +1,6 @@
 # Tracking de Implementacion Frontend MVP
 
-Actualizado: 2026-09-22
+Actualizado: 2026-09-25
 
 ## Proposito
 
@@ -14,7 +14,7 @@ Los demás documentos deben enlazar este archivo cuando necesiten mencionar qué
 
 El frontend ya tiene una base limpia de Next.js, agenda/admin con mocks, flujo de crear turno alineado a Stitch y autenticación administrativa real mediante el BFF same-origin.
 
-Todavía no hay booking cliente ni integración real de agenda, catálogo, clientes, profesionales o dashboard. La agenda en `/agenda` sigue usando mocks; TURN-94 agregó las rutas administrativas y sus estados de transición, que se reemplazarán progresivamente por pantallas funcionales. Configuración ya integra los datos del negocio y las reglas de reserva; los horarios semanales están en integración mediante TURN-82.
+Todavía no hay booking cliente ni integración real de agenda, catálogo, clientes, profesionales o dashboard. La agenda en `/agenda` sigue usando mocks; TURN-94 agregó las rutas administrativas y sus estados de transición, que se reemplazarán progresivamente por pantallas funcionales. TURN-85 quedó completada: Configuración integra datos del negocio, reglas de reserva y horarios semanales contra la API real.
 
 El backend ya dispone de auth Google/sesión convergente con el contrato canónico y de recursos admin para configuración, servicios, profesionales, clientes y horarios. La autenticación real quedó validada con la cookie HTTP-only local.
 
@@ -114,6 +114,8 @@ La prioridad actual es integrar primero los recursos administrativos cuyo contra
 - TURN-94 mergeado en PR #4: rutas públicas y administrativas separadas, navegación desktop/mobile consistente y estados transitorios para Dashboard, Clientes, Servicios, Profesionales y Configuración.
 - TURN-81 mergeado en PR #5: configuración de identidad, contacto y zona horaria del negocio mediante `business`.
 - TURN-83 mergeado en PR #6: reglas de reserva mediante `booking-settings`, con validación, estados recuperables y acción sticky mobile.
+- TURN-82 mergeado en PR #8: editor semanal de `business-hours` con carga y guardado reales, validación por día, feedback y acción sticky mobile. TURN-81, TURN-82 y TURN-83 completan TURN-85 en Jira.
+- El PR #8 también unificó los componentes de guardado y feedback de los formularios de Configuración; la verificación final pasó lint, tipos, 35 tests unitarios, build y 109 E2E (14 omitidos).
 
 ## Pendiente
 
@@ -126,15 +128,15 @@ La prioridad actual es integrar primero los recursos administrativos cuyo contra
 
 Actualizar esta sección al cerrar cada PR. La prioridad y sus dependencias se registran aquí, no en el roadmap, handoff, decisiones ni documentos Stitch.
 
-### Ahora — I1: integración de configuración
+### Entregado — I1: integración de configuración
 
-- `business` y `booking-settings` ya están integrados por TURN-81 y TURN-83.
-- TURN-82 en curso: integrar `business-hours` con adapters `snake_case`, carga, error, guardado y reemplazo transaccional de horarios semanales.
+- `business`, `booking-settings` y `business-hours` están integrados por TURN-81, TURN-83 y TURN-82 (PRs #5, #6 y #8).
+- El editor envía la semana completa al backend; este actualiza en el lugar los días existentes y crea solo los faltantes, sin alterar horarios de profesionales.
 - Excepciones, feriados, pausas y horarios especiales quedan para una tarea posterior: `availability_exceptions` existe en backend, pero todavía no expone CRUD administrativo.
 
-Condición de cierre: configuración usable contra API real, sin acoplar agenda ni el formulario de turnos a contratos incompletos.
+Condición de cierre cumplida: configuración usable contra API real, sin acoplar agenda ni el formulario de turnos a contratos incompletos.
 
-### Siguiente — I2: catálogos administrativos reales
+### Ahora — I2: catálogos administrativos reales
 
 - Crear rutas y flujos para servicios, profesionales y clientes sobre los endpoints admin disponibles.
 - Incorporar formularios, validación y server state cuando aporten valor al flujo real.
@@ -170,6 +172,7 @@ Estado backend relevante:
 - PR 1-4 completados.
 - PRs 8-15 implementados en codigo; Availability y parte de su contrato aun requieren validacion.
 - PR 16 (`business`), PR 17 (`booking-settings`) y PR 18 (`business-hours`/TURN-55) completados y mergeados.
+- El reemplazo semanal de `business-hours` fue corregido en backend PR #69 para actualizar días existentes sin chocar con la restricción única por negocio y día.
 - TURN-88 alineó auth/sesión/protección admin al contrato canónico; TURN-69 quedó validado contra backend local.
 - PR 5 / `TURN-41` parcial:
   - ya existe `/api/v1/appointments`;
@@ -193,7 +196,7 @@ Dependencias por flujo frontend:
 | Staff members admin | Si | CRUD, asociaciones y horarios disponibles para integracion progresiva. |
 | Staff-service offerings | Si | Endpoints v1 ya disponibles para integracion progresiva. |
 | Customers admin | Si | Endpoints admin v1 ya disponibles para integracion progresiva. |
-| Business/configuracion | Si | `business` y `booking-settings` integrados en PR #5/#6. TURN-89 protege `business-hours`; TURN-82 integra su editor semanal. Excepciones y feriados requieren un contrato CRUD posterior. |
+| Business/configuracion | No requiere mocks | `business`, `booking-settings` y `business-hours` integrados en PRs #5/#6/#8. TURN-89 protege horarios y backend PR #69 corrigió su actualización. Excepciones y feriados requieren un contrato CRUD posterior. |
 | Auth Google admin | No requiere mocks | TURN-97 + TURN-88 + TURN-69 entregados: BFF, contrato canónico y aprovisionamiento local. |
 | Booking publico | Si | TURN-58 ya expone perfil y servicios; TURN-59 a TURN-61 deben completar availability, reserva y cancelación. |
 
