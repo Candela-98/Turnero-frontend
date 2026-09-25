@@ -1,7 +1,7 @@
 import { AxeBuilder } from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
-const authMeUrl = "http://127.0.0.1:3000/api/backend/api/v1/auth/me";
+const authMeUrl = "**/api/backend/api/v1/auth/me";
 
 function isMobileProject(projectName: string) {
   return projectName.startsWith("mobile");

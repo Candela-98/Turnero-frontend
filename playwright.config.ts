@@ -2,6 +2,9 @@ import { defineConfig, devices } from "@playwright/test";
 
 process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ??= "test-google-client-id";
 
+const playwrightPort = process.env.PLAYWRIGHT_PORT ?? "3100";
+const playwrightBaseUrl = `http://127.0.0.1:${playwrightPort}`;
+
 export default defineConfig({
   expect: {
     timeout: 5_000,
@@ -11,14 +14,15 @@ export default defineConfig({
   testDir: "./tests/e2e",
   timeout: 30_000,
   use: {
-    baseURL: "http://127.0.0.1:3000",
+    baseURL: playwrightBaseUrl,
     trace: "on-first-retry",
   },
   webServer: {
-    command: "npm run dev",
+    command: `npm run dev -- --port ${playwrightPort}`,
+    env: { NEXT_DIST_DIR: ".next-e2e" },
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
-    url: "http://127.0.0.1:3000",
+    url: playwrightBaseUrl,
   },
   projects: [
     {

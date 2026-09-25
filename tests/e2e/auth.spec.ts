@@ -1,9 +1,9 @@
 import { expect, test } from "@playwright/test";
 
-const apiBaseUrl = "http://127.0.0.1:3000";
-const authGoogleUrl = `${apiBaseUrl}/api/backend/api/v1/auth/google`;
-const authMeUrl = `${apiBaseUrl}/api/backend/api/v1/auth/me`;
-const authLogoutUrl = `${apiBaseUrl}/api/backend/api/v1/auth/logout`;
+const apiBaseUrl = "**/api/backend/api/v1";
+const authGoogleUrl = `${apiBaseUrl}/auth/google`;
+const authMeUrl = `${apiBaseUrl}/auth/me`;
+const authLogoutUrl = `${apiBaseUrl}/auth/logout`;
 const googleScriptUrl = "https://accounts.google.com/gsi/client";
 
 function isMobileProject(projectName: string) {

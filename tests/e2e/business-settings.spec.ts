@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
-const authMeUrl = "http://127.0.0.1:3000/api/backend/api/v1/auth/me";
-const businessUrl = "http://127.0.0.1:3000/api/backend/api/v1/business";
+const authMeUrl = "**/api/backend/api/v1/auth/me";
+const businessUrl = "**/api/backend/api/v1/business";
 
 const currentUser = {
   business: { id: 10, name: "Barber Studio", onboarding_status: "COMPLETED", slug: "barber-studio" },
@@ -41,10 +41,37 @@ test.describe("business settings", () => {
     await expect(page.getByLabel("Correo electrónico")).toHaveValue("hola@barberstudio.demo");
     await expect(page.getByLabel("Zona horaria")).toHaveValue("America/Argentina/Buenos_Aires");
     await expect(page.getByRole("link", { name: "Configurar reglas de reserva" })).toHaveAttribute("href", "/configuracion/reservas");
+    await expect(page.getByRole("link", { name: "Configurar horarios de atención" })).toHaveAttribute("href", "/configuracion/horarios");
     await expect(page.getByTestId("business-time-reference")).toContainText(
       isMobileProject(testInfo.project.name) ? "Argentina — Buenos Aires" : "Hora actual de referencia en Argentina — Buenos Aires:",
     );
     await expect(page.getByText("barber-studio")).not.toBeVisible();
+  });
+
+  test("enables saving only for unsaved edits and disables it again after reverting or saving", async ({ page }) => {
+    let saveCalls = 0;
+    await page.route(businessUrl, async (route) => {
+      if (route.request().method() === "PATCH") {
+        saveCalls += 1;
+        await route.fulfill({ contentType: "application/json", json: { ...currentBusiness, name: "Studio Nuevo" }, status: 200 });
+        return;
+      }
+      await route.fulfill({ contentType: "application/json", json: currentBusiness, status: 200 });
+    });
+    await page.goto("/configuracion");
+
+    const name = page.getByLabel("Nombre del negocio");
+    const save = page.getByRole("button", { name: "Guardar cambios" });
+    await expect(save).toBeDisabled();
+    await name.fill("Studio Nuevo");
+    await expect(save).toBeEnabled();
+    await name.fill("Barber Studio");
+    await expect(save).toBeDisabled();
+    await name.fill("Studio Nuevo");
+    await save.click();
+    await expect(page.getByText("Cambios guardados")).toBeVisible();
+    await expect(save).toBeDisabled();
+    expect(saveCalls).toBe(1);
   });
 
   test("saves only editable fields and refreshes the business name in the shell", async ({ page }, testInfo) => {
@@ -75,6 +102,13 @@ test.describe("business settings", () => {
     await page.getByRole("button", { name: "Guardar cambios" }).click();
 
     await expect(page.getByText("Cambios guardados")).toBeVisible();
+    const alertBox = await page.getByTestId("floating-alert").boundingBox();
+    const saveBox = await page.getByRole("button", { name: "Guardar cambios" }).boundingBox();
+    expect(alertBox).not.toBeNull();
+    expect(saveBox).not.toBeNull();
+    const gap = (saveBox?.y ?? 0) - (alertBox?.y ?? 0) - (alertBox?.height ?? 0);
+    if (isMobileProject(testInfo.project.name)) expect(gap).toBeGreaterThanOrEqual(0);
+    else expect(gap).toBeCloseTo(8, 0);
     await expect(page.getByTestId("business-time-reference")).toContainText(
       isMobileProject(testInfo.project.name) ? "Uruguay" : "Hora actual de referencia en Uruguay:",
     );
@@ -126,8 +160,10 @@ test.describe("business settings", () => {
     await page.getByLabel("Correo electrónico").fill("nuevo@barberstudio.demo");
     await page.getByRole("button", { name: "Guardar cambios" }).click();
 
-    await expect(page.getByText("El correo ya está en uso.")).toBeVisible();
+    await expect(page.getByText("El correo ya está en uso.")).toBeInViewport();
+    await expect(page.getByLabel("Correo electrónico")).toBeFocused();
     await expect(page.getByLabel("Correo electrónico")).toHaveAttribute("aria-invalid", "true");
+    await expect(page.getByTestId("floating-alert")).not.toBeVisible();
   });
 
   test("validates required fields before sending the update", async ({ page }) => {
@@ -140,8 +176,10 @@ test.describe("business settings", () => {
     await page.getByLabel("Nombre del negocio").fill("");
     await page.getByRole("button", { name: "Guardar cambios" }).click();
 
-    await expect(page.getByText("Ingresá el nombre del negocio.")).toBeVisible();
+    await expect(page.getByText("Ingresá el nombre del negocio.")).toBeInViewport();
+    await expect(page.getByLabel("Nombre del negocio")).toBeFocused();
     await expect(page.getByLabel("Nombre del negocio")).toHaveAttribute("aria-invalid", "true");
+    await expect(page.getByTestId("floating-alert")).not.toBeVisible();
     expect(patchCalls).toBe(0);
   });
 

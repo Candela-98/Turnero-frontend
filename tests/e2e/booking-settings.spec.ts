@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
-const authMeUrl = "http://127.0.0.1:3000/api/backend/api/v1/auth/me";
-const bookingSettingsUrl = "http://127.0.0.1:3000/api/backend/api/v1/booking-settings";
+const authMeUrl = "**/api/backend/api/v1/auth/me";
+const bookingSettingsUrl = "**/api/backend/api/v1/booking-settings";
 
 const currentUser = {
   business: { id: 10, name: "Barber Studio", onboarding_status: "COMPLETED", slug: "barber-studio" },
@@ -43,7 +43,33 @@ test.describe("booking settings", () => {
     await expect(page.getByText("WhatsApp")).not.toBeVisible();
   });
 
-  test("saves all editable rules and never sends post-MVP fields", async ({ page }) => {
+  test("enables saving only for unsaved edits and disables it again after reverting or saving", async ({ page }) => {
+    let saveCalls = 0;
+    await page.route(bookingSettingsUrl, async (route) => {
+      if (route.request().method() === "PATCH") {
+        saveCalls += 1;
+        await route.fulfill({ contentType: "application/json", json: { ...currentBookingSettings, public_booking_enabled: false }, status: 200 });
+        return;
+      }
+      await route.fulfill({ contentType: "application/json", json: currentBookingSettings, status: 200 });
+    });
+    await page.goto("/configuracion/reservas");
+
+    const toggle = page.getByRole("switch", { name: "Aceptar reservas online" });
+    const save = page.getByRole("button", { name: "Guardar cambios" });
+    await expect(save).toBeDisabled();
+    await toggle.click();
+    await expect(save).toBeEnabled();
+    await toggle.click();
+    await expect(save).toBeDisabled();
+    await toggle.click();
+    await save.click();
+    await expect(page.getByText("Cambios guardados")).toBeVisible();
+    await expect(save).toBeDisabled();
+    expect(saveCalls).toBe(1);
+  });
+
+  test("saves all editable rules and never sends post-MVP fields", async ({ page }, testInfo) => {
     await page.route(bookingSettingsUrl, async (route) => {
       if (route.request().method() === "GET") {
         await route.fulfill({ contentType: "application/json", json: currentBookingSettings, status: 200 });
@@ -83,6 +109,13 @@ test.describe("booking settings", () => {
     await page.getByRole("button", { name: "Guardar cambios" }).click();
 
     await expect(page.getByText("Cambios guardados")).toBeVisible();
+    const alertBox = await page.getByTestId("floating-alert").boundingBox();
+    const saveBox = await page.getByRole("button", { name: "Guardar cambios" }).boundingBox();
+    expect(alertBox).not.toBeNull();
+    expect(saveBox).not.toBeNull();
+    const gap = (saveBox?.y ?? 0) - (alertBox?.y ?? 0) - (alertBox?.height ?? 0);
+    if (isMobileProject(testInfo.project.name)) expect(gap).toBeGreaterThanOrEqual(0);
+    else expect(gap).toBeCloseTo(8, 0);
     await page.getByRole("button", { name: "Cerrar confirmación" }).click();
     await expect(page.getByText("Cambios guardados")).not.toBeVisible();
   });
@@ -107,11 +140,17 @@ test.describe("booking settings", () => {
     await page.goto("/configuracion/reservas");
     await page.getByLabel("Ventana de reserva").fill("0");
     await page.getByLabel("Anticipación mínima para reservar").fill("-1");
+    await page.getByLabel("Anticipación para cancelar").fill("");
     await page.getByRole("button", { name: "Guardar cambios" }).click();
 
-    await expect(page.getByText("Ingresá una cantidad entera de al menos 1 día.")).toBeVisible();
-    await expect(page.getByText("Ingresá una cantidad entera de 0 horas o más.")).toBeVisible();
+    await expect(page.getByTestId("floating-alert")).not.toBeVisible();
+    await expect(page.getByText("Ingresá una cantidad entera de al menos 1 día.")).toBeInViewport();
+    await expect(page.getByText("Ingresá una cantidad entera de 0 horas o más.")).toHaveCount(2);
+    await expect(page.getByLabel("Anticipación para cancelar")).toHaveAttribute("aria-invalid", "true");
     await expect(page.getByLabel("Ventana de reserva")).toHaveAttribute("aria-invalid", "true");
+    await expect(page.getByLabel("Ventana de reserva")).toBeFocused();
+    await expect(page.getByTestId("form-validation-summary")).toHaveCount(0);
+    await expect(page.getByLabel("Anticipación para cancelar")).toHaveAttribute("aria-invalid", "true");
     expect(patchCalls).toBe(0);
   });
 
@@ -137,7 +176,38 @@ test.describe("booking settings", () => {
     await page.getByRole("button", { name: "Guardar cambios" }).click();
 
     await expect(page.getByText("La ventana supera el máximo permitido.")).toBeVisible();
+    await expect(page.getByLabel("Ventana de reserva")).toBeFocused();
     await expect(page.getByLabel("Ventana de reserva")).toHaveAttribute("aria-invalid", "true");
+    await expect(page.getByText("La ventana supera el máximo permitido.")).toBeInViewport();
+    await expect(page.getByTestId("floating-alert")).not.toBeVisible();
+  });
+
+  test("shows API validation beside an affected switch", async ({ page }) => {
+    await page.route(bookingSettingsUrl, async (route) => {
+      if (route.request().method() === "GET") {
+        await route.fulfill({ contentType: "application/json", json: currentBookingSettings, status: 200 });
+        return;
+      }
+      await route.fulfill({
+        contentType: "application/json",
+        json: {
+          code: "VALIDATION_ERROR",
+          details: [{ field: "manualConfirmationEnabled", message: "La confirmación manual no está disponible." }],
+          message: "Validation error",
+          status: 400,
+        },
+        status: 400,
+      });
+    });
+    await page.goto("/configuracion/reservas");
+    const confirmation = page.getByRole("switch", { name: "Requerir confirmación manual" });
+    await confirmation.click();
+    await page.getByRole("button", { name: "Guardar cambios" }).click();
+
+    await expect(confirmation).toBeFocused();
+    await expect(confirmation).toHaveAttribute("aria-invalid", "true");
+    await expect(page.getByText("La confirmación manual no está disponible.")).toBeInViewport();
+    await expect(page.getByTestId("floating-alert")).not.toBeVisible();
   });
 
   test("offers a retry when loading rules fails", async ({ page }) => {
