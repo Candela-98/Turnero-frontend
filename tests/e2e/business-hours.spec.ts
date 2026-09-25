@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
-const authMeUrl = "http://127.0.0.1:3000/api/backend/api/v1/auth/me";
-const businessHoursUrl = "http://127.0.0.1:3000/api/backend/api/v1/business-hours";
+const authMeUrl = "**/api/backend/api/v1/auth/me";
+const businessHoursUrl = "**/api/backend/api/v1/business-hours";
 
 const currentUser = {
   business: { id: 10, name: "Barber Studio", onboarding_status: "COMPLETED", slug: "barber-studio" },
@@ -102,7 +102,7 @@ test.describe("business hours", () => {
     await expect(page.getByText("La hora de cierre debe ser posterior a la apertura.")).toBeVisible();
     await expect(page.getByLabel("Lunes: cierre")).toHaveAttribute("aria-invalid", "true");
     await expect(page.getByLabel("Lunes: cierre")).toBeFocused();
-    await page.getByRole("button", { name: "Cerrar resumen de errores" }).click();
+    await expect(page.getByRole("button", { name: "Cerrar resumen de errores" })).toHaveCount(0);
     await expect(page.getByText("Revisá los horarios", { exact: true })).not.toBeVisible();
     await expect(page.getByText("La hora de cierre debe ser posterior a la apertura.")).toBeVisible();
     expect(putCalls).toBe(0);
@@ -126,15 +126,15 @@ test.describe("business hours", () => {
     expect(midway - end).toBeGreaterThan(100);
   });
 
-  test("shows the error summary beside an invalid Sunday field", async ({ page }) => {
+  test("shows the field-level error beside an invalid Sunday field without a redundant summary", async ({ page }) => {
     await page.route(businessHoursUrl, (route) => route.fulfill({ contentType: "application/json", json: weeklyHours(), status: 200 }));
     await page.goto("/configuracion/horarios");
     await page.getByLabel("Domingo: apertura").fill("");
     await page.getByRole("button", { name: "Guardar cambios" }).click();
 
     await expect(page.getByLabel("Domingo: apertura")).toBeFocused();
-    await expect(page.getByText("Revisá los horarios", { exact: true })).toBeInViewport();
     await expect(page.getByText("Ingresá una hora de apertura.")).toBeInViewport();
+    await expect(page.getByText("Revisá los horarios", { exact: true })).not.toBeVisible();
   });
 
   test("does not send a replacement after reopening and reclosing Sunday", async ({ page }) => {
