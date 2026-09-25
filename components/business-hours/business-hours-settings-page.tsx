@@ -1,11 +1,11 @@
 "use client";
 
-import { CheckCircle2, ChevronLeft, Clock3, Save } from "lucide-react";
+import { CheckCircle2, ChevronLeft, Clock3 } from "lucide-react";
 import Link from "next/link";
-import { Fragment, type FormEvent, useCallback, useEffect, useId, useRef, useState } from "react";
+import { Fragment, type FormEvent, useCallback, useEffect, useId, useState } from "react";
 
 import { AdminMobileStickyAction } from "@/components/layouts";
-import { Button, FloatingAlert, InlineAlert, Input, Skeleton } from "@/components/ui";
+import { Button, FloatingAlert, InlineAlert, Input, SaveActionFeedback, SaveChangesButton, Skeleton } from "@/components/ui";
 import { Switch } from "@/components/ui/switch";
 import {
   businessDayLabels,
@@ -19,6 +19,7 @@ import {
   type BusinessHoursFormValues,
   type BusinessHoursListApiResponse,
 } from "@/lib/business-hours";
+import { useFocusInvalidField } from "@/lib/forms/use-focus-invalid-field";
 
 function TimeField({
   ariaLabel,
@@ -134,12 +135,8 @@ export function BusinessHoursSettingsPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [hasSaved, setHasSaved] = useState(false);
   const formId = useId();
-  const scrollFrame = useRef<number | null>(null);
+  const focusInvalidField = useFocusInvalidField();
   const hasChanges = Boolean(values && hours && hasUnsavedChanges(values, hours));
-
-  useEffect(() => () => {
-    if (scrollFrame.current !== null) window.cancelAnimationFrame(scrollFrame.current);
-  }, []);
 
   const loadBusinessHours = useCallback(async () => {
     setIsLoading(true);
@@ -206,46 +203,11 @@ export function BusinessHoursSettingsPage() {
         : `${formId}-${firstInvalidDay.dayOfWeek.toLowerCase()}-closes-at`
       : null;
 
-    setFormError(validation.form ?? (firstInvalidField ? "Revisá los horarios señalados para continuar." : null));
+    setFormError(validation.form ?? null);
     setSaveError(null);
     setHasSaved(false);
     if (validation.form || firstInvalidField) {
-      if (firstInvalidField) {
-        if (scrollFrame.current !== null) window.cancelAnimationFrame(scrollFrame.current);
-        scrollFrame.current = window.requestAnimationFrame(() => {
-          const input = document.getElementById(firstInvalidField);
-          if (!input) return;
-          scrollFrame.current = window.requestAnimationFrame(() => {
-            const start = window.scrollY;
-            const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-            const target = Math.max(0, Math.min(maxScroll, start + input.getBoundingClientRect().top - window.innerHeight / 2));
-
-            if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-              window.scrollTo(0, target);
-              input.focus({ preventScroll: true });
-              scrollFrame.current = null;
-              return;
-            }
-
-            let startedAt: number | null = null;
-            const animate = (now: number) => {
-              startedAt ??= now;
-              const progress = Math.min((now - startedAt) / 700, 1);
-              const eased = progress < 0.5
-                ? 4 * progress ** 3
-                : 1 - (-2 * progress + 2) ** 3 / 2;
-              window.scrollTo(0, start + (target - start) * eased);
-              if (progress < 1) {
-                scrollFrame.current = window.requestAnimationFrame(animate);
-              } else {
-                input.focus({ preventScroll: true });
-                scrollFrame.current = null;
-              }
-            };
-            scrollFrame.current = window.requestAnimationFrame(animate);
-          });
-        });
-      }
+      if (firstInvalidField) focusInvalidField(firstInvalidField);
       return;
     }
 
@@ -325,30 +287,23 @@ export function BusinessHoursSettingsPage() {
           ))}
         </div>
 
-        <div className="mt-7 hidden justify-end border-t border-outline-variant pt-6 md:flex">
-          <Button disabled={isSaving || !hasChanges} type="submit">
-            <Save aria-hidden="true" />
-            {isSaving ? "Guardando..." : "Guardar cambios"}
-          </Button>
-        </div>
+        <SaveActionFeedback hasChanges={hasChanges} isSaving={isSaving}>
+          {saveError ? (
+            <FloatingAlert dismissLabel="Cerrar error" onDismiss={() => setSaveError(null)} title="No pudimos guardar los horarios" tone="error">
+              <p>{saveError}</p>
+              <Button className="mt-3" disabled={isSaving} onClick={() => void save(values)} size="sm" variant="outline">Reintentar</Button>
+            </FloatingAlert>
+          ) : null}
+          {hasSaved ? (
+            <FloatingAlert dismissLabel="Cerrar confirmación" onDismiss={() => setHasSaved(false)} title="Cambios guardados" tone="positive">
+              <span className="inline-flex items-center gap-2"><CheckCircle2 aria-hidden="true" className="size-4" />Los horarios del negocio están actualizados.</span>
+            </FloatingAlert>
+          ) : null}
+        </SaveActionFeedback>
       </form>
       <AdminMobileStickyAction>
-        <Button className="w-full" data-testid="business-hours-mobile-save" disabled={isSaving || !hasChanges} form={formId} type="submit">
-          <Save aria-hidden="true" />
-          {isSaving ? "Guardando..." : "Guardar cambios"}
-        </Button>
+        <SaveChangesButton className="w-full" data-testid="business-hours-mobile-save" form={formId} hasChanges={hasChanges} isSaving={isSaving} />
       </AdminMobileStickyAction>
-      {saveError ? (
-        <FloatingAlert dismissLabel="Cerrar error" onDismiss={() => setSaveError(null)} title="No pudimos guardar los horarios" tone="error">
-          <p>{saveError}</p>
-          <Button className="mt-3" disabled={isSaving} onClick={() => void save(values)} size="sm" variant="outline">Reintentar</Button>
-        </FloatingAlert>
-      ) : null}
-      {hasSaved ? (
-        <FloatingAlert dismissLabel="Cerrar confirmación" onDismiss={() => setHasSaved(false)} title="Cambios guardados" tone="positive">
-          <span className="inline-flex items-center gap-2"><CheckCircle2 aria-hidden="true" className="size-4" />Los horarios del negocio están actualizados.</span>
-        </FloatingAlert>
-      ) : null}
     </section>
   );
 }

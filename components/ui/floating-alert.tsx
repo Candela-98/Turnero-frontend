@@ -13,7 +13,7 @@ export type FloatingAlertProps = {
   tone: "error" | "positive";
 };
 
-/** Feedback visible regardless of the form's scroll position. Actionable alerts do not time out. */
+/** Fixed above the mobile action; anchored above SaveActionFeedback on desktop. Actionable alerts do not time out. */
 export function FloatingAlert({ autoDismissMs, children, dismissLabel, onDismiss, title, tone }: FloatingAlertProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [hasFocus, setHasFocus] = useState(false);
@@ -27,7 +27,7 @@ export function FloatingAlert({ autoDismissMs, children, dismissLabel, onDismiss
 
   return (
     <div
-      className="pointer-events-none fixed inset-x-4 bottom-[calc(9.5rem+env(safe-area-inset-bottom))] z-50 max-h-[calc(100dvh-11rem)] overflow-y-auto md:inset-x-auto md:bottom-6 md:right-6 md:w-[min(28rem,calc(100vw-3rem))] md:max-h-[calc(100dvh-3rem)]"
+      className="pointer-events-none fixed inset-x-4 bottom-[calc(9.5rem+env(safe-area-inset-bottom))] z-50 max-h-[calc(100dvh-11rem)] overflow-y-auto md:absolute md:inset-x-auto md:bottom-[calc(100%+8px)] md:right-0 md:top-auto md:w-[min(28rem,calc(100vw-3rem))] md:max-h-[calc(100dvh-11rem)]"
       data-testid="floating-alert"
       onBlurCapture={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget)) setHasFocus(false);

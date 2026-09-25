@@ -68,13 +68,13 @@ test.describe("business hours", () => {
     await expect(page.getByText("Cambios guardados")).toBeVisible();
     await expect(page.getByText("Los horarios del negocio están actualizados.")).toBeVisible();
     await expect(page.getByTestId("floating-alert")).toBeInViewport();
-    if (isMobileProject(testInfo.project.name)) {
-      const alertBox = await page.getByTestId("floating-alert").boundingBox();
-      const saveBox = await page.getByTestId("business-hours-mobile-save").boundingBox();
-      expect(alertBox).not.toBeNull();
-      expect(saveBox).not.toBeNull();
-      expect((alertBox?.y ?? 0) + (alertBox?.height ?? 0)).toBeLessThanOrEqual(saveBox?.y ?? 0);
-    }
+    const alertBox = await page.getByTestId("floating-alert").boundingBox();
+    const saveBox = await page.getByRole("button", { name: "Guardar cambios" }).boundingBox();
+    expect(alertBox).not.toBeNull();
+    expect(saveBox).not.toBeNull();
+    const gap = (saveBox?.y ?? 0) - (alertBox?.y ?? 0) - (alertBox?.height ?? 0);
+    if (isMobileProject(testInfo.project.name)) expect(gap).toBeGreaterThanOrEqual(0);
+    else expect(gap).toBeCloseTo(8, 0);
   });
 
   test("closes a successful save notice automatically", async ({ page }, testInfo) => {

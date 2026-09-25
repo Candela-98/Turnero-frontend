@@ -15,6 +15,8 @@ export { FloatingAlert, type FloatingAlertProps } from "./floating-alert";
 export { IconButton, iconButtonVariants, type IconButtonProps } from "./icon-button";
 export { InlineAlert, type InlineAlertProps } from "./inline-alert";
 export { Input, type InputProps } from "./input";
+export { SaveActionFeedback, type SaveActionFeedbackProps } from "./save-action-feedback";
+export { SaveChangesButton, type SaveChangesButtonProps } from "./save-changes-button";
 export { Select, type SelectProps } from "./select";
 export { Skeleton, type SkeletonProps } from "./skeleton";
 export { Switch, type SwitchProps } from "./switch";

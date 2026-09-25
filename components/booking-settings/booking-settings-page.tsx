@@ -1,11 +1,11 @@
 "use client";
 
-import { CheckCircle2, ChevronLeft, Save, SlidersHorizontal } from "lucide-react";
+import { CheckCircle2, ChevronLeft, SlidersHorizontal } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useCallback, useEffect, useId, useState } from "react";
 
 import { AdminMobileStickyAction } from "@/components/layouts";
-import { Button, FloatingAlert, InlineAlert, Input, Select, Skeleton } from "@/components/ui";
+import { Button, FloatingAlert, InlineAlert, Input, SaveActionFeedback, SaveChangesButton, Select, Skeleton } from "@/components/ui";
 import { Switch } from "@/components/ui/switch";
 import { ApiError } from "@/lib/api/client";
 import {
@@ -16,6 +16,8 @@ import {
   type BookingSettingsApiResponse,
   type BookingSettingsFormValues,
 } from "@/lib/booking-settings";
+import { hasChangedFields } from "@/lib/forms/has-changed-fields";
+import { useFocusInvalidField } from "@/lib/forms/use-focus-invalid-field";
 
 const slotIntervalOptions = [15, 30, 45, 60] as const;
 
@@ -141,24 +143,38 @@ function NumberField({
 function ToggleField({
   checked,
   description,
+  error,
+  id,
   label,
   onCheckedChange,
 }: {
   checked: boolean;
   description: string;
+  error?: string;
+  id: string;
   label: string;
   onCheckedChange: (checked: boolean) => void;
 }) {
-  const id = useId();
+  const labelId = `${id}-label`;
+  const errorId = `${id}-error`;
 
   return (
-    <div className="flex items-center justify-between gap-4 rounded-lg bg-surface-container-low p-4">
-      <div>
-        <p className="text-sm font-semibold">{label}</p>
-        <p className="mt-1 text-sm text-on-surface-variant">{description}</p>
+    <div className="rounded-lg bg-surface-container-low p-4">
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <p className="text-sm font-semibold" id={labelId}>{label}</p>
+          <p className="mt-1 text-sm text-on-surface-variant">{description}</p>
+        </div>
+        <Switch
+          aria-describedby={error ? errorId : undefined}
+          aria-invalid={Boolean(error)}
+          aria-labelledby={labelId}
+          checked={checked}
+          id={id}
+          onCheckedChange={onCheckedChange}
+        />
       </div>
-      <Switch aria-labelledby={id} checked={checked} onCheckedChange={onCheckedChange} />
-      <span className="sr-only" id={id}>{label}</span>
+      {error ? <p className="mt-2 text-sm text-error" id={errorId} role="alert">{error}</p> : null}
     </div>
   );
 }
@@ -173,6 +189,22 @@ export function BookingSettingsPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [hasSaved, setHasSaved] = useState(false);
   const formId = useId();
+  const focusInvalidField = useFocusInvalidField();
+  const hasChanges = hasChangedFields(values, settings ? toBookingSettingsFormValues(settings) : null);
+
+  function focusFirstError(errors: FieldErrors) {
+    const field = (["publicBookingEnabled", "manualConfirmationEnabled", "bookingWindowDays", "minNoticeHours", "cancellationNoticeHours", "slotIntervalMinutes"] as const)
+      .find((name) => errors[name]);
+    const suffix = {
+      bookingWindowDays: "booking-window-days",
+      cancellationNoticeHours: "cancellation-notice-hours",
+      manualConfirmationEnabled: "manual-confirmation-enabled",
+      minNoticeHours: "min-notice-hours",
+      publicBookingEnabled: "public-booking-enabled",
+      slotIntervalMinutes: "slot-interval-minutes",
+    };
+    if (field) focusInvalidField(`${formId}-${suffix[field]}`);
+  }
 
   const loadBookingSettings = useCallback(async () => {
     setIsLoading(true);
@@ -214,6 +246,7 @@ export function BookingSettingsPage() {
     } catch (error) {
       const errors = apiFieldErrors(error);
       setFieldErrors(errors);
+      focusFirstError(errors);
       if (Object.keys(errors).length === 0) {
         setSaveError("No pudimos guardar las reglas. Intentá nuevamente.");
       }
@@ -230,7 +263,11 @@ export function BookingSettingsPage() {
     setFieldErrors(errors);
     setSaveError(null);
     setHasSaved(false);
-    if (Object.keys(errors).length > 0) return;
+    if (Object.keys(errors).length > 0) {
+      focusFirstError(errors);
+      return;
+    }
+    if (!hasChanges) return;
 
     void save(values);
   }
@@ -287,12 +324,16 @@ export function BookingSettingsPage() {
           <ToggleField
             checked={values.publicBookingEnabled}
             description="Permití que tus clientes reserven desde el enlace público del negocio."
+            error={fieldErrors.publicBookingEnabled}
+            id={`${formId}-public-booking-enabled`}
             label="Aceptar reservas online"
             onCheckedChange={(checked) => updateValue("publicBookingEnabled", checked)}
           />
           <ToggleField
             checked={values.manualConfirmationEnabled}
             description="Las nuevas reservas quedarán pendientes hasta que las confirmes."
+            error={fieldErrors.manualConfirmationEnabled}
+            id={`${formId}-manual-confirmation-enabled`}
             label="Requerir confirmación manual"
             onCheckedChange={(checked) => updateValue("manualConfirmationEnabled", checked)}
           />
@@ -339,30 +380,23 @@ export function BookingSettingsPage() {
           </Field>
         </div>
 
-        <div className="mt-7 hidden justify-end border-t border-outline-variant pt-6 md:flex">
-          <Button disabled={isSaving} type="submit">
-            <Save aria-hidden="true" />
-            {isSaving ? "Guardando..." : "Guardar cambios"}
-          </Button>
-        </div>
+        <SaveActionFeedback hasChanges={hasChanges} isSaving={isSaving}>
+          {saveError ? (
+            <FloatingAlert dismissLabel="Cerrar error" onDismiss={() => setSaveError(null)} title="No pudimos guardar las reglas" tone="error">
+              <p>{saveError}</p>
+              <Button className="mt-3" disabled={isSaving} onClick={() => void save(values)} size="sm" variant="outline">Reintentar</Button>
+            </FloatingAlert>
+          ) : null}
+          {hasSaved ? (
+            <FloatingAlert dismissLabel="Cerrar confirmación" onDismiss={() => setHasSaved(false)} title="Cambios guardados" tone="positive">
+              <span className="inline-flex items-center gap-2"><CheckCircle2 aria-hidden="true" className="size-4" />Las reglas de reserva están actualizadas.</span>
+            </FloatingAlert>
+          ) : null}
+        </SaveActionFeedback>
       </form>
       <AdminMobileStickyAction>
-        <Button className="w-full" data-testid="booking-settings-mobile-save" disabled={isSaving} form={formId} type="submit">
-          <Save aria-hidden="true" />
-          {isSaving ? "Guardando..." : "Guardar cambios"}
-        </Button>
+        <SaveChangesButton className="w-full" data-testid="booking-settings-mobile-save" form={formId} hasChanges={hasChanges} isSaving={isSaving} />
       </AdminMobileStickyAction>
-      {saveError ? (
-        <FloatingAlert dismissLabel="Cerrar error" onDismiss={() => setSaveError(null)} title="No pudimos guardar las reglas" tone="error">
-          <p>{saveError}</p>
-          <Button className="mt-3" disabled={isSaving} onClick={() => void save(values)} size="sm" variant="outline">Reintentar</Button>
-        </FloatingAlert>
-      ) : null}
-      {hasSaved ? (
-        <FloatingAlert dismissLabel="Cerrar confirmación" onDismiss={() => setHasSaved(false)} title="Cambios guardados" tone="positive">
-          <span className="inline-flex items-center gap-2"><CheckCircle2 aria-hidden="true" className="size-4" />Las reglas de reserva están actualizadas.</span>
-        </FloatingAlert>
-      ) : null}
     </section>
   );
 }
