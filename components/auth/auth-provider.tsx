@@ -10,6 +10,7 @@ import {
   useState,
 } from "react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { getCurrentUser, loginWithGoogle, logout } from "@/lib/auth/api";
 import { getAuthErrorMessage, isForbiddenError, isUnauthorizedError } from "@/lib/auth/errors";
@@ -32,6 +33,7 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<AuthStatus>("loading");
   const [user, setUser] = useState<AuthSession["user"] | null>(null);
@@ -49,6 +51,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const handleAuthError = useCallback((authError: unknown, { silentUnauthorized = false } = {}) => {
     if (isUnauthorizedError(authError)) {
+      queryClient.clear();
       setUser(null);
       setBusiness(null);
       setError(silentUnauthorized ? null : getAuthErrorMessage(authError));
@@ -60,7 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setError(getAuthErrorMessage(authError));
       setStatus("error");
     }
-  }, []);
+  }, [queryClient]);
 
   const refreshUser = useCallback(async () => {
     setStatus("loading");
@@ -93,11 +96,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = useCallback(async () => {
     try { await logout(); } catch { /* Expired sessions are already effectively signed out. */ }
     setUser(null);
+    queryClient.clear();
     setBusiness(null);
     setError(null);
     setStatus("unauthenticated");
     router.replace("/login");
-  }, [router]);
+  }, [router, queryClient]);
 
   useEffect(() => {
     let isMounted = true;

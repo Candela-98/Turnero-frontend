@@ -222,6 +222,10 @@ test.describe("admin authentication", () => {
     }
 
     await expect(page).toHaveURL(/\/(clientes|servicios)$/);
-    await expect(page.getByText("Esta sección estará disponible próximamente.")).toBeVisible();
+    if (isMobileProject(testInfo.project.name)) {
+      await expect(page.getByRole("heading", { name: "Servicios" })).toBeVisible();
+    } else {
+      await expect(page.getByText("Esta sección estará disponible próximamente.")).toBeVisible();
+    }
   });
 });
