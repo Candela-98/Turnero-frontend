@@ -19,6 +19,8 @@ No mezclar shell administrativo con booking público. Las tablas desktop se conv
 ## Contrato espacial del admin
 
 - Breakpoint del shell: `< 768px` mobile; `>= 768px` desktop.
+- El shell desktop ya aporta el landmark `main` y el padding exterior. Las secciones que renderiza usan `section`, sin repetir ese padding.
+- Configuración y Servicios comparten `AdminPageHeader` y un contenedor `max-w-4xl`: título, descripción y margen superior mantienen la misma jerarquía; el contenido conserva la estructura propia del formulario o listado.
 - La bottom nav mide `calc(4.75rem + env(safe-area-inset-bottom))`, incluye la zona segura y permanece fija.
 - Todo contenido de una sección admin debe reservar padding inferior al menos igual a esa navegación.
 - Formularios con una acción primaria usan `AdminMobileStickyAction`: queda inmediatamente arriba de la bottom nav y el contenido reserva también su altura.

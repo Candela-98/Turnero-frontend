@@ -284,3 +284,15 @@ Para cambios futuros de codigo:
 - No crear reglas de negocio duplicadas en frontend si el backend debe validarlas.
 - No mezclar booking cliente con admin.
 - No implementar portal cliente, portal profesional, multi-business, vista mes ni analytics avanzado en MVP.
+
+## Entrega TURN-76 pendiente de integración
+
+Preparada para revisión el 2026-10-01 en `feature/TURN-76-services-list`, con destino `dev`. Pendiente de merge: no modifica todavía el estado de integración de las secciones anteriores.
+
+- `/servicios` consume el listado paginado y las categorías reales mediante BFF, cliente compartido y TanStack Query; requiere el contrato backend de TURN-76.
+- Búsqueda con debounce, modal responsive con filtros provisionales y acción Aplicar, pills removibles y paginación.
+- Estados de carga, negocio vacío, búsqueda sin resultados y error con reintento; aislamiento del cache por negocio, cancelación de respuestas obsoletas y limpieza al salir.
+- Layout alineado con Configuración y componentes de listado/filtros reutilizables documentados en `componentes-listados.md`.
+- QA local aprobado por el usuario en desktop y mobile; cobertura E2E y accesibilidad en `1440×900`, `390×844` y `412×915`.
+- Crear, editar, detalle y baja de servicios quedan para TURN-96/98; la agenda demo conserva su alcance actual.
+- Integrar primero el PR backend hacia `develop`; al integrar ambos PRs actualizar el estado operativo y el tracking de cierre.
