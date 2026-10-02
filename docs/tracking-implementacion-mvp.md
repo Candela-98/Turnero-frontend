@@ -1,6 +1,6 @@
 # Tracking de Implementacion Frontend MVP
 
-Actualizado: 2026-09-25
+Actualizado: 2026-10-02
 
 ## Proposito
 
@@ -14,7 +14,7 @@ Los demás documentos deben enlazar este archivo cuando necesiten mencionar qué
 
 El frontend ya tiene una base limpia de Next.js, agenda/admin con mocks, flujo de crear turno alineado a Stitch y autenticación administrativa real mediante el BFF same-origin.
 
-Todavía no hay booking cliente ni integración real de agenda, catálogo, clientes, profesionales o dashboard. La agenda en `/agenda` sigue usando mocks; TURN-94 agregó las rutas administrativas y sus estados de transición, que se reemplazarán progresivamente por pantallas funcionales. TURN-85 quedó completada: Configuración integra datos del negocio, reglas de reserva y horarios semanales contra la API real.
+El listado de servicios ya consume la API real por TURN-76 (PR #9). Todavía no hay booking cliente ni integración real de agenda, clientes, profesionales o dashboard; las mutaciones de servicios quedan pendientes. La agenda en `/agenda` sigue usando mocks; TURN-94 agregó las rutas administrativas y sus estados de transición, que se reemplazarán progresivamente por pantallas funcionales. TURN-85 quedó completada: Configuración integra datos del negocio, reglas de reserva y horarios semanales contra la API real.
 
 El backend ya dispone de auth Google/sesión convergente con el contrato canónico y de recursos admin para configuración, servicios, profesionales, clientes y horarios. La autenticación real quedó validada con la cookie HTTP-only local.
 
@@ -117,10 +117,14 @@ La prioridad actual es integrar primero los recursos administrativos cuyo contra
 - TURN-82 mergeado en PR #8: editor semanal de `business-hours` con carga y guardado reales, validación por día, feedback y acción sticky mobile. TURN-81, TURN-82 y TURN-83 completan TURN-85 en Jira.
 - El PR #8 también unificó los componentes de guardado y feedback de los formularios de Configuración; la verificación final pasó lint, tipos, 35 tests unitarios, build y 109 E2E (14 omitidos).
 
+- TURN-76 integrado en [PR #9](https://github.com/Candela-98/Turnero-frontend/pull/9): `/servicios` con catálogo real, filtros responsive, pills removibles, paginación y estados recuperables. Depende del backend [PR #72](https://github.com/Candela-98/Turnero-api/pull/72), también integrado.
+- Componentes reutilizables de diálogo, filtros, búsqueda y paginación documentados en `componentes-listados.md`; `AdminPageHeader` compartido con Configuración.
+
 ## Pendiente
 
-- Integrar los catálogos que el backend ya expone.
-- Implementar las rutas/pantallas de dashboard, clientes, servicios y profesionales.
+- Integrar los listados reales de profesionales y clientes.
+- Implementar creación, edición, detalle y baja de servicios mediante TURN-96/98.
+- Completar las pantallas funcionales de dashboard, clientes y profesionales.
 - Cerrar contratos pendientes de agenda y appointments antes de conectarlos como fuente final.
 - Implementar booking cliente real cuando estén disponibles sus endpoints públicos.
 
@@ -138,7 +142,8 @@ Condición de cierre cumplida: configuración usable contra API real, sin acopla
 
 ### Ahora — I2: catálogos administrativos reales
 
-- Crear rutas y flujos para servicios, profesionales y clientes sobre los endpoints admin disponibles.
+- Entregado TURN-76: listado real de servicios, búsqueda, filtros y paginación; backend PR #72 y frontend PR #9 integrados.
+- Continuar con los listados reales de profesionales/clientes y las mutaciones de servicios de TURN-96/98 sobre los endpoints admin disponibles.
 - Incorporar formularios, validación y server state cuando aporten valor al flujo real.
 - Mantener fuera de la UI los campos relacionales o métricas que el backend aún no expone.
 
@@ -192,7 +197,7 @@ Dependencias por flujo frontend:
 | Confirmar/cancelar | Si visualmente | Endpoints existen; integrar cuando la agenda real use el mismo adapter de appointments. |
 | Completar/no-show | Si visualmente | Endpoints existen; integrar cuando la agenda real use el mismo adapter de appointments. |
 | Slots reales admin | Si con mocks visuales | Endpoint existe, pero la respuesta actual es plana y requiere adapter/validacion contra contrato. |
-| Service offerings admin | Si | Endpoints admin v1 disponibles para integracion progresiva. |
+| Service offerings admin | Lectura real | TURN-76 integrado en PR #9 y backend PR #72: listado paginado, búsqueda, filtros y categorías reales. Creación, edición, detalle y baja pendientes de TURN-96/98. |
 | Staff members admin | Si | CRUD, asociaciones y horarios disponibles para integracion progresiva. |
 | Staff-service offerings | Si | Endpoints v1 ya disponibles para integracion progresiva. |
 | Customers admin | Si | Endpoints admin v1 ya disponibles para integracion progresiva. |
@@ -215,7 +220,7 @@ Dependencias por flujo frontend:
 - Booking cliente y confirmacion.
 - Dashboard.
 - Clientes y perfil.
-- Servicios.
+- Flujos pendientes de creación, edición y detalle de servicios.
 - Profesionales.
 - Configuracion.
 - Empty states.
@@ -285,14 +290,15 @@ Para cambios futuros de codigo:
 - No mezclar booking cliente con admin.
 - No implementar portal cliente, portal profesional, multi-business, vista mes ni analytics avanzado en MVP.
 
-## Entrega TURN-76 pendiente de integración
+## TURN-76 integrada — listado real de servicios
 
-Preparada para revisión el 2026-10-01 en `feature/TURN-76-services-list`, con destino `dev`. Pendiente de merge: no modifica todavía el estado de integración de las secciones anteriores.
+Integrada el 2026-10-02 en `dev` mediante [PR #9](https://github.com/Candela-98/Turnero-frontend/pull/9), merge `70df540`. Dependencia backend integrada previamente en `develop` mediante [PR #72](https://github.com/Candela-98/Turnero-api/pull/72), merge `a734b63`.
 
-- `/servicios` consume el listado paginado y las categorías reales mediante BFF, cliente compartido y TanStack Query; requiere el contrato backend de TURN-76.
+- `/servicios` consume el listado paginado y las categorías reales mediante BFF, cliente compartido y TanStack Query.
 - Búsqueda con debounce, modal responsive con filtros provisionales y acción Aplicar, pills removibles y paginación.
 - Estados de carga, negocio vacío, búsqueda sin resultados y error con reintento; aislamiento del cache por negocio, cancelación de respuestas obsoletas y limpieza al salir.
 - Layout alineado con Configuración y componentes de listado/filtros reutilizables documentados en `componentes-listados.md`.
 - QA local aprobado por el usuario en desktop y mobile; cobertura E2E y accesibilidad en `1440×900`, `390×844` y `412×915`.
-- Crear, editar, detalle y baja de servicios quedan para TURN-96/98; la agenda demo conserva su alcance actual.
-- Integrar primero el PR backend hacia `develop`; al integrar ambos PRs actualizar el estado operativo y el tracking de cierre.
+- Verificación: lint, TypeScript, build y 37 tests unitarios correctos; suite completa E2E con 127 aprobados y 14 omisiones previstas por viewport. CI del PR #9 completado correctamente antes del merge.
+- Crear, editar, detalle y baja de servicios quedan para TURN-96/98; la agenda demo conserva su alcance actual. La fase I2 continúa para el resto de catálogos y mutaciones.
+- Entrega técnica completada. El usuario realiza el cierre de TURN-76 en Jira.
