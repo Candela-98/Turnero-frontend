@@ -1,11 +1,5 @@
-import { AdminPlaceholderPage } from "@/components/admin";
+import { ServicesPage } from "@/components/services/services-page";
 
 export default function Services() {
-  return (
-    <AdminPlaceholderPage
-      description="La gestión de servicios estará disponible en esta sección."
-      title="Servicios"
-    />
-  );
+  return <ServicesPage />;
 }
-

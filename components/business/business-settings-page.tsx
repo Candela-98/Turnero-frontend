@@ -5,7 +5,7 @@ import Link from "next/link";
 import { type FormEvent, useCallback, useEffect, useId, useMemo, useState } from "react";
 
 import { useAuth } from "@/components/auth/auth-provider";
-import { AdminMobileStickyAction } from "@/components/layouts";
+import { AdminMobileStickyAction, AdminPageHeader } from "@/components/layouts";
 import { Button, FloatingAlert, InlineAlert, Input, SaveActionFeedback, SaveChangesButton, Select, Skeleton } from "@/components/ui";
 import { ApiError } from "@/lib/api/client";
 import {
@@ -247,12 +247,10 @@ export function BusinessSettingsPage() {
 
   return (
     <section className="mx-auto max-w-4xl pb-[calc(10.5rem+env(safe-area-inset-bottom))] md:pb-8">
-      <header className="mb-5 px-5 pt-5 md:mb-8 md:px-0 md:pt-0">
-        <p className="text-sm font-semibold text-primary">Administración</p>
-        <h1 className="mt-1 text-2xl font-bold tracking-tight sm:mt-2 sm:text-4xl">Configuración</h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-on-surface-variant sm:mt-3 sm:text-base sm:leading-7">
-          Actualizá la información que se mostrará a tus clientes y la referencia horaria del negocio.
-        </p>
+      <AdminPageHeader
+        title="Configuración"
+        description="Actualizá la información que se mostrará a tus clientes y la referencia horaria del negocio."
+      >
         <Link
           className="mt-4 inline-flex min-h-touch items-center gap-2 rounded-lg border border-outline bg-surface-container-lowest px-3 text-sm font-semibold text-primary shadow-soft transition-colors hover:bg-surface-container-low"
           href="/configuracion/reservas"
@@ -267,7 +265,7 @@ export function BusinessSettingsPage() {
           <Clock3 aria-hidden="true" className="size-4" />
           Configurar horarios de atención
         </Link>
-      </header>
+      </AdminPageHeader>
 
       <form className="rounded-xl bg-surface-container-lowest p-5 shadow-panel sm:p-8" id={formId} noValidate onSubmit={handleSubmit}>
         <div className="flex flex-col gap-3 border-b border-outline-variant pb-5 sm:flex-row sm:items-center sm:gap-4 sm:pb-6">

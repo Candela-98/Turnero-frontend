@@ -28,6 +28,7 @@ export type ApiRequestOptions = {
   body?: unknown;
   headers?: HeadersInit;
   method?: "DELETE" | "GET" | "PATCH" | "POST" | "PUT";
+  signal?: AbortSignal;
 };
 
 function isApiErrorBody(value: unknown): value is ApiErrorBody {
@@ -72,7 +73,7 @@ async function readResponseBody(response: Response) {
 
 export async function apiFetch<TResponse>(
   endpoint: string,
-  { body, headers, method = "GET" }: ApiRequestOptions = {},
+  { body, headers, method = "GET", signal }: ApiRequestOptions = {},
 ): Promise<TResponse> {
   const response = await fetch(buildApiUrl(endpoint), {
     body: body === undefined ? undefined : JSON.stringify(body),
@@ -82,6 +83,7 @@ export async function apiFetch<TResponse>(
       ...headers,
     },
     method,
+    signal,
   });
   const responseBody = await readResponseBody(response);
 
