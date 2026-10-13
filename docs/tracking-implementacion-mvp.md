@@ -305,7 +305,7 @@ Integrada el 2026-10-02 en `dev` mediante [PR #9](https://github.com/Candela-98/
 
 ## TURN-96 — implementación local pendiente de integración
 
-Preparada el 2026-10-09 en `feature/TURN-96-service-form`. Pruebas manuales aprobadas por el usuario en desktop y mobile el 2026-10-12; publicación de los PRs frontend hacia `dev` y backend hacia `develop` autorizada. Pendiente de merge. Este apartado no modifica el estado mergeado de las secciones anteriores.
+Preparada el 2026-10-09 en `feature/TURN-96-service-form`. Pruebas manuales aprobadas por el usuario en desktop y mobile el 2026-10-12; PR frontend [#10](https://github.com/Candela-98/Turnero-frontend/pull/10) abierto hacia `dev` y backend [#75](https://github.com/Candela-98/Turnero-api/pull/75) hacia `develop`. Integrar primero backend; ambos pendientes de merge. Este apartado no modifica el estado mergeado de las secciones anteriores.
 
 - Alta y edición mediante el formulario reutilizable de nombre, categoría opcional, duración y precio ARS. Modal en desktop, panel inferior en mobile y acciones fijas.
 - Operaciones GET por ID, POST y PATCH mediante BFF; campos editables exclusivamente y PATCH parcial. Categorías libres con sugerencias y limpieza mediante cadena vacía.
