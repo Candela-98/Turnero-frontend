@@ -15,6 +15,8 @@ Este archivo es el indice de documentacion frontend. No reemplaza a los document
 
 ### Para implementar pantallas
 
+Consultar primero [patrones-pantallas.md](patrones-pantallas.md) y [componentes-listados.md](componentes-listados.md): composición compartida desktop/mobile y comprobaciones de navegador. Las instrucciones para todas las sesiones están en `../AGENTS.md`.
+
 1. `tracking-implementacion-mvp.md`
 2. `integracion-api-mvp.md` si la pantalla consume backend.
 3. `roadmap.md`

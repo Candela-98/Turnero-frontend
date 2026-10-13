@@ -13,14 +13,15 @@ export type ResponsiveDialogProps = {
   title: string;
   description: string;
   closeLabel?: string;
+  closeDisabled?: boolean;
   children: ReactNode;
   footer?: ReactNode;
 };
 
 /** Controlled dialog: centered on desktop, bottom panel on mobile. */
-export function ResponsiveDialog({ open, onOpenChange, trigger, title, description, closeLabel = "Cerrar diálogo", children, footer }: ResponsiveDialogProps) {
+export function ResponsiveDialog({ open, onOpenChange, trigger, title, description, closeLabel = "Cerrar diálogo", closeDisabled = false, children, footer }: ResponsiveDialogProps) {
   return (
-    <Dialog.Root open={open} onOpenChange={onOpenChange}>
+    <Dialog.Root open={open} onOpenChange={next => { if (next || !closeDisabled) onOpenChange(next); }}>
       <Dialog.Trigger asChild>{trigger}</Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-50 bg-on-surface/40" />
@@ -30,9 +31,9 @@ export function ResponsiveDialog({ open, onOpenChange, trigger, title, descripti
               <Dialog.Title className="text-xl font-semibold">{title}</Dialog.Title>
               <Dialog.Description className="mt-1 text-sm text-on-surface-variant">{description}</Dialog.Description>
             </div>
-            <Dialog.Close asChild><Button aria-label={closeLabel} variant="ghost" className="size-11 shrink-0 px-0"><X aria-hidden="true" /></Button></Dialog.Close>
+            <Dialog.Close asChild><Button aria-label={closeLabel} disabled={closeDisabled} variant="ghost" className="size-11 shrink-0 px-0"><X aria-hidden="true" /></Button></Dialog.Close>
           </div>
-          <div className="min-h-0 space-y-6 overflow-y-auto p-5">{children}</div>
+          <div data-dialog-scroll className="min-h-0 space-y-6 overflow-y-auto p-5">{children}</div>
           {footer ? <div className="flex items-center justify-between gap-3 border-t border-outline-variant p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]">{footer}</div> : null}
         </Dialog.Content>
       </Dialog.Portal>

@@ -58,3 +58,17 @@ export async function getServiceOfferings(filters: ServiceFilters, signal?: Abor
 export function getServiceCategories(signal?: AbortSignal) {
   return apiFetch<string[]>("/api/v1/service-offerings/categories", { signal });
 }
+
+export type ServiceOfferingWriteRequest = Pick<ServiceOfferingDto, "name" | "category" | "duration_minutes" | "price_cents">;
+
+export async function getServiceOffering(id: number, signal?: AbortSignal) {
+  return toServiceOffering(await apiFetch<ServiceOfferingDto>(`/api/v1/service-offerings/${id}`, { signal }));
+}
+
+export async function createServiceOffering(body: ServiceOfferingWriteRequest) {
+  return toServiceOffering(await apiFetch<ServiceOfferingDto>("/api/v1/service-offerings", { method: "POST", body }));
+}
+
+export async function updateServiceOffering(id: number, body: Partial<ServiceOfferingWriteRequest>) {
+  return toServiceOffering(await apiFetch<ServiceOfferingDto>(`/api/v1/service-offerings/${id}`, { method: "PATCH", body }));
+}

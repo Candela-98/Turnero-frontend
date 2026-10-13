@@ -29,3 +29,5 @@ export { FilterButton, type FilterButtonProps } from "./filter-button";
 export { SearchInput, type SearchInputProps } from "./search-input";
 export { ListToolbar, type ListToolbarProps } from "./list-toolbar";
 export { Pagination, type PaginationProps } from "./pagination";
+
+export { ConfirmDiscardDialog, type ConfirmDiscardDialogProps } from "./confirm-discard-dialog";

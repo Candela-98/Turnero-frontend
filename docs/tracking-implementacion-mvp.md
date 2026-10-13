@@ -1,6 +1,6 @@
 # Tracking de Implementacion Frontend MVP
 
-Actualizado: 2026-10-02
+Actualizado: 2026-10-09
 
 ## Proposito
 
@@ -302,3 +302,21 @@ Integrada el 2026-10-02 en `dev` mediante [PR #9](https://github.com/Candela-98/
 - Verificación: lint, TypeScript, build y 37 tests unitarios correctos; suite completa E2E con 127 aprobados y 14 omisiones previstas por viewport. CI del PR #9 completado correctamente antes del merge.
 - Crear, editar, detalle y baja de servicios quedan para TURN-96/98; la agenda demo conserva su alcance actual. La fase I2 continúa para el resto de catálogos y mutaciones.
 - Entrega técnica completada. El usuario realiza el cierre de TURN-76 en Jira.
+
+## TURN-96 — implementación local pendiente de integración
+
+Preparada el 2026-10-09 en `feature/TURN-96-service-form`. Pruebas manuales aprobadas por el usuario en desktop y mobile el 2026-10-12; publicación de los PRs frontend hacia `dev` y backend hacia `develop` autorizada. Pendiente de merge. Este apartado no modifica el estado mergeado de las secciones anteriores.
+
+- Alta y edición mediante el formulario reutilizable de nombre, categoría opcional, duración y precio ARS. Modal en desktop, panel inferior en mobile y acciones fijas.
+- Operaciones GET por ID, POST y PATCH mediante BFF; campos editables exclusivamente y PATCH parcial. Categorías libres con sugerencias y limpieza mediante cadena vacía.
+- Validación local y errores de campo del backend, comparación contra la respuesta hidratada, conservación de borradores y confirmación de descarte. Bloqueo de doble envío y cierre durante el guardado.
+- Refresco de listado, categorías y detalle por negocio; recuperación de fallos de lectura posteriores al guardado sin repetir la escritura.
+- Tests unitarios y E2E de alta, edición, errores, descarte, categorías, hidratación, filtros y accesibilidad. QA en desktop y mobile; la verificación no sustituye las pruebas locales del usuario contra su backend.
+- Verificación final: lint, TypeScript, build y 56 tests unitarios correctos. Suite completa E2E: 160 aprobados y 14 omisiones previstas por viewport; los 33 casos del formulario pasan sin omisiones. Guía manual en `pruebas-locales-turn-96.md`.
+- Revisión local del 2026-10-12: confirmaciones de servicios flotantes con `FloatingAlert placement="viewport"`, sin desplazar el listado, con cierre manual y automático a los 6 segundos. E2E afectados: 36 aprobados sin omisiones, incluyendo posición estable al hacer scroll y ambos cierres en desktop y los dos viewports mobile.
+- Avisos unificados también en Configuración, reglas de reserva y horarios: flotantes a la derecha en desktop, acompañan el scroll y reservan espacio sobre Guardar; éxitos temporizados y errores persistentes con reintento. E2E de Configuración: 71 aprobados y 7 omisiones previstas por viewport.
+- Patrones reforzados entre sesiones: guía `patrones-pantallas.md` y reglas de composición en `AGENTS.md`; `AdminPageSection` y `AdminFormActions` utilizados en pantallas existentes; `FloatingAlert` flotante por defecto y separación automática sobre Guardar. Helpers E2E compartidos, comando `test:patterns` y CI también en pushes a `dev`, con reporte de fallos. Verificación local completa: lint, TypeScript, build y 56 unitarios correctos; 163 E2E aprobados y 14 omisiones previstas por viewport.
+- QA real detectó un defecto previo del backend: alta de servicios sin `created_at`/`updated_at`, rechazado por PostgreSQL. Corrección local en `ServOfferingServiceImpl`: fechas al crear y actualización de `updated_at` al editar/desactivar; prueba de persistencia con timestamps NOT NULL. Suite backend completa correcta mediante `make test`, que configura Docker/Colima para las pruebas PostgreSQL. Pendiente de integración backend; reiniciar la API local para probar. Sin migraciones.
+- Estado activo/inactivo, baja, detalle informativo y profesionales asociados permanecen fuera del frontend de TURN-96.
+- Segundo defecto del seed local: V1000 asignaba IDs explícitos sin avanzar secuencias. Nueva migración exclusivamente local `V1001__sync_seed_sequences.sql` sincroniza negocios, usuarios, profesionales y servicios sin retroceder contadores ni modificar filas. Reparación aplicada en la base local de esta sesión; regresión PostgreSQL para bases nuevas y existentes. Suite backend completa: 440 aprobados sin omisiones mediante `make test`. Pendiente de integración.
+- Avisos mobile según contexto: `FloatingAlert` deja 16 px sobre la navegación en páginas sin acción fija y reserva espacio sobre Guardar automáticamente dentro de `AdminFormActions`/`SaveActionFeedback`. Patrón aplicado a todos sus usos; guía persistente y helper E2E actualizados. Recorridos afectados: 107 aprobados y 7 omisiones previstas por viewport.

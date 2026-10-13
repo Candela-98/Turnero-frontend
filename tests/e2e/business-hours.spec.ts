@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { expectAdminNotice } from "./helpers/admin-patterns";
 
 const authMeUrl = "**/api/backend/api/v1/auth/me";
 const businessHoursUrl = "**/api/backend/api/v1/business-hours";
@@ -45,7 +46,7 @@ test.describe("business hours", () => {
     await expect(page.getByLabel("Martes: apertura")).toHaveValue("09:00");
   });
 
-  test("replaces the full week and sends null hours for a closed day", async ({ page }, testInfo) => {
+  test("replaces the full week and sends null hours for a closed day", async ({ page }) => {
     await page.route(businessHoursUrl, async (route) => {
       if (route.request().method() === "GET") {
         await route.fulfill({ contentType: "application/json", json: weeklyHours(), status: 200 });
@@ -68,13 +69,7 @@ test.describe("business hours", () => {
     await expect(page.getByText("Cambios guardados")).toBeVisible();
     await expect(page.getByText("Los horarios del negocio están actualizados.")).toBeVisible();
     await expect(page.getByTestId("floating-alert")).toBeInViewport();
-    const alertBox = await page.getByTestId("floating-alert").boundingBox();
-    const saveBox = await page.getByRole("button", { name: "Guardar cambios" }).boundingBox();
-    expect(alertBox).not.toBeNull();
-    expect(saveBox).not.toBeNull();
-    const gap = (saveBox?.y ?? 0) - (alertBox?.y ?? 0) - (alertBox?.height ?? 0);
-    if (isMobileProject(testInfo.project.name)) expect(gap).toBeGreaterThanOrEqual(0);
-    else expect(gap).toBeCloseTo(8, 0);
+    await expectAdminNotice(page, { withSaveAction: true });
   });
 
   test("closes a successful save notice automatically", async ({ page }, testInfo) => {

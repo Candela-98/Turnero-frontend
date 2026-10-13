@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { expectAdminNotice } from "./helpers/admin-patterns";
 
 const authMeUrl = "**/api/backend/api/v1/auth/me";
 const businessUrl = "**/api/backend/api/v1/business";
@@ -102,13 +103,7 @@ test.describe("business settings", () => {
     await page.getByRole("button", { name: "Guardar cambios" }).click();
 
     await expect(page.getByText("Cambios guardados")).toBeVisible();
-    const alertBox = await page.getByTestId("floating-alert").boundingBox();
-    const saveBox = await page.getByRole("button", { name: "Guardar cambios" }).boundingBox();
-    expect(alertBox).not.toBeNull();
-    expect(saveBox).not.toBeNull();
-    const gap = (saveBox?.y ?? 0) - (alertBox?.y ?? 0) - (alertBox?.height ?? 0);
-    if (isMobileProject(testInfo.project.name)) expect(gap).toBeGreaterThanOrEqual(0);
-    else expect(gap).toBeCloseTo(8, 0);
+    await expectAdminNotice(page, { withSaveAction: true });
     await expect(page.getByTestId("business-time-reference")).toContainText(
       isMobileProject(testInfo.project.name) ? "Uruguay" : "Hora actual de referencia en Uruguay:",
     );

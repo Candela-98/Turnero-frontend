@@ -5,8 +5,8 @@ import Link from "next/link";
 import { type FormEvent, useCallback, useEffect, useId, useMemo, useState } from "react";
 
 import { useAuth } from "@/components/auth/auth-provider";
-import { AdminMobileStickyAction, AdminPageHeader } from "@/components/layouts";
-import { Button, FloatingAlert, InlineAlert, Input, SaveActionFeedback, SaveChangesButton, Select, Skeleton } from "@/components/ui";
+import { AdminPageSection, AdminFormActions, AdminPageHeader } from "@/components/layouts";
+import { Button, FloatingAlert, InlineAlert, Input, Select, Skeleton } from "@/components/ui";
 import { ApiError } from "@/lib/api/client";
 import {
   getBusiness,
@@ -128,6 +128,7 @@ export function BusinessSettingsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [hasSaved, setHasSaved] = useState(false);
+  const dismissSaved = useCallback(() => setHasSaved(false), []);
   const formId = useId();
   const focusInvalidField = useFocusInvalidField();
   const hasChanges = hasChangedFields(values, business ? toBusinessFormValues(business) : null);
@@ -246,7 +247,7 @@ export function BusinessSettingsPage() {
   }
 
   return (
-    <section className="mx-auto max-w-4xl pb-[calc(10.5rem+env(safe-area-inset-bottom))] md:pb-8">
+    <AdminPageSection withSaveAction>
       <AdminPageHeader
         title="Configuración"
         description="Actualizá la información que se mostrará a tus clientes y la referencia horaria del negocio."
@@ -366,7 +367,7 @@ export function BusinessSettingsPage() {
           </div>
         </div>
 
-        <SaveActionFeedback hasChanges={hasChanges} isSaving={isSaving}>
+        <AdminFormActions formId={formId} hasChanges={hasChanges} isSaving={isSaving} mobileSaveTestId="business-settings-mobile-save">
           {saveError ? (
             <FloatingAlert dismissLabel="Cerrar error" onDismiss={() => setSaveError(null)} title="No pudimos guardar los cambios" tone="error">
               <p>{saveError}</p>
@@ -374,15 +375,12 @@ export function BusinessSettingsPage() {
             </FloatingAlert>
           ) : null}
           {hasSaved ? (
-            <FloatingAlert dismissLabel="Cerrar confirmación" onDismiss={() => setHasSaved(false)} title="Cambios guardados" tone="positive">
+            <FloatingAlert dismissLabel="Cerrar confirmación" onDismiss={dismissSaved} title="Cambios guardados" tone="positive">
               <span className="inline-flex items-center gap-2"><CheckCircle2 aria-hidden="true" className="size-4" />La información del negocio está actualizada.</span>
             </FloatingAlert>
           ) : null}
-        </SaveActionFeedback>
+        </AdminFormActions>
       </form>
-      <AdminMobileStickyAction>
-        <SaveChangesButton className="w-full" data-testid="business-settings-mobile-save" form={formId} hasChanges={hasChanges} isSaving={isSaving} />
-      </AdminMobileStickyAction>
-    </section>
+    </AdminPageSection>
   );
 }

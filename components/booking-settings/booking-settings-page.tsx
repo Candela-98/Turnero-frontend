@@ -4,8 +4,8 @@ import { CheckCircle2, ChevronLeft, SlidersHorizontal } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useCallback, useEffect, useId, useState } from "react";
 
-import { AdminMobileStickyAction } from "@/components/layouts";
-import { Button, FloatingAlert, InlineAlert, Input, SaveActionFeedback, SaveChangesButton, Select, Skeleton } from "@/components/ui";
+import { AdminPageSection, AdminFormActions } from "@/components/layouts";
+import { Button, FloatingAlert, InlineAlert, Input, Select, Skeleton } from "@/components/ui";
 import { Switch } from "@/components/ui/switch";
 import { ApiError } from "@/lib/api/client";
 import {
@@ -188,6 +188,7 @@ export function BookingSettingsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [hasSaved, setHasSaved] = useState(false);
+  const dismissSaved = useCallback(() => setHasSaved(false), []);
   const formId = useId();
   const focusInvalidField = useFocusInvalidField();
   const hasChanges = hasChangedFields(values, settings ? toBookingSettingsFormValues(settings) : null);
@@ -296,7 +297,7 @@ export function BookingSettingsPage() {
   }
 
   return (
-    <section className="mx-auto max-w-4xl pb-[calc(10.5rem+env(safe-area-inset-bottom))] md:pb-8">
+    <AdminPageSection withSaveAction>
       <header className="mb-5 px-5 pt-5 md:mb-8 md:px-0 md:pt-0">
         <Link className="inline-flex min-h-touch items-center gap-2 text-sm font-semibold text-primary hover:underline" href="/configuracion">
           <ChevronLeft aria-hidden="true" className="size-4" />
@@ -380,7 +381,7 @@ export function BookingSettingsPage() {
           </Field>
         </div>
 
-        <SaveActionFeedback hasChanges={hasChanges} isSaving={isSaving}>
+        <AdminFormActions formId={formId} hasChanges={hasChanges} isSaving={isSaving} mobileSaveTestId="booking-settings-mobile-save">
           {saveError ? (
             <FloatingAlert dismissLabel="Cerrar error" onDismiss={() => setSaveError(null)} title="No pudimos guardar las reglas" tone="error">
               <p>{saveError}</p>
@@ -388,15 +389,12 @@ export function BookingSettingsPage() {
             </FloatingAlert>
           ) : null}
           {hasSaved ? (
-            <FloatingAlert dismissLabel="Cerrar confirmación" onDismiss={() => setHasSaved(false)} title="Cambios guardados" tone="positive">
+            <FloatingAlert dismissLabel="Cerrar confirmación" onDismiss={dismissSaved} title="Cambios guardados" tone="positive">
               <span className="inline-flex items-center gap-2"><CheckCircle2 aria-hidden="true" className="size-4" />Las reglas de reserva están actualizadas.</span>
             </FloatingAlert>
           ) : null}
-        </SaveActionFeedback>
+        </AdminFormActions>
       </form>
-      <AdminMobileStickyAction>
-        <SaveChangesButton className="w-full" data-testid="booking-settings-mobile-save" form={formId} hasChanges={hasChanges} isSaving={isSaving} />
-      </AdminMobileStickyAction>
-    </section>
+    </AdminPageSection>
   );
 }
