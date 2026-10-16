@@ -72,3 +72,15 @@ export async function createServiceOffering(body: ServiceOfferingWriteRequest) {
 export async function updateServiceOffering(id: number, body: Partial<ServiceOfferingWriteRequest>) {
   return toServiceOffering(await apiFetch<ServiceOfferingDto>(`/api/v1/service-offerings/${id}`, { method: "PATCH", body }));
 }
+
+export function deactivateServiceOffering(id: number): Promise<void> {
+  return apiFetch<void>(`/api/v1/service-offerings/${id}`, { method: "DELETE" });
+}
+
+export async function restoreServiceOffering(id: number) {
+  return toServiceOffering(await apiFetch<ServiceOfferingDto>(`/api/v1/service-offerings/${id}`, { method: "PATCH", body: { status: "ACTIVE" } }));
+}
+
+export function removeServiceOffering(id: number): Promise<void> {
+  return apiFetch<void>(`/api/v1/service-offerings/${id}/catalog`, { method: "DELETE" });
+}

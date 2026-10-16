@@ -31,3 +31,4 @@ export { ListToolbar, type ListToolbarProps } from "./list-toolbar";
 export { Pagination, type PaginationProps } from "./pagination";
 
 export { ConfirmDiscardDialog, type ConfirmDiscardDialogProps } from "./confirm-discard-dialog";
+export { ConfirmActionDialog, type ConfirmActionDialogProps } from "./confirm-action-dialog";

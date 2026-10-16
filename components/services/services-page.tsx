@@ -2,27 +2,31 @@
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Scissors } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useAuth } from "@/components/auth/auth-provider";
 import { AdminPageHeader, AdminPageSection } from "@/components/layouts";
-import { AppliedFilterChip, Button, EmptyState, FloatingAlert, InlineAlert, ListToolbar, Skeleton } from "@/components/ui";
-import { getServiceCategories, getServiceOfferings, type ServiceFilters } from "@/lib/service-offerings/api";
+import { AppliedFilterChip, Button, EmptyState, InlineAlert, ListToolbar, Skeleton } from "@/components/ui";
+import { getServiceCategories, getServiceOfferings, type ServiceFilters, type ServiceOffering } from "@/lib/service-offerings/api";
 
-import { refreshServiceCatalog, serviceOfferingKeys } from "@/lib/service-offerings/queries";
+import { serviceOfferingKeys } from "@/lib/service-offerings/queries";
+import { useServicesFeedback, type ServiceNotice } from "./services-feedback-context";
 import { ServiceOfferingEditor } from "./service-offering-editor";
 
 import { ServiceFiltersDialog } from "./service-filters-dialog";
 import { ServiceOfferingsList } from "./service-offerings-list";
+
+import { ServiceStatusConfirmation } from "./service-status-confirmation";
 
 const size = 20;
 
 export function ServicesPage() {
   const { business } = useAuth();
   const client = useQueryClient();
-  const [savedMessage, setSavedMessage] = useState<string | null>(null);
-  const dismissSavedMessage = useCallback(() => setSavedMessage(null), []);
-  const [refreshFailed, setRefreshFailed] = useState(false);
+  const { notify } = useServicesFeedback();
+  const [removingService, setRemovingService] = useState(false);
+  const [selectedService, setSelectedService] = useState<ServiceOffering | null>(null);
+  const [changingStatus, setChangingStatus] = useState(false);
   const [search, setSearch] = useState("");
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("");
@@ -47,20 +51,25 @@ export function ServicesPage() {
     enabled: Boolean(business),
   });
 
+  useEffect(() => {
+    if (!offerings.data || page < offerings.data.page.total_pages || page === 0) return;
+    const frame = window.requestAnimationFrame(() => setPage(Math.max(0, offerings.data!.page.total_pages - 1)));
+    return () => window.cancelAnimationFrame(frame);
+  }, [offerings.data, page]);
+
   const changeCategory = (next: string) => { setCategory(next); setPage(0); };
   const changeStatus = (next: ServiceFilters["status"]) => { setStatus(next); setPage(0); };
   const hasFilters = Boolean(query || category || status !== "ALL");
   const isDebouncing = search.trim() !== query;
-  function saved(message: string, failed: boolean) {
-    setSavedMessage(message);
-    setRefreshFailed(failed);
+  function saved(message: ServiceNotice, failed: boolean) {
+    notify(message, failed);
     const catalog = client.getQueryData<Awaited<ReturnType<typeof getServiceOfferings>>>([...serviceOfferingKeys.list(business?.id), filters]);
     if (catalog && page >= catalog.page.total_pages) setPage(Math.max(0, catalog.page.total_pages - 1));
     window.requestAnimationFrame(() => {
       if (document.activeElement === document.body) document.getElementById("services-search")?.focus({ preventScroll: true });
     });
   }
-  const createAction = <ServiceOfferingEditor trigger={<Button>Nuevo servicio</Button>} onSaved={(_, failed) => saved("Servicio creado", failed)} />;
+  const createAction = <ServiceOfferingEditor trigger={<Button>Nuevo servicio</Button>} onSaved={(_, failed) => saved("created", failed)} />;
 
 
   return (
@@ -68,8 +77,6 @@ export function ServicesPage() {
       <AdminPageHeader title="Servicios" description="Consultá los servicios, sus precios y disponibilidad."><div className="mt-4">{createAction}</div></AdminPageHeader>
       <div className="px-5 md:px-0">
 
-      {savedMessage ? <FloatingAlert title={savedMessage} tone="positive" dismissLabel="Cerrar confirmación" onDismiss={dismissSavedMessage}>Los cambios se guardaron correctamente.</FloatingAlert> : null}
-      {refreshFailed ? <div className="mb-4"><InlineAlert tone="error">El servicio se guardó, pero no pudimos actualizar el catálogo. <Button variant="ghost" onClick={() => { if (business) void refreshServiceCatalog(client, business.id).then(() => setRefreshFailed(false)).catch(() => setRefreshFailed(true)); }}>Reintentar actualización</Button></InlineAlert></div> : null}
       <ListToolbar label="Filtros de servicios" search={{
         id: "services-search", label: "Buscar por servicio o categoría", maxLength: 100,
         placeholder: "Buscar por servicio o categoría", value: search, onChange: event => setSearch(event.target.value),
@@ -86,9 +93,14 @@ export function ServicesPage() {
         <EmptyState action={!hasFilters ? createAction : undefined} icon={<Scissors />} title={hasFilters ? "No encontramos servicios" : "Todavía no hay servicios"} description={hasFilters ? "Probá con otra búsqueda o cambiá los filtros." : "Los servicios que agregues al negocio aparecerán acá."} />
       ) : null}
       {!isDebouncing && offerings.data && offerings.data.data.length > 0 ? (
-        <ServiceOfferingsList services={offerings.data.data} total={offerings.data.page.total_elements} page={page} pageCount={offerings.data.page.total_pages} onPageChange={setPage} renderActions={service => <ServiceOfferingEditor id={service.id} trigger={<Button variant="outline" aria-label={`Editar ${service.name}`}>Editar</Button>} onSaved={(_, failed) => saved("Servicio actualizado", failed)} />} />
+        <ServiceOfferingsList services={offerings.data.data} total={offerings.data.page.total_elements} page={page} pageCount={page < offerings.data.page.total_pages ? offerings.data.page.total_pages : 0} onPageChange={setPage} renderActions={service => <div className="flex flex-wrap gap-2">
+          <Button disabled={changingStatus} variant="ghost" className={service.status === "ACTIVE" ? "text-error" : undefined} aria-label={`${service.status === "ACTIVE" ? "Desactivar" : "Restaurar"} ${service.name}`} onClick={() => { setRemovingService(false); setSelectedService(service); }}>{service.status === "ACTIVE" ? "Desactivar" : "Restaurar"}</Button>
+          {service.status === "INACTIVE" ? <Button disabled={changingStatus} variant="ghost" className="text-error" aria-label={`Eliminar ${service.name}`} onClick={() => { setRemovingService(true); setSelectedService(service); }}>Eliminar</Button> : null}
+          <ServiceOfferingEditor id={service.id} trigger={<Button disabled={changingStatus} variant="outline" aria-label={`Editar ${service.name}`}>Editar</Button>} onSaved={(_, failed) => saved("updated", failed)} />
+        </div>} />
       ) : null}
       </div>
+      <ServiceStatusConfirmation removing={removingService} service={selectedService} onClose={() => setSelectedService(null)} onPendingChange={setChangingStatus} />
     </AdminPageSection>
   );
 }

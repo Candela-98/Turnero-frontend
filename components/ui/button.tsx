@@ -17,6 +17,7 @@ export const buttonVariants = cva(
         sm: "h-9 px-3 text-xs",
       },
       variant: {
+        danger: "bg-error text-on-error hover:bg-error/90 active:bg-error/80",
         ghost:
           "bg-transparent text-on-surface hover:bg-surface-container-low active:bg-surface-container",
         neutral:
