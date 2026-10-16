@@ -7,6 +7,8 @@ export { AdminMobileHeader, type AdminMobileHeaderProps } from "./admin-mobile-h
 export { AdminMobileStickyAction, type AdminMobileStickyActionProps } from "./admin-mobile-sticky-action";
 export { AdminAppShell } from "./admin-app-shell";
 export { AdminPageHeader } from "./admin-page-header";
+export { AdminFormActions, type AdminFormActionsProps } from "./admin-form-actions";
+export { AdminPageSection, type AdminPageSectionProps } from "./admin-page-section";
 export { AdminShellDesktop, defaultAdminNavItems } from "./admin-shell-desktop";
 export type { AdminNavItem, AdminShellDesktopProps } from "./admin-shell-desktop";
 export { BookingPublicShell, type BookingPublicShellProps } from "./booking-public-shell";

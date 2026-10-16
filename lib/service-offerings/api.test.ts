@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { getServiceOfferings, serviceOfferingParams, toServiceOffering } from "./api";
+import { createServiceOffering, getServiceOffering, updateServiceOffering, getServiceOfferings, serviceOfferingParams, toServiceOffering } from "./api";
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -20,4 +20,22 @@ describe("service offerings API", () => {
     expect(fetchMock).toHaveBeenCalledWith(`/api/backend/api/v1/service-offerings?${serviceOfferingParams(filters)}`, expect.objectContaining({ credentials: "include" }));
     expect(serviceOfferingParams(filters)).toContain("category=Combo+%26+color");
   });
+});
+
+const detailDto = { id: 3, name: "Corte", category: null, duration_minutes: 30, price_cents: 0, status: "ACTIVE" as const };
+it("uses GET by id and maps the detail response", async () => {
+  const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify(detailDto), { headers: { "content-type": "application/json" } }));
+  vi.stubGlobal("fetch", fetchMock);
+  expect((await getServiceOffering(3)).durationMinutes).toBe(30);
+  expect(fetchMock.mock.calls[0][0]).toBe("/api/backend/api/v1/service-offerings/3");
+});
+it("uses POST and PATCH with editable wire fields", async () => {
+  const fetchMock = vi.fn().mockImplementation(async () => new Response(JSON.stringify(detailDto), { headers: { "content-type": "application/json" } }));
+  vi.stubGlobal("fetch", fetchMock);
+  const request = { name: "Corte", category: "", duration_minutes: 30, price_cents: 0 };
+  await createServiceOffering(request);
+  await updateServiceOffering(3, { category: "" });
+  expect(fetchMock.mock.calls[0][0]).toBe("/api/backend/api/v1/service-offerings");
+  expect(fetchMock.mock.calls[0][1]).toMatchObject({ method: "POST", body: JSON.stringify(request) });
+  expect(fetchMock.mock.calls[1][1]).toMatchObject({ method: "PATCH", body: '{"category":""}' });
 });

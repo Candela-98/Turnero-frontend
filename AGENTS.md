@@ -1,6 +1,6 @@
 # Guía de trabajo frontend
 
-Este archivo aplica al repositorio `turnero-frontend`. Antes de crear una pantalla o un patrón visual, consultá `docs/patrones-mobile.md` y las decisiones vigentes de Stitch.
+Este archivo aplica al repositorio `turnero-frontend` en todas las sesiones. Antes de crear o modificar una pantalla, consultá `docs/patrones-pantallas.md`, `docs/patrones-mobile.md`, `docs/componentes-listados.md` y las decisiones vigentes de Stitch. Estos patrones aprobados aplican a desktop y mobile; documentar cualquier nuevo patrón compartido en estos archivos.
 
 ## Plan para cada pantalla
 
@@ -15,3 +15,11 @@ Este archivo aplica al repositorio `turnero-frontend`. Antes de crear una pantal
 - Señalar duplicación de comportamiento ya resuelto por un componente compartido y estados inconsistentes entre páginas equivalentes.
 - No forzar una abstracción genérica que oculte reglas de dominio distintas; por ejemplo, un día cerrado no compara horas ocultas.
 - Mantener las instrucciones de este archivo breves y actualizarlas solo cuando una decisión se convierta en patrón estable del producto.
+
+## Composición obligatoria de nuevas pantallas admin
+
+- El layout de ruta aporta `AdminAppShell`: no duplicar shell, landmark `main` ni padding exterior. Usar `AdminPageSection` y `AdminPageHeader` en secciones principales; las tareas focalizadas mantienen su encabezado de volver/cerrar.
+- Formularios de página: `AdminPageSection withSaveAction` y `AdminFormActions` dentro del formulario. Colocar los avisos de guardado como hijos de `AdminFormActions`; este componente gestiona Guardar en ambos viewports y la separación del aviso. No copiar offsets, z-index ni acciones mobile desde otra pantalla.
+- `FloatingAlert` flota por defecto a la derecha en desktop y acompaña el scroll. En mobile queda 16 px sobre la navegación; solo dentro de `AdminFormActions`/`SaveActionFeedback` reserva además espacio sobre Guardar. Éxitos: 6 segundos, cierre manual, pausa por hover/foco. Errores recuperables: persistentes con reintento. `placement="dialog"` se usa explícitamente solo dentro del footer de un diálogo; para carga y validación usar `InlineAlert` o mensajes de campo.
+- Listados: componer `ListToolbar`, `SearchInput`, filtros con `ResponsiveDialog`, `AppliedFilterChip`, estados compartidos y `Pagination`. Diálogos de edición: `ResponsiveDialog`, acciones en su footer y `ConfirmDiscardDialog` cuando existan cambios pendientes.
+- Incorporar `expectAdminViewport`, `expectAdminSaveAction` y `expectAdminNotice` de `tests/e2e/helpers/admin-patterns.ts` a los E2E de cada pantalla nueva según sus estados. Verificar los tres proyectos de Playwright sin omitir desktop o mobile para estos contratos. CI ejecuta todos los E2E mediante `npm run check`.

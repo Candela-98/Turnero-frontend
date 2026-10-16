@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { expectAdminNotice } from "./helpers/admin-patterns";
 
 const authMeUrl = "**/api/backend/api/v1/auth/me";
 const bookingSettingsUrl = "**/api/backend/api/v1/booking-settings";
@@ -69,7 +70,7 @@ test.describe("booking settings", () => {
     expect(saveCalls).toBe(1);
   });
 
-  test("saves all editable rules and never sends post-MVP fields", async ({ page }, testInfo) => {
+  test("saves all editable rules and never sends post-MVP fields", async ({ page }) => {
     await page.route(bookingSettingsUrl, async (route) => {
       if (route.request().method() === "GET") {
         await route.fulfill({ contentType: "application/json", json: currentBookingSettings, status: 200 });
@@ -109,13 +110,7 @@ test.describe("booking settings", () => {
     await page.getByRole("button", { name: "Guardar cambios" }).click();
 
     await expect(page.getByText("Cambios guardados")).toBeVisible();
-    const alertBox = await page.getByTestId("floating-alert").boundingBox();
-    const saveBox = await page.getByRole("button", { name: "Guardar cambios" }).boundingBox();
-    expect(alertBox).not.toBeNull();
-    expect(saveBox).not.toBeNull();
-    const gap = (saveBox?.y ?? 0) - (alertBox?.y ?? 0) - (alertBox?.height ?? 0);
-    if (isMobileProject(testInfo.project.name)) expect(gap).toBeGreaterThanOrEqual(0);
-    else expect(gap).toBeCloseTo(8, 0);
+    await expectAdminNotice(page, { withSaveAction: true });
     await page.getByRole("button", { name: "Cerrar confirmación" }).click();
     await expect(page.getByText("Cambios guardados")).not.toBeVisible();
   });

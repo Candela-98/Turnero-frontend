@@ -23,7 +23,7 @@ No mezclar shell administrativo con booking público. Las tablas desktop se conv
 - Configuración y Servicios comparten `AdminPageHeader` y un contenedor `max-w-4xl`: título, descripción y margen superior mantienen la misma jerarquía; el contenido conserva la estructura propia del formulario o listado.
 - La bottom nav mide `calc(4.75rem + env(safe-area-inset-bottom))`, incluye la zona segura y permanece fija.
 - Todo contenido de una sección admin debe reservar padding inferior al menos igual a esa navegación.
-- Formularios con una acción primaria usan `AdminMobileStickyAction`: queda inmediatamente arriba de la bottom nav y el contenido reserva también su altura.
+- Formularios admin de página usan `AdminPageSection withSaveAction` y `AdminFormActions`: compone `AdminMobileStickyAction` inmediatamente arriba de la bottom nav y reserva su altura en el contenido.
 - Solo una acción primaria contextual por pantalla. La acción fija debe indicar carga/deshabilitado y no duplicarse como CTA visible en mobile.
 - Header y navegación usan z-index separados: header `z-20`, acción contextual `z-30`, bottom nav `z-40`.
 
@@ -35,6 +35,7 @@ No mezclar shell administrativo con booking público. Las tablas desktop se conv
 - Nombres de negocio se truncan en header antes de desplazar acciones.
 - Fechas/horas largas tienen variante compacta en mobile; la versión completa puede mantenerse desde `md`.
 - Para respuestas de guardado, usar `FloatingAlert` por encima de la acción fija y la navegación: éxito visible sin scroll, descartable y con cierre automático a los 6 s; error de guardado persistente con cierre y reintento. El aviso no debe tapar controles críticos. Para errores de validación, mostrar el mensaje específico junto a cada campo; después de guardar, desplazar suavemente y enfocar el primero inválido, respetando la preferencia de movimiento reducido. No repetir estos errores en un aviso flotante.
+- `FloatingAlert` usa `placement="viewport"` por defecto y acompaña el scroll. Desktop lo ubica a la derecha; `AdminFormActions` reserva altura sobre Guardar automáticamente. Mobile mantiene la separación con la acción fija y la navegación. Ver composición y pruebas compartidas en `patrones-pantallas.md`.
 
 ## QA obligatorio
 

@@ -19,6 +19,8 @@ Los logs de desarrollo incluyen una hora local por línea para facilitar el segu
 La documentacion frontend vive en `docs/`:
 
 - `docs/README.md` - indice de documentacion frontend.
+- `AGENTS.md` - instrucciones persistentes para implementar y verificar pantallas.
+- `docs/patrones-pantallas.md` - composición compartida, avisos, acciones y pruebas desktop/mobile.
 - `docs/roadmap.md` - roadmap de producto frontend.
 - `docs/integracion-api-mvp.md` - arquitectura de integracion con Turnero API.
 - `docs/pruebas-locales-google-auth.md` - configuracion y recorrido de pruebas locales con Google Auth.
@@ -38,6 +40,7 @@ npm run test
 npm run build
 npm run start
 npm run test:e2e
+npm run test:patterns
 npm run check
 ```
 
