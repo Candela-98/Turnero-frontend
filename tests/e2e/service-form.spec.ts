@@ -170,7 +170,7 @@ test.describe("service form", () => {
     await page.route("**/api/backend/api/v1/service-offerings?*", route => route.fulfill({ status: 503, json: { message: "Refresh failure" } }));
     await page.getByRole("button", { name: "Crear servicio", exact: true }).click();
     await expect(page.getByRole("dialog")).toHaveCount(0);
-    await expect(page.getByText("El servicio se guardó, pero no pudimos actualizar el catálogo.")).toBeVisible();
+    await expect(page.getByText("El cambio se guardó, pero no pudimos actualizar los datos.")).toBeVisible();
     await page.route("**/api/backend/api/v1/service-offerings?*", route => route.fulfill({ json: { data: services, page: { number: 0, size: 20, total_elements: 2, total_pages: 1 } } }));
     await page.getByRole("button", { name: "Reintentar actualización", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Barba", exact: true })).toBeVisible();

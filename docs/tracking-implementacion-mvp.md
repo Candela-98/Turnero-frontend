@@ -1,6 +1,6 @@
 # Tracking de Implementacion Frontend MVP
 
-Actualizado: 2026-10-09
+Actualizado: 2026-10-16
 
 ## Proposito
 
@@ -320,3 +320,23 @@ Preparada el 2026-10-09 en `feature/TURN-96-service-form`. Pruebas manuales apro
 - Estado activo/inactivo, baja, detalle informativo y profesionales asociados permanecen fuera del frontend de TURN-96.
 - Segundo defecto del seed local: V1000 asignaba IDs explícitos sin avanzar secuencias. Nueva migración exclusivamente local `V1001__sync_seed_sequences.sql` sincroniza negocios, usuarios, profesionales y servicios sin retroceder contadores ni modificar filas. Reparación aplicada en la base local de esta sesión; regresión PostgreSQL para bases nuevas y existentes. Suite backend completa: 440 aprobados sin omisiones mediante `make test`. Pendiente de integración.
 - Avisos mobile según contexto: `FloatingAlert` deja 16 px sobre la navegación en páginas sin acción fija y reserva espacio sobre Guardar automáticamente dentro de `AdminFormActions`/`SaveActionFeedback`. Patrón aplicado a todos sus usos; guía persistente y helper E2E actualizados. Recorridos afectados: 107 aprobados y 7 omisiones previstas por viewport.
+
+## TURN-98 — implementación local pendiente de validación manual
+
+Preparada el 2026-10-13 en `feature/TURN-98-service-detail`, sobre la entrega de TURN-96. Pruebas manuales aprobadas por el usuario el 2026-10-16. Preparada para PR sobre `feature/TURN-96-service-form` mientras #10 siga abierto; cambiar la base a `dev` después de integrar TURN-96. Pendiente de integración.
+
+- Alcance ajustado por el usuario: desactivar, restaurar y eliminar desde las tarjetas, sin panel de detalle. Eliminar requiere estado inactivo y usa borrado lógico sin restauración desde la app. El catálogo mantiene su ancho completo en desktop y mobile; antiguas URLs de detalle redirigen a `/servicios`.
+- Desactivar usa DELETE lógico; Restaurar usa PATCH solo con `status: "ACTIVE"`, ya soportado por la API. Ambos requieren confirmación accesible con bloqueo de doble envío y cierre durante la escritura, y errores recuperables.
+- Cache por negocio: cancelación de lecturas anteriores, estado confirmado antes del refresco e invalidación del catálogo, categorías y detalle usado por edición. Reintentar un refresco fallido solo repite lecturas. Se conservan filtros y búsqueda; se vuelve a una página válida si desaparece el último resultado.
+- Confirmación reutilizable `ConfirmActionDialog` y `ServiceStatusConfirmation`, avisos flotantes compartidos y formulario de edición de TURN-96. Eliminar depende del backend local TURN-98 y de V1002 (`deleted_at`); desactivar/restaurar mantienen sus endpoints existentes.
+- Guía de validación en `pruebas-locales-turn-98.md` y componentes documentados en `componentes-listados.md`. Pruebas automatizadas actualizadas al nuevo alcance; pendiente de QA manual contra la API local.
+- Verificación del alcance ajustado: lint y build de producción con TypeScript correctos; 62 unitarios aprobados. E2E afectados: 21 de estado, 36 de alta/edición y 18 de listado/filtros aprobados en desktop y ambos tamaños mobile, sin omisiones. Los casos anteriores del panel de detalle fueron reemplazados por el nuevo flujo; no se volvió a ejecutar la suite completa de pantallas ajenas a servicios.
+
+- Extensión aprobada: Eliminar solo para servicios inactivos, con confirmación irreversible desde la app, conservación del historial y exclusión del catálogo/categorías. Frontend utiliza DELETE `/{id}/catalog`; backend en rama separada `feature/TURN-98-service-removal`. Pendiente de reiniciar API y QA manual antes de PR.
+- Verificación de esta extensión: lint, TypeScript y build correctos; 64 unitarios y 81 E2E de servicios aprobados en desktop y ambos tamaños mobile, sin omisiones. Cobertura de eliminación, cancelación, rechazo de backend y actualización de categorías, además de regresión de estado, filtros y formulario.
+
+- Corrección de QA local (2026-10-16): el BFF no permitía DELETE `service-offerings/{id}/catalog` y rechazaba la eliminación con 404 sin llegar a la API. Ruta habilitada exclusivamente para DELETE con ID numérico. Regresión sobre el handler real del BFF: reenvío de ruta y cookie, conservación de 204/404/409, métodos e IDs inválidos bloqueados. Verificación: 68 unitarios, lint y TypeScript correctos. Pendiente de repetir eliminación manual.
+
+- QA manual final aprobado por el usuario el 2026-10-16, incluyendo eliminación tras corregir el BFF y avisos específicos por acción. Avisos tipados centralizados; lint, TypeScript y 12 E2E de los flujos afectados aprobados en desktop y ambos tamaños mobile. Entrega autorizada para revisión por PR, sin merge automático.
+
+- PR frontend [#11](https://github.com/Candela-98/Turnero-frontend/pull/11) creado el 2026-10-16 sobre la rama de #10; backend relacionado [#76](https://github.com/Candela-98/Turnero-api/pull/76), sobre #75. Ambos abiertos para revisión del usuario; sin merge. Tras integrar TURN-96, cambiar bases a `dev`/`develop` e integrar TURN-98 backend antes que frontend.
