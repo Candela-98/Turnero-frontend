@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
@@ -23,6 +25,7 @@ export function Avatar({
   size = "md",
   ...props
 }: AvatarProps) {
+  const [failedUrl, setFailedUrl] = React.useState<string | null>(null);
   return (
     <div
       className={cn(
@@ -33,9 +36,9 @@ export function Avatar({
       title={name}
       {...props}
     >
-      {imageUrl ? (
+      {imageUrl && imageUrl !== failedUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img alt={name} className="size-full object-cover" src={imageUrl} />
+        <img onError={() => setFailedUrl(imageUrl)} alt={name} className="size-full object-cover" src={imageUrl} />
       ) : (
         <span aria-hidden="true">{initials}</span>
       )}
