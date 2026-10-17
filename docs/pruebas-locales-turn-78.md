@@ -2,7 +2,7 @@
 
 ## Preparación
 
-Ambos repos deben estar en `feature/TURN-78-staff-services`, basados en TURN-99. Reiniciar el backend para cargar la transacción y las reglas nuevas; reiniciar el frontend si fuera necesario. Usar la sesión habitual de administrador y abrir `/profesionales`. No hay migraciones nuevas ni cambios en la agenda demo.
+Ambos repos deben estar en `feature/TURN-78-staff-services`. TURN-98/77/99 ya están integrados; los PRs de TURN-78 apuntan a `develop` (backend #79) y `dev` (frontend #14). Reiniciar el backend para cargar la transacción y las reglas nuevas; reiniciar el frontend si fuera necesario. Usar la sesión habitual de administrador y abrir `/profesionales`. No hay migraciones nuevas ni cambios en la agenda demo.
 
 Preparar dos servicios activos y un profesional; se puede usar uno existente o inactivo. Para probar varias páginas hacen falta más de 20 servicios activos: los E2E ya incluyen 42, sin alterar la base local.
 
