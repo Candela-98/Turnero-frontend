@@ -63,4 +63,13 @@ La composición completa y los helpers de verificación están en `patrones-pant
 
 ## Profesionales (TURN-77)
 
-`StaffMembersPage` gestiona consulta por negocio, debounce y estados; `StaffMembersList` y `StaffMemberCard` solo presentan modelos de `lib/staff-members`. `StaffFiltersDialog` mantiene estado provisional hasta Aplicar, reutilizando los controles compartidos. El listado oculta resultados durante debounce y nuevas consultas, conserva el borrado de caché de sesión del proveedor de auth y propaga cancelación. `Avatar` muestra iniciales también ante errores de imagen. Alcance: lectura, sin acciones de creación, edición, servicios, horarios ni detalle.
+`StaffMembersPage` gestiona consulta por negocio, debounce y estados; `StaffMembersList` y `StaffMemberCard` solo presentan modelos de `lib/staff-members`. `StaffFiltersDialog` mantiene estado provisional hasta Aplicar, reutilizando los controles compartidos. El listado oculta resultados durante debounce y nuevas consultas, conserva el borrado de caché de sesión del proveedor de auth y propaga cancelación. `Avatar` muestra iniciales también ante errores de imagen. La base de lectura de TURN-77 se amplía con alta y edición en TURN-99; servicios, horarios y detalle operativo permanecen en sus tareas.
+
+
+## Formulario de profesionales (TURN-99)
+
+`StaffMemberEditor` compone `ResponsiveDialog`, carga de detalle y `ConfirmDiscardDialog`; `StaffMemberForm` comparte alta/edición, validación con foco, footer fijo y bloqueo inmediato de doble envío/cierre. Reutiliza `Input`, `Switch`, `SaveChangesButton` y `FloatingAlert`; no crea controles visuales alternativos. `lib/staff-members/form.ts` convierte valores, calcula PATCH y diferencia errores de campos y vinculación. La opción de vincular al usuario actual existe solo en alta; avatar y estado se conservan. El listado gestiona avisos de guardado e invalida sus consultas sin repetir la escritura cuando falla una lectura. Su tarjeta/listado reciben acciones por composición, sin consultar datos.
+
+La fila de un profesional vinculado al usuario autenticado muestra **Vos**, comparando `user_id` con el ID de sesión, sin inferir identidad por nombre. En edición se identifica como **Tu perfil profesional**; el conflicto de alta indica buscar la etiqueta Vos.
+
+El alta comprueba la vinculación mediante GET `staff-members/me`, con key por negocio/usuario, consulta fresca al abrir e invalidación tras guardar o recibir conflicto. La opción se bloquea durante carga/error y si ya existe un profesional (también inactivo o fuera del listado visible), indicando su nombre. Se puede crear sin vinculación mientras esa opción está bloqueada; el backend mantiene la restricción ante carreras.

@@ -13,6 +13,7 @@ export type StaffMemberDto = {
 
 export type StaffMember = {
   id: number;
+  userId: number | null;
   name: string;
   roleLabel: string | null;
   specialty: string | null;
@@ -33,7 +34,7 @@ type StaffPageDto = {
 };
 
 export function toStaffMember(dto: StaffMemberDto): StaffMember {
-  return { id: dto.id, name: dto.name, roleLabel: dto.role_label?.trim() || null,
+  return { id: dto.id, userId: dto.user_id, name: dto.name, roleLabel: dto.role_label?.trim() || null,
     specialty: dto.specialty?.trim() || null, avatarUrl: dto.avatar_url?.trim() || null, status: dto.status };
 }
 
@@ -47,4 +48,20 @@ export function staffMemberParams(filters: StaffFilters) {
 export async function getStaffMembers(filters: StaffFilters, signal?: AbortSignal) {
   const result = await apiFetch<StaffPageDto>(`/api/v1/staff-members?${staffMemberParams(filters)}`, { signal });
   return { data: result.data.map(toStaffMember), page: result.page };
+}
+
+export type StaffMemberWriteRequest = { name: string; role_label: string; specialty: string; user_id?: number };
+export async function getStaffMember(id: number, signal?: AbortSignal) {
+  return toStaffMember(await apiFetch<StaffMemberDto>(`/api/v1/staff-members/${id}`, { signal }));
+}
+export async function createStaffMember(body: StaffMemberWriteRequest) {
+  return toStaffMember(await apiFetch<StaffMemberDto>("/api/v1/staff-members", { method: "POST", body }));
+}
+export async function updateStaffMember(id: number, body: Partial<Omit<StaffMemberWriteRequest, "user_id">>) {
+  return toStaffMember(await apiFetch<StaffMemberDto>(`/api/v1/staff-members/${id}`, { method: "PATCH", body }));
+}
+
+export async function getMyStaffMember(signal?: AbortSignal): Promise<StaffMember | null> {
+  const result = await apiFetch<{ staff_member: StaffMemberDto | null }>("/api/v1/staff-members/me", { signal });
+  return result.staff_member ? toStaffMember(result.staff_member) : null;
 }
