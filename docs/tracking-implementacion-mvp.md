@@ -386,3 +386,5 @@ Preparada el 2026-10-13 en `feature/TURN-98-service-detail`, sobre la entrega de
 - Verificación de la mejora: backend 513 pruebas; frontend lint, TypeScript, 108 unitarios y build aprobados. Pasaron 54 recorridos de listado/formulario de profesionales y la ejecución final de 63 E2E de asignaciones/estado de servicios (tres proyectos); sin fallos pendientes. Capturas de fila con cantidad y sin asignaciones revisadas en 1440×900, 390×844 y 412×915. QA manual de esta mejora aprobada por el usuario tras reiniciar backend; integración pendiente.
 
 - Ajuste visual final aprobado: etiquetas **Rol:** y **Especialidad:** con el mismo tamaño/color y peso medio; campos vacíos omitidos. ESLint del componente y `git diff --check` correctos.
+
+- PRs TURN-78 creados el 2026-10-17: [backend #79](https://github.com/Candela-98/Turnero-api/pull/79) y [frontend #14](https://github.com/Candela-98/Turnero-frontend/pull/14), ambos sobre `feature/TURN-99-staff-form`. QA manual aprobada. Sin revisión de CI ni merge; ajustar bases al integrar TURN-99 y entregar backend primero.
