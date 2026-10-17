@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { DELETE, GET } from "@/app/api/backend/[...path]/route";
+import { DELETE, GET, POST, PATCH } from "@/app/api/backend/[...path]/route";
 
 const originalFetch = global.fetch;
 
@@ -170,4 +170,41 @@ it.each([200, 400, 401, 503])("forwards staff listing through the actual handler
   expect(target.toString()).toBe(`http://localhost:8080/api/v1/staff-members?${query}`);
   expect(options.method).toBe("GET");
   expect(options.headers.get("cookie")).toBe("turnero_session=opaque");
+});
+
+it.each([
+  ["GET", "/5", 200], ["GET", "/5", 404], ["POST", "", 201], ["POST", "", 409], ["PATCH", "/5", 200], ["PATCH", "/5", 400],
+] as const)("forwards staff editor %s %s and preserves status %i", async (method, suffix, status) => {
+  vi.stubEnv("TURNERO_API_BASE_URL", "http://localhost:8080");
+  const body = { name: "Ana", role_label: "", specialty: "Color", ...(method === "POST" ? { user_id: 1 } : {}) };
+  const responseBody = status === 409 ? { code: "STAFF_USER_ALREADY_LINKED" } : { id: 5 };
+  const fetch = vi.fn().mockResolvedValue(Response.json(responseBody, { status }));
+  global.fetch = fetch;
+  const handler = { GET, POST, PATCH }[method];
+  const response = await handler(new Request(`http://localhost:3000/api/backend/api/v1/staff-members${suffix}`, {
+    method, headers: { cookie: "turnero_session=opaque", "content-type": "application/json" },
+    ...(method === "GET" ? {} : { body: JSON.stringify(body) }),
+  }), routeContext(["api", "v1", "staff-members", ...(suffix ? ["5"] : [])]));
+  expect(response.status).toBe(status);
+  expect(await response.json()).toEqual(responseBody);
+  const [target, options] = fetch.mock.calls[0];
+  expect(target.toString()).toBe(`http://localhost:8080/api/v1/staff-members${suffix}`);
+  expect(options.method).toBe(method);
+  expect(options.headers.get("cookie")).toBe("turnero_session=opaque");
+  if (method !== "GET") expect(new TextDecoder().decode(options.body)).toBe(JSON.stringify(body));
+});
+
+it("forwards the authenticated current staff lookup and permits only GET", async () => {
+  vi.stubEnv("TURNERO_API_BASE_URL", "http://localhost:8080");
+  const fetch = vi.fn().mockResolvedValue(Response.json({ staff_member: null }));
+  global.fetch = fetch;
+  const context = routeContext(["api", "v1", "staff-members", "me"]);
+  const response = await GET(new Request("http://localhost:3000/api/backend/api/v1/staff-members/me", { headers: { cookie: "turnero_session=opaque" } }), context);
+  expect(await response.json()).toEqual({ staff_member: null });
+  const [target, options] = fetch.mock.calls[0];
+  expect(target.toString()).toBe("http://localhost:8080/api/v1/staff-members/me");
+  expect(options.headers.get("cookie")).toBe("turnero_session=opaque");
+  const rejected = await PATCH(new Request("http://localhost:3000/api/backend/api/v1/staff-members/me", { method: "PATCH" }), context);
+  expect(rejected.status).toBe(405);
+  expect(fetch).toHaveBeenCalledTimes(1);
 });

@@ -350,3 +350,24 @@ Preparada el 2026-10-13 en `feature/TURN-98-service-detail`, sobre la entrega de
 - Verificación final: lint, TypeScript, build y 76 unitarios aprobados; suite E2E completa 202 aprobadas/14 omisiones previstas, recorrido final TURN-77 15/15. Capturas revisadas en 1440×900, 390×844 y 412×915; sin infracciones Axe básicas. QA manual con API real aprobada; paginación cubierta por automatización.
 
 - PRs TURN-77 creados: [backend #77](https://github.com/Candela-98/Turnero-api/pull/77) sobre TURN-98 y [frontend #12](https://github.com/Candela-98/Turnero-frontend/pull/12) sobre TURN-98. Sin revisión de CI ni merge por instrucción del usuario. Ajustar bases al integrar dependencias; backend primero.
+
+## TURN-99 — Crear y editar profesionales
+
+- Implementación local en `feature/TURN-99-staff-form`, sobre TURN-77. Header/vacío con alta y filas con edición; modal desktop/panel inferior mobile con formulario reutilizable, descarte, validación, errores recuperables, guardado sin cambios deshabilitado y protección de doble envío.
+- Campos: nombre, rol opcional y especialidad; vinculación opcional al usuario actual solo en alta. API/adapters con campos editables, PATCH solo de cambios y soporte de especialidad heredada nula. Avatar, estado y vinculación existente se conservan en edición.
+- Cache por negocio: detalle confirmado, cancelación de lecturas anteriores e invalidación de listado/detalle; filtros y búsqueda conservados, página ajustada si deja de ser válida. Reintento de refresco posterior a éxito solo repite lecturas.
+- Prerrequisito backend acordado: rol máximo 80, creación/vinculación transaccional con copia de horarios y conflicto `409 STAFF_USER_ALREADY_LINKED`, incluso ante altas concurrentes o profesional inactivo. Sin migraciones; entregar backend primero, en PR separado.
+- Verificación local: 90 unitarios, lint, TypeScript y build correctos; E2E completa 235 aprobadas y 14 omisiones previstas. Formularios con Axe y capturas revisadas en desktop y ambos tamaños mobile. Guía manual: `pruebas-locales-turn-99.md`.
+- QA manual aprobada por el usuario el 2026-10-17. Creación de PRs autorizada; integración pendiente, ajustar bases según TURN-77 e integrar backend primero. Sin revisión de CI ni merge automático.
+
+- Verificación final tras ajustar la densidad desktop: 45/45 E2E de listado y formulario aprobados en los tres viewports, sin omisiones.
+
+- Corrección de QA manual: faltaba identificar qué profesional pertenece al usuario actual. Se agrega **Vos** en el listado según `user_id` y sesión, aviso **Tu perfil profesional** en edición y mensaje de conflicto que señala esa etiqueta. Se conserva la vinculación única y no se reasignan datos. QA manual repetida y aprobada por el usuario.
+
+- Verificación del indicador de identidad: lint, TypeScript, build, 90 unitarios y 48/48 E2E de Profesionales correctos. Capturas revisadas en desktop y mobile; se comprueba por ID que el usuario ajeno o sin vínculo no recibe la etiqueta Vos.
+
+- QA manual de prevención: **Este profesional soy yo** queda desactivado y bloqueado si el usuario ya tiene profesional vinculado, mostrando su nombre. Se comprueba mediante un endpoint de sesión independiente de filtros/paginación, también para inactivos. Carga/error bloquean la opción con reintento; crear otros profesionales sin vínculo sigue permitido. Consulta fresca al abrir y refresco tras guardar/conflicto. QA manual aprobada tras reiniciar la API.
+
+- Verificación de bloqueo preventivo: lint, TypeScript, build y 92 unitarios aprobados; suite E2E completa 244 aprobadas / 14 omisiones previstas, con comprobación de carga/error/reintento, vínculo fuera de página y filtros, inactivos y alta sin usuario. Capturas revisadas en desktop y mobile. QA manual aprobada por el usuario el 2026-10-17.
+
+- PRs TURN-99 creados el 2026-10-17: [backend #78](https://github.com/Candela-98/Turnero-api/pull/78) y [frontend #13](https://github.com/Candela-98/Turnero-frontend/pull/13), ambos sobre sus ramas de TURN-77. QA manual aprobada. Sin revisión de CI ni merge; ajustar bases al integrar dependencias y entregar backend primero.
