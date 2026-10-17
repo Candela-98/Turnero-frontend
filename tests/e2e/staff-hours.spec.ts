@@ -159,6 +159,8 @@ test.describe("staff working hours", () => {
   test("supports keyboard menu navigation, confirms escape/cancel/close and returns focus", async ({ page }) => {
     const trigger = page.getByRole("button", { name: `Más acciones de ${member.name}` });
     await trigger.focus(); await page.keyboard.press("Enter");
+    await expect(page.getByRole("menuitem", { name: "Ver detalle" })).toBeFocused();
+    await page.keyboard.press("ArrowDown");
     await expect(page.getByRole("menuitem", { name: "Editar datos" })).toBeFocused();
     await page.keyboard.press("ArrowDown");
     await expect(page.getByRole("menuitem", { name: "Horarios", exact: true })).toBeFocused();

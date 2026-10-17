@@ -411,3 +411,25 @@ Preparada el 2026-10-13 en `feature/TURN-98-service-detail`, sobre la entrega de
 - QA manual final aprobada por el usuario el 2026-10-17, incluidos avisos de horarios del negocio y consultas canceladas en desarrollo. Creación de PRs separados autorizada. Bases TURN-78 mientras backend #79 / frontend #14 sigan abiertos; ajustar a develop/dev al integrar esas dependencias. Integrar backend primero, sin revisión de CI ni merge automático.
 
 - PRs TURN-79 creados el 2026-10-17: [backend #80](https://github.com/Candela-98/Turnero-api/pull/80) y [frontend #15](https://github.com/Candela-98/Turnero-frontend/pull/15), ambos sobre feature/TURN-78-staff-services. QA manual aprobada; abiertos para revisión. Sin consultar CI ni mergear. Tras integrar TURN-78, ajustar bases a develop/dev e integrar TURN-79 backend primero.
+
+## TURN-101 — Detalle y estado de profesionales (2026-10-17)
+
+- Implementación local en `feature/TURN-101-staff-status`, sobre TURN-79. Ampliación aprobada: reactivar, además de desactivar; conservar búsqueda, filtro y página mediante URL. `/profesionales/[id]` admite enlace directo/recarga; Ver detalle y Desactivar/Reactivar se incorporan al menú sin modificar alta/edición/servicios/horarios.
+- Detalle comparte shell, tarjeta, avatar, badges y estados. Confirmación reutilizada entre ambas pantallas, bloqueo de doble envío/cierre, conflicto específico por turnos futuros, 404 y errores recuperables. Cache por negocio actualizada desde escritura confirmada, consultas antiguas canceladas, contador preservado y refresco separado de la mutación. Agenda y flujos frontend de turnos siguen demo.
+- QA automática: 138 unitarios y 81 E2E afectados aprobados; suite completa en curso. QA manual pendiente; guía `docs/pruebas-locales-turn-101.md`.
+- Integración pendiente: PRs separados después de aprobación manual, backend primero. Base TURN-79 mientras #80/#15 sigan abiertos; ajustar a develop/dev al integrar dependencias. No revisar CI ni mergear automáticamente.
+
+- Verificación final: backend 544 pruebas sin fallos ni omisiones. Frontend lint, TypeScript, 138 unitarios y build aprobados; suite E2E completa 346 aprobados / 14 omisiones preexistentes. Tras corregir conservación de búsqueda pendiente al filtrar y cancelación ante 404, se repitieron lint/tipos/unitarios/build y 87 E2E de listado/formulario/detalle/estado, todos aprobados, incluidos los 33 recorridos de TURN-101 en los tres proyectos. Capturas de detalle, confirmación y conflicto revisadas en 1440×900, 390×844 y 412×915, sin scroll horizontal ni infracciones axe básicas. QA manual e integración pendientes.
+
+### Extensión TURN-101 — Eliminar profesionales inactivos (2026-10-17)
+
+- Detalle y cambios de estado aprobados manualmente por el usuario. Nueva solicitud: ocultar definitivamente del listado los profesionales previamente desactivados mediante borrado lógico.
+- Implementación local: DELETE `staff-members/{id}/catalog`, solo INACTIVE, scoping por negocio y bloqueo compartido con reactivación/reservas. Conserva historial y relaciones; excluye eliminados de listados y operaciones, sin restauración desde la app. Libera el vínculo operativo de cuenta para otro perfil, conservando `user_id` histórico y la cuenta.
+- Nueva migración Flyway V1003: `deleted_at`, índice único parcial de usuario no eliminado y restricción de eliminado inactivo. Reiniciar backend antes de probar frontend.
+- UI reutiliza menú/confirmación/avisos; eliminación desde listado o detalle, filtros y página conservados, caché limpiada tras éxito y reintento solo de lecturas. BFF probado mediante handler real, errores y cookie.
+- QA manual de esta extensión e integración pendientes. Guía local `docs/pruebas-locales-turn-101.md` en frontend. PRs separados después de aprobación manual; backend primero. Sin revisar CI ni mergear automáticamente.
+
+- QA final de la extensión: backend 550 pruebas aprobadas, sin fallos ni omisiones; frontend lint/TypeScript, 145 unitarios, build y suite E2E completa correctos (361 aprobados / 14 omisiones preexistentes). Los 45 recorridos de detalle/estado/eliminación pasan en desktop 1440×900 y mobile 390×844 / 412×915. Capturas de eliminación revisadas y axe básico sin infracciones en los recorridos cubiertos. QA manual de eliminación e integración pendientes.
+
+- Ajuste UX de avisos aprobado por el usuario: Profesionales comparte un catálogo de mensajes por acción entre listado y detalle, siguiendo Servicios. Se elimina el texto genérico repetido; las siete acciones incluyen descripciones específicas sobre el resultado, próximos pasos o datos conservados. Verificación de la versión inicial: lint, TypeScript, 145 unitarios, build y 156 E2E afectados aprobados en los tres viewports; capturas de avisos revisadas. Descripciones ampliadas según copy aprobado por el usuario.
+- Ajuste de copy en Servicios aprobado por el usuario: actualización informa que el catálogo ya muestra los datos nuevos; restauración informa que el servicio vuelve a aparecer entre los activos.
