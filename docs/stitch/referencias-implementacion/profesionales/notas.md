@@ -9,3 +9,5 @@ Disponible:
 
 Pendiente:
 - Registrar observaciones de drift visual.
+
+TURN-77 conserva shell, jerarquía, filas con avatar y densidad de Servicios. El alcance acordado excluye métricas, disponibilidad, chips de servicios y acciones Ver agenda/Editar de la referencia completa; especialidad se presenta como texto informativo. Filtros comparten modal desktop/panel inferior mobile de Servicios.

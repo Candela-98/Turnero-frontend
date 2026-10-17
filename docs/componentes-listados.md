@@ -60,3 +60,7 @@ La composición completa y los helpers de verificación están en `patrones-pant
 - `ConfirmActionDialog` comparte confirmación accesible con foco inicial en Cancelar, acción opcional de peligro, bloqueo durante envío y contenido de error. El propietario cierra al confirmar éxito; `ConfirmDiscardDialog` conserva su contrato como wrapper.
 - `applyServiceStatus` actualiza detalle y resultados cacheados, excluye la fila de páginas cuyo estado ya no corresponde y cancela lecturas obsoletas antes de invalidar. La escritura no se repite al reintentar un refresco fallido.
 - Restaurar usa PATCH exclusivamente con `status: "ACTIVE"`; Desactivar usa DELETE lógico. Eliminar solo está disponible para inactivos y usa DELETE `/{id}/catalog`: borrado lógico sin restauración desde la app. `applyServiceRemoval` quita resultados cacheados y el dato de edición antes del refresco. Las antiguas URLs de detalle redirigen al catálogo.
+
+## Profesionales (TURN-77)
+
+`StaffMembersPage` gestiona consulta por negocio, debounce y estados; `StaffMembersList` y `StaffMemberCard` solo presentan modelos de `lib/staff-members`. `StaffFiltersDialog` mantiene estado provisional hasta Aplicar, reutilizando los controles compartidos. El listado oculta resultados durante debounce y nuevas consultas, conserva el borrado de caché de sesión del proveedor de auth y propaga cancelación. `Avatar` muestra iniciales también ante errores de imagen. Alcance: lectura, sin acciones de creación, edición, servicios, horarios ni detalle.
