@@ -3,6 +3,7 @@ import { apiFetch } from "@/lib/api/client";
 export type StaffMemberDto = {
   id: number;
   business_id: number;
+  service_count?: number;
   user_id: number | null;
   name: string;
   role_label: string | null;
@@ -14,6 +15,7 @@ export type StaffMemberDto = {
 export type StaffMember = {
   id: number;
   userId: number | null;
+  serviceCount: number | null;
   name: string;
   roleLabel: string | null;
   specialty: string | null;
@@ -34,7 +36,7 @@ type StaffPageDto = {
 };
 
 export function toStaffMember(dto: StaffMemberDto): StaffMember {
-  return { id: dto.id, userId: dto.user_id, name: dto.name, roleLabel: dto.role_label?.trim() || null,
+  return { id: dto.id, serviceCount: dto.service_count ?? null, userId: dto.user_id, name: dto.name, roleLabel: dto.role_label?.trim() || null,
     specialty: dto.specialty?.trim() || null, avatarUrl: dto.avatar_url?.trim() || null, status: dto.status };
 }
 

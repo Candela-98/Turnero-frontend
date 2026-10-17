@@ -8,6 +8,8 @@ import { AdminPageHeader, AdminPageSection } from "@/components/layouts";
 import { AppliedFilterChip, Button, EmptyState, FloatingAlert, InlineAlert, ListToolbar, Skeleton } from "@/components/ui";
 import { getStaffMembers, type StaffFilters, type StaffMember } from "@/lib/staff-members/api";
 import { refreshStaffMembers, staffMemberKeys } from "@/lib/staff-members/queries";
+import { refreshStaffServices } from "@/lib/staff-members/service-queries";
+import { StaffServicesEditor } from "./staff-services-editor";
 import { StaffMemberEditor } from "./staff-member-editor";
 import { StaffFiltersDialog } from "./staff-filters-dialog";
 import { StaffMembersList } from "./staff-members-list";
@@ -17,7 +19,9 @@ export function StaffMembersPage() {
   const client = useQueryClient();
   const sequence = useRef(0);
   const [notice, setNotice] = useState<{ title: string; sequence: number } | null>(null);
-  const [refreshFailure, setRefreshFailure] = useState<number | null>(null);
+  const [refreshFailure, setRefreshFailure] = useState<{ id: number; services?: number[] } | null>(null);
+  const [servicesMember, setServicesMember] = useState<StaffMember | null>(null);
+  const servicesTrigger = useRef<HTMLButtonElement | null>(null);
   const [retrying, setRetrying] = useState(false);
   const [search, setSearch] = useState("");
   const [query, setQuery] = useState("");
@@ -41,7 +45,7 @@ export function StaffMembersPage() {
   }, [members.data, page]);
   function saved(member: StaffMember, failed: boolean, created: boolean) {
     setNotice({ title: created ? "Profesional creado" : "Profesional actualizado", sequence: ++sequence.current });
-    setRefreshFailure(failed ? member.id : null);
+    setRefreshFailure(failed ? { id: member.id } : null);
     window.requestAnimationFrame(() => {
       if (document.activeElement === document.body) document.getElementById("staff-search")?.focus({ preventScroll: true });
     });
@@ -49,9 +53,21 @@ export function StaffMembersPage() {
   async function retryRefresh() {
     if (!business || retrying || refreshFailure === null) return;
     setRetrying(true);
-    try { await refreshStaffMembers(client, business.id, refreshFailure); setRefreshFailure(null); }
+    try {
+      if (refreshFailure.services) await refreshStaffServices(client, business.id, refreshFailure.id, refreshFailure.services);
+      else await refreshStaffMembers(client, business.id, refreshFailure.id);
+      setRefreshFailure(null);
+    }
     catch { /* Retry reads only: the write already succeeded. */ }
     finally { setRetrying(false); }
+  }
+  function closeServices() {
+    setServicesMember(null);
+    window.requestAnimationFrame(() => {
+      const target = servicesTrigger.current;
+      if (target?.isConnected) target.focus({ preventScroll: true });
+      else document.getElementById("staff-search")?.focus({ preventScroll: true });
+    });
   }
   const createAction = <StaffMemberEditor trigger={<Button>Nuevo profesional</Button>} onSaved={(member, failed) => saved(member, failed, true)} />;
   const busy = search.trim() !== query || members.isFetching || members.isPending;
@@ -67,7 +83,17 @@ export function StaffMembersPage() {
       {busy ? <div role="status" aria-label="Cargando profesionales" className="space-y-3"><Skeleton className="h-24 w-full" /><Skeleton className="h-24 w-full" /><Skeleton className="h-24 w-full" /></div> : members.isError ?
         <InlineAlert tone="error">No se pudieron cargar los profesionales. <Button size="sm" variant="ghost" onClick={() => void members.refetch()}>Reintentar</Button></InlineAlert> : members.data?.data.length === 0 ?
         <EmptyState action={!query && status === "ALL" ? createAction : undefined} icon={<Users />} title={query || status !== "ALL" ? "No encontramos profesionales" : "Todavía no hay profesionales"} description={query || status !== "ALL" ? "Probá con otra búsqueda o cambiá los filtros." : "Los profesionales del negocio aparecerán acá."} /> : members.data ?
-        <StaffMembersList currentUserId={user?.id} members={members.data.data} total={members.data.page.total_elements} page={page} pageCount={members.data.page.total_pages} onPageChange={setPage} renderActions={member => <StaffMemberEditor id={member.id} trigger={<Button variant="outline" aria-label={`Editar ${member.name}`}>Editar</Button>} onSaved={(savedMember, failed) => saved(savedMember, failed, false)} />} /> : null}
+        <StaffMembersList currentUserId={user?.id} members={members.data.data} total={members.data.page.total_elements} page={page} pageCount={members.data.page.total_pages} onPageChange={setPage} renderActions={member => {
+          const servicesLabel = member.serviceCount === 0 ? "Asignar servicios" : member.serviceCount === null ? "Servicios" : `Servicios (${member.serviceCount})`;
+          return <>
+            <Button variant="outline" aria-label={`${servicesLabel} de ${member.name}`} onClick={event => { servicesTrigger.current = event.currentTarget; setServicesMember(member); }}>{servicesLabel}</Button>
+            <StaffMemberEditor id={member.id} trigger={<Button variant="outline" aria-label={`Editar ${member.name}`}>Editar</Button>} onSaved={(savedMember, failed) => saved(savedMember, failed, false)} />
+          </>;
+        }} /> : null}
     </div>
+    <StaffServicesEditor member={servicesMember} onClose={closeServices} onSaved={(id, failed, services) => {
+      setNotice({ title: "Servicios actualizados", sequence: ++sequence.current });
+      setRefreshFailure(failed ? { id, services } : null);
+    }} />
   </AdminPageSection>;
 }

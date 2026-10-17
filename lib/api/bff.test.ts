@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { DELETE, GET, POST, PATCH } from "@/app/api/backend/[...path]/route";
+import { DELETE, GET, POST, PATCH, PUT } from "@/app/api/backend/[...path]/route";
 
 const originalFetch = global.fetch;
 
@@ -207,4 +207,25 @@ it("forwards the authenticated current staff lookup and permits only GET", async
   const rejected = await PATCH(new Request("http://localhost:3000/api/backend/api/v1/staff-members/me", { method: "PATCH" }), context);
   expect(rejected.status).toBe(405);
   expect(fetch).toHaveBeenCalledTimes(1);
+});
+
+
+it.each([["GET", 200], ["GET", 404], ["PUT", 204], ["PUT", 400], ["PUT", 401], ["PUT", 404], ["PUT", 409], ["PUT", 503]] as const)("forwards staff services %s with status %i through the real proxy", async (method, status) => {
+  vi.stubEnv("TURNERO_API_BASE_URL", "http://localhost:8080");
+  const requestBody = { service_offering_ids: [20, 30] };
+  const responseBody = status === 200 ? [{ id: 20, duration_minutes: 30, price_cents: 1000, status: "INACTIVE" }] : { code: "REJECTED", message: "Rejected" };
+  const fetch = vi.fn().mockResolvedValue(status === 204 ? new Response(null, { status }) : Response.json(responseBody, { status }));
+  global.fetch = fetch;
+  const response = await ({ GET, PUT }[method])(new Request("http://localhost:3000/api/backend/api/v1/staff-members/5/service-offerings", {
+    method, headers: { cookie: "turnero_session=opaque", "content-type": "application/json" },
+    ...(method === "PUT" ? { body: JSON.stringify(requestBody) } : {}),
+  }), routeContext(["api", "v1", "staff-members", "5", "service-offerings"]));
+  expect(response.status).toBe(status);
+  if (status === 204) expect(await response.text()).toBe("");
+  else expect(await response.json()).toEqual(responseBody);
+  const [target, options] = fetch.mock.calls[0];
+  expect(target.toString()).toBe("http://localhost:8080/api/v1/staff-members/5/service-offerings");
+  expect(options.method).toBe(method);
+  expect(options.headers.get("cookie")).toBe("turnero_session=opaque");
+  if (method === "PUT") expect(new TextDecoder().decode(options.body)).toBe(JSON.stringify(requestBody));
 });
