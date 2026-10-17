@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { GET } from "@/app/api/backend/[...path]/route";
+import { DELETE, GET } from "@/app/api/backend/[...path]/route";
 
 const originalFetch = global.fetch;
 
@@ -14,6 +14,36 @@ afterEach(() => {
 });
 
 describe("BFF route handler", () => {
+  it.each([204, 404, 409])("forwards catalog removal and preserves backend status %i", async status => {
+    vi.stubEnv("TURNERO_API_BASE_URL", "http://localhost:8080");
+    const fetchMock = vi.fn().mockResolvedValue(new Response(status === 204 ? null : JSON.stringify({ message: "Rejected" }), {
+      status, headers: { "content-type": "application/json" },
+    }));
+    global.fetch = fetchMock;
+    const response = await DELETE(new Request("http://localhost:3000/api/backend/api/v1/service-offerings/5/catalog", {
+      method: "DELETE", headers: { cookie: "turnero_session=opaque" },
+    }), routeContext(["api", "v1", "service-offerings", "5", "catalog"]));
+    expect(response.status).toBe(status);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const [target, options] = fetchMock.mock.calls[0];
+    expect(target.toString()).toBe("http://localhost:8080/api/v1/service-offerings/5/catalog");
+    expect(options.method).toBe("DELETE");
+    expect(options.headers.get("cookie")).toBe("turnero_session=opaque");
+    if (status === 204) expect(await response.text()).toBe("");
+    else expect(await response.json()).toEqual({ message: "Rejected" });
+  });
+
+  it("rejects unsupported catalog methods and malformed IDs without calling upstream", async () => {
+    const fetchMock = vi.fn();
+    global.fetch = fetchMock;
+    const read = await GET(new Request("http://localhost:3000/api/backend/api/v1/service-offerings/5/catalog"), routeContext(["api", "v1", "service-offerings", "5", "catalog"]));
+    expect(read.status).toBe(405);
+    expect(read.headers.get("allow")).toBe("DELETE");
+    const malformed = await DELETE(new Request("http://localhost:3000/api/backend/api/v1/service-offerings/invalid/catalog", { method: "DELETE" }), routeContext(["api", "v1", "service-offerings", "invalid", "catalog"]));
+    expect(malformed.status).toBe(404);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it("forwards allowed requests, query params and required headers to the private backend", async () => {
     vi.stubEnv("TURNERO_API_BASE_URL", "http://localhost:8080");
     const fetchMock = vi.fn().mockResolvedValue(

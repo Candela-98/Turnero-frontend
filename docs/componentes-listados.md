@@ -52,3 +52,11 @@ El encabezado `AdminPageHeader` y el shell `AdminAppShell` siguen compartidos de
 - Las keys y el refresco de listado/categorías/detalle se centralizan en `lib/service-offerings/queries.ts`. Un fallo de refresco posterior a una escritura exitosa no repite la mutación.
 
 La composición completa y los helpers de verificación están en `patrones-pantallas.md`.
+
+## Estado de servicios (TURN-98)
+
+- `ServicesWorkspace` centraliza avisos y reintento de lecturas del catálogo; `serviceNotices` define título y descripción específicos para crear, actualizar, desactivar, restaurar y eliminar, seleccionados mediante una clave tipada; el listado conserva su ancho completo.
+- `ServiceStatusConfirmation` confirma Desactivar, Restaurar o Eliminar desde las tarjetas, bloquea doble envío y mantiene los errores en el diálogo para reintentar. Al cambiar de estado conserva búsqueda, filtros y página válida.
+- `ConfirmActionDialog` comparte confirmación accesible con foco inicial en Cancelar, acción opcional de peligro, bloqueo durante envío y contenido de error. El propietario cierra al confirmar éxito; `ConfirmDiscardDialog` conserva su contrato como wrapper.
+- `applyServiceStatus` actualiza detalle y resultados cacheados, excluye la fila de páginas cuyo estado ya no corresponde y cancela lecturas obsoletas antes de invalidar. La escritura no se repite al reintentar un refresco fallido.
+- Restaurar usa PATCH exclusivamente con `status: "ACTIVE"`; Desactivar usa DELETE lógico. Eliminar solo está disponible para inactivos y usa DELETE `/{id}/catalog`: borrado lógico sin restauración desde la app. `applyServiceRemoval` quita resultados cacheados y el dato de edición antes del refresco. Las antiguas URLs de detalle redirigen al catálogo.

@@ -28,6 +28,7 @@ const allowedRoutes: readonly AllowedRoute[] = [
   },
   { pattern: /^\/api\/v1\/service-offerings$/, methods: ["GET", "POST"] },
   { pattern: /^\/api\/v1\/service-offerings\/categories$/, methods: ["GET"] },
+  { pattern: /^\/api\/v1\/service-offerings\/\d+\/catalog$/, methods: ["DELETE"] },
   {
     pattern: /^\/api\/v1\/service-offerings\/[^/]+$/,
     methods: ["GET", "PATCH", "DELETE"],
