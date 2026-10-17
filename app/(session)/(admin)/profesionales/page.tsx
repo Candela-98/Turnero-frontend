@@ -1,11 +1,5 @@
-import { AdminPlaceholderPage } from "@/components/admin";
+import { StaffMembersPage } from "@/components/staff-members/staff-members-page";
 
 export default function StaffMembers() {
-  return (
-    <AdminPlaceholderPage
-      description="La gestión de profesionales estará disponible en esta sección."
-      title="Profesionales"
-    />
-  );
+  return <StaffMembersPage />;
 }
-

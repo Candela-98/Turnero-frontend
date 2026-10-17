@@ -340,3 +340,11 @@ Preparada el 2026-10-13 en `feature/TURN-98-service-detail`, sobre la entrega de
 - QA manual final aprobado por el usuario el 2026-10-16, incluyendo eliminación tras corregir el BFF y avisos específicos por acción. Avisos tipados centralizados; lint, TypeScript y 12 E2E de los flujos afectados aprobados en desktop y ambos tamaños mobile. Entrega autorizada para revisión por PR, sin merge automático.
 
 - PR frontend [#11](https://github.com/Candela-98/Turnero-frontend/pull/11) creado el 2026-10-16 sobre la rama de #10; backend relacionado [#76](https://github.com/Candela-98/Turnero-api/pull/76), sobre #75. Ambos abiertos para revisión del usuario; sin merge. Tras integrar TURN-96, cambiar bases a `dev`/`develop` e integrar TURN-98 backend antes que frontend.
+
+## TURN-77 — Listado real de profesionales
+
+- Implementación local: rama `feature/TURN-77-staff-list`, basada en TURN-98; `/profesionales` consume API real mediante BFF/apiFetch y TanStack Query, con keys por negocio/parámetros, cancelación, debounce 300 ms y páginas de 20.
+- Componentes separados de consulta, listado, tarjeta y filtros; controles, shell y estados compartidos con Servicios. Campos opcionales omitidos e iniciales ante imagen ausente/fallida. No incluye acciones reservadas para TURN-99/78/79/101 ni modifica agenda demo.
+- QA automatizado: adapter/parámetros y handler real BFF; E2E en los tres viewports con filtros provisionales, debounce, paginación, carga, vacíos, error/reintento, respuesta tardía, avatar fallido, textos largos y Axe. Guía y resultados: `docs/qa-turn-77.md`.
+- QA manual aprobada por el usuario; paginación sin prueba manual por tener menos de 20 profesionales, cubierta por automatización. PRs autorizados; integración pendiente, ajustar bases por TURN-98 e integrar backend primero. Requiere API con respuesta `{ data, page }`, sin nuevas migraciones.
+- Verificación final: lint, TypeScript, build y 76 unitarios aprobados; suite E2E completa 202 aprobadas/14 omisiones previstas, recorrido final TURN-77 15/15. Capturas revisadas en 1440×900, 390×844 y 412×915; sin infracciones Axe básicas. QA manual con API real aprobada; paginación cubierta por automatización.

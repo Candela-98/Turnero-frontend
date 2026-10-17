@@ -154,3 +154,20 @@ describe("BFF route handler", () => {
     expect((await timedOut.json()).code).toBe("UPSTREAM_TIMEOUT");
   });
 });
+
+it.each([200, 400, 401, 503])("forwards staff listing through the actual handler with filters, cookies and status %i", async status => {
+  vi.stubEnv("TURNERO_API_BASE_URL", "http://localhost:8080");
+  const body = status === 200 ? { data: [], page: { number: 2, size: 20, total_elements: 0, total_pages: 0 } } : { message: "Rejected" };
+  const fetchMock = vi.fn().mockResolvedValue(Response.json(body, { status }));
+  global.fetch = fetchMock;
+  const query = "q=Ana+%26+color&status=ACTIVE&page=2&size=20&sort=name%2Cdesc";
+  const response = await GET(new Request(`http://localhost:3000/api/backend/api/v1/staff-members?${query}`, {
+    headers: { cookie: "turnero_session=opaque" },
+  }), routeContext(["api", "v1", "staff-members"]));
+  expect(response.status).toBe(status);
+  expect(await response.json()).toEqual(body);
+  const [target, options] = fetchMock.mock.calls[0];
+  expect(target.toString()).toBe(`http://localhost:8080/api/v1/staff-members?${query}`);
+  expect(options.method).toBe("GET");
+  expect(options.headers.get("cookie")).toBe("turnero_session=opaque");
+});
