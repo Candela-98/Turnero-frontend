@@ -58,3 +58,8 @@ await expectAdminNotice(page, { withSaveAction: true }); // Posición fija, dere
 Playwright ejecuta desktop `1440×900`, mobile `390×844` y mobile `412×915`. Además, probar carga, vacío, validación, edición, reversión, envío, éxito, error/reintento, teclado, descarte y accesibilidad según corresponda. Para listados sin Guardar omitir `withSaveAction`.
 
 `npm run test:patterns` ejecuta los recorridos de referencia de Configuración y Servicios. `npm run check` añade lint, TypeScript, unitarios, build y todos los E2E; CI lo ejecuta en PRs y pushes a `dev`, `develop` y `main`, y conserva el reporte del navegador si falla. Antes de entregar, revisar visualmente los cambios de UI contra Stitch y las pantallas aprobadas.
+
+
+### Acciones secundarias en filas
+
+Cuando una fila de Profesionales ofrece Servicios, Editar datos y Horarios, conservar Servicios visible con su cantidad y agrupar las otras acciones en `ActionMenu` (Más acciones). Mantener los diálogos controlados en la pantalla, fuera del árbol de resultados que se desmonta al consultar. Abrirlos después del cierre del menú y devolver foco a la fila o al buscador si desapareció. Los horarios reutilizan `WeeklyDayRow`, con reglas y etiquetas por dominio, dentro de ResponsiveDialog con footer fijo.

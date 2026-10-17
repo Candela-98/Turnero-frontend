@@ -1,24 +1,8 @@
-export const businessWeek = [
-  "MONDAY",
-  "TUESDAY",
-  "WEDNESDAY",
-  "THURSDAY",
-  "FRIDAY",
-  "SATURDAY",
-  "SUNDAY",
-] as const;
+import { weekDays, weekDayLabels, type WeekDay } from "@/lib/weekly-hours";
 
-export type BusinessDay = (typeof businessWeek)[number];
-
-export const businessDayLabels: Record<BusinessDay, string> = {
-  MONDAY: "Lunes",
-  TUESDAY: "Martes",
-  WEDNESDAY: "Miércoles",
-  THURSDAY: "Jueves",
-  FRIDAY: "Viernes",
-  SATURDAY: "Sábado",
-  SUNDAY: "Domingo",
-};
+export const businessWeek = weekDays;
+export const businessDayLabels = weekDayLabels;
+export type BusinessDay = WeekDay;
 
 export type BusinessHoursDayApiResponse = {
   id: number;

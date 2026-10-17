@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Users } from "lucide-react";
+import { Ellipsis, Users } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/components/auth/auth-provider";
 import { AdminPageHeader, AdminPageSection } from "@/components/layouts";
@@ -9,6 +9,8 @@ import { AppliedFilterChip, Button, EmptyState, FloatingAlert, InlineAlert, List
 import { getStaffMembers, type StaffFilters, type StaffMember } from "@/lib/staff-members/api";
 import { refreshStaffMembers, staffMemberKeys } from "@/lib/staff-members/queries";
 import { refreshStaffServices } from "@/lib/staff-members/service-queries";
+import { ActionMenu } from "@/components/ui/action-menu";
+import { StaffHoursEditor } from "./staff-hours-editor";
 import { StaffServicesEditor } from "./staff-services-editor";
 import { StaffMemberEditor } from "./staff-member-editor";
 import { StaffFiltersDialog } from "./staff-filters-dialog";
@@ -21,6 +23,8 @@ export function StaffMembersPage() {
   const [notice, setNotice] = useState<{ title: string; sequence: number } | null>(null);
   const [refreshFailure, setRefreshFailure] = useState<{ id: number; services?: number[] } | null>(null);
   const [servicesMember, setServicesMember] = useState<StaffMember | null>(null);
+  const [actionEditor, setActionEditor] = useState<{ kind: "details" | "hours"; member: StaffMember } | null>(null);
+  const actionTrigger = useRef<HTMLButtonElement | null>(null);
   const servicesTrigger = useRef<HTMLButtonElement | null>(null);
   const [retrying, setRetrying] = useState(false);
   const [search, setSearch] = useState("");
@@ -69,6 +73,17 @@ export function StaffMembersPage() {
       else document.getElementById("staff-search")?.focus({ preventScroll: true });
     });
   }
+  function closeAction() {
+    setActionEditor(null);
+    window.requestAnimationFrame(() => {
+      if (actionTrigger.current?.isConnected) actionTrigger.current.focus({ preventScroll: true });
+      else document.getElementById("staff-search")?.focus({ preventScroll: true });
+    });
+  }
+  function openAction(kind: "details" | "hours", member: StaffMember) {
+    if (kind === "details" && business) client.removeQueries({ queryKey: staffMemberKeys.detail(business.id, member.id), exact: true, type: "inactive" });
+    setActionEditor({ kind, member });
+  }
   const createAction = <StaffMemberEditor trigger={<Button>Nuevo profesional</Button>} onSaved={(member, failed) => saved(member, failed, true)} />;
   const busy = search.trim() !== query || members.isFetching || members.isPending;
   const changeStatus = (next: StaffFilters["status"]) => { setStatus(next); setPage(0); };
@@ -87,10 +102,15 @@ export function StaffMembersPage() {
           const servicesLabel = member.serviceCount === 0 ? "Asignar servicios" : member.serviceCount === null ? "Servicios" : `Servicios (${member.serviceCount})`;
           return <>
             <Button variant="outline" aria-label={`${servicesLabel} de ${member.name}`} onClick={event => { servicesTrigger.current = event.currentTarget; setServicesMember(member); }}>{servicesLabel}</Button>
-            <StaffMemberEditor id={member.id} trigger={<Button variant="outline" aria-label={`Editar ${member.name}`}>Editar</Button>} onSaved={(savedMember, failed) => saved(savedMember, failed, false)} />
+            <ActionMenu trigger={<Button variant="outline" className="size-11 shrink-0 px-0" aria-label={`Más acciones de ${member.name}`} onFocus={event => { actionTrigger.current = event.currentTarget; }}><Ellipsis aria-hidden="true" /></Button>}
+              actions={[{ label: "Editar datos", onSelect: () => openAction("details", member) }, { label: "Horarios", onSelect: () => openAction("hours", member) }]} />
           </>;
         }} /> : null}
     </div>
+    {actionEditor?.kind === "details" ? <StaffMemberEditor key={actionEditor.member.id} id={actionEditor.member.id} open onOpenChange={next => { if (!next) closeAction(); }} onSaved={(member, failed) => saved(member, failed, false)} /> : null}
+    <StaffHoursEditor member={actionEditor?.kind === "hours" ? actionEditor.member : null} onClose={closeAction} onSaved={() => {
+      setNotice({ title: "Horarios actualizados", sequence: ++sequence.current });
+    }} />
     <StaffServicesEditor member={servicesMember} onClose={closeServices} onSaved={(id, failed, services) => {
       setNotice({ title: "Servicios actualizados", sequence: ++sequence.current });
       setRefreshFailure(failed ? { id, services } : null);

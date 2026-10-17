@@ -9,12 +9,14 @@ import { getMyStaffMember, getStaffMember, type StaffMember } from "@/lib/staff-
 import { staffMemberKeys } from "@/lib/staff-members/queries";
 import { StaffMemberForm, type StaffFormHandle } from "./staff-member-form";
 
-export type StaffMemberEditorProps = { id?: number; trigger: ReactElement; onSaved: (member: StaffMember, refreshFailed: boolean) => void };
+export type StaffMemberEditorProps = { id?: number; trigger?: ReactElement; open?: boolean; onOpenChange?: (open: boolean) => void; onSaved: (member: StaffMember, refreshFailed: boolean) => void };
 
-export function StaffMemberEditor({ id, trigger, onSaved }: StaffMemberEditorProps) {
+export function StaffMemberEditor({ id, trigger, open: controlledOpen, onOpenChange, onSaved }: StaffMemberEditorProps) {
   const { business, user } = useAuth();
   const client = useQueryClient();
-  const [open, setOpen] = useState(false);
+  const [localOpen, setLocalOpen] = useState(false);
+  const open = controlledOpen ?? localOpen;
+  function setOpen(next: boolean) { if (controlledOpen === undefined) setLocalOpen(next); onOpenChange?.(next); }
   const [confirmDiscard, setConfirmDiscard] = useState(false);
   const [saving, setSaving] = useState(false);
   const [footerTarget, setFooterTarget] = useState<HTMLDivElement | null>(null);

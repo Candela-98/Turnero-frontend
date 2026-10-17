@@ -1,3 +1,4 @@
+import { openStaffAction } from "./helpers/staff-actions";
 import { expect, test, type Page } from "@playwright/test";
 import { AxeBuilder } from "@axe-core/playwright";
 import { expectAdminNotice, expectAdminViewport } from "./helpers/admin-patterns";
@@ -68,7 +69,7 @@ test.describe("staff form", () => {
     await expect(page.getByLabel("Nombre", { exact: true })).toHaveValue("");
     await fill(page, "Juan");
     await page.getByRole("button", { name: "Crear profesional", exact: true }).click();
-    await page.getByRole("button", { name: "Editar Juan", exact: true }).click();
+    await openStaffAction(page, "Juan", "Editar datos");
     await expect(page.getByLabel("Nombre", { exact: true })).toHaveValue("Juan");
     await expect(page.getByRole("switch")).toHaveCount(0);
     await page.getByLabel("Rol (opcional)", { exact: true }).fill("Dueño");
@@ -92,12 +93,12 @@ test.describe("staff form", () => {
     await expect(page.getByText("Vos", { exact: true })).toHaveCount(1);
     await expectAdminViewport(page);
     await page.screenshot({ path: testInfo.outputPath("staff-own-profile.png"), fullPage: true });
-    await page.getByRole("button", { name: "Editar Ana Pérez", exact: true }).click();
+    await openStaffAction(page, "Ana Pérez", "Editar datos");
     await expect(page.getByText("Tu perfil profesional", { exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "Guardar cambios", exact: true })).toBeDisabled();
     await expect(page.getByRole("switch")).toHaveCount(0);
     await page.getByRole("button", { name: "Cerrar formulario" }).click();
-    await page.getByRole("button", { name: "Editar Juan", exact: true }).click();
+    await openStaffAction(page, "Juan", "Editar datos");
     await expect(page.getByLabel("Nombre", { exact: true })).toHaveValue("Juan");
     await expect(page.getByText("Tu perfil profesional", { exact: true })).toHaveCount(0);
   });
@@ -152,7 +153,7 @@ test.describe("staff form", () => {
   });
 
   test("hydrates edits, detects reversal, clears role, and reloads saved values", async ({ page }, testInfo) => {
-    await page.getByRole("button", { name: "Editar Ana Pérez" }).click();
+    await openStaffAction(page, "Ana Pérez", "Editar datos");
     const save = page.getByRole("button", { name: "Guardar cambios", exact: true });
     await expect(page.getByLabel("Rol (opcional)", { exact: true })).toHaveValue("Barbera");
     await expect(save).toBeDisabled();
@@ -166,7 +167,7 @@ test.describe("staff form", () => {
     await expect(page.getByRole("dialog")).toHaveCount(0);
     expect(writes).toEqual([{ method: "PATCH", body: { role_label: "" } }]);
     expect(details).toBeGreaterThanOrEqual(2);
-    await page.getByRole("button", { name: "Editar Ana Pérez" }).click();
+    await openStaffAction(page, "Ana Pérez", "Editar datos");
     await expect(page.getByLabel("Rol (opcional)", { exact: true })).toHaveValue("");
     await expect(save).toBeDisabled();
   });
@@ -244,7 +245,7 @@ test.describe("staff form", () => {
 
   test("can edit inactive legacy data without sending specialty, state, avatar or user", async ({ page }) => {
     members[0] = { ...initial, specialty: null, role_label: null, status: "INACTIVE", user_id: 1 };
-    await page.getByRole("button", { name: "Editar Ana Pérez" }).click();
+    await openStaffAction(page, "Ana Pérez", "Editar datos");
     await expect(page.getByLabel("Especialidad", { exact: true })).toHaveValue("");
     await page.getByLabel("Nombre", { exact: true }).fill("Ana nueva");
     await page.getByRole("button", { name: "Guardar cambios", exact: true }).click();
@@ -264,7 +265,7 @@ test.describe("staff form", () => {
       if (!recover) return route.fulfill({ status: 503, json: {} });
       return route.fallback();
     });
-    await page.getByRole("button", { name: "Editar Ana Pérez" }).click();
+    await openStaffAction(page, "Ana Pérez", "Editar datos");
     await expect(page.getByLabel("Cargando profesional")).toBeVisible();
     release();
     await expect(page.getByText("No pudimos cargar el profesional", { exact: true })).toBeVisible();
@@ -273,7 +274,7 @@ test.describe("staff form", () => {
     await expect(page.getByLabel("Nombre", { exact: true })).toHaveValue("Ana Pérez");
     await page.getByRole("button", { name: "Cerrar formulario" }).click();
     missing = true;
-    await page.getByRole("button", { name: "Editar Ana Pérez" }).click();
+    await openStaffAction(page, "Ana Pérez", "Editar datos");
     await expect(page.getByText("El profesional ya no está disponible")).toBeVisible();
     await page.getByRole("button", { name: "Volver al listado" }).click();
     await expect(page.getByRole("dialog")).toHaveCount(0);
@@ -299,7 +300,7 @@ test.describe("staff form", () => {
     await page.getByRole("searchbox").fill("Ana");
     await expect(page.getByText("Página 1 de 2")).toBeVisible();
     await page.getByRole("button", { name: "Siguiente" }).click();
-    await page.getByRole("button", { name: "Editar Ana 21", exact: true }).click();
+    await openStaffAction(page, "Ana 21", "Editar datos");
     await page.getByLabel("Nombre", { exact: true }).fill("Bruno");
     await page.getByRole("button", { name: "Guardar cambios", exact: true }).click();
     await expect(page.getByRole("dialog")).toHaveCount(0);

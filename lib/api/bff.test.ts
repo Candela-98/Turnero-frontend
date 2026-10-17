@@ -229,3 +229,18 @@ it.each([["GET", 200], ["GET", 404], ["PUT", 204], ["PUT", 400], ["PUT", 401], [
   expect(options.headers.get("cookie")).toBe("turnero_session=opaque");
   if (method === "PUT") expect(new TextDecoder().decode(options.body)).toBe(JSON.stringify(requestBody));
 });
+
+it.each([["GET", 200], ["GET", 404], ["PUT", 200], ["PUT", 400], ["PUT", 401], ["PUT", 404], ["PUT", 503]] as const)("forwards staff working hours %s with status %i", async (method, status) => {
+  vi.stubEnv("TURNERO_API_BASE_URL", "http://localhost:8080");
+  const body = [{ day_of_week: "MONDAY", is_available: false, starts_at: null, ends_at: null }];
+  const responseBody = status === 200 ? body : { code: "REJECTED", message: "Rejected" };
+  const fetch = vi.fn().mockResolvedValue(Response.json(responseBody, { status })); global.fetch = fetch;
+  const response = await ({ GET, PUT }[method])(new Request("http://localhost:3000/api/backend/api/v1/staff-members/5/working-hours", {
+    method, headers: { cookie: "turnero_session=opaque", "content-type": "application/json" }, ...(method === "PUT" ? { body: JSON.stringify(body) } : {}),
+  }), routeContext(["api", "v1", "staff-members", "5", "working-hours"]));
+  expect(response.status).toBe(status); expect(await response.json()).toEqual(responseBody);
+  const [target, options] = fetch.mock.calls[0];
+  expect(target.toString()).toBe("http://localhost:8080/api/v1/staff-members/5/working-hours");
+  expect(options.method).toBe(method); expect(options.headers.get("cookie")).toBe("turnero_session=opaque");
+  if (method === "PUT") expect(new TextDecoder().decode(options.body)).toBe(JSON.stringify(body));
+});

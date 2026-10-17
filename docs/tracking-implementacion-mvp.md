@@ -390,3 +390,22 @@ Preparada el 2026-10-13 en `feature/TURN-98-service-detail`, sobre la entrega de
 - PRs TURN-78 creados el 2026-10-17: [backend #79](https://github.com/Candela-98/Turnero-api/pull/79) y [frontend #14](https://github.com/Candela-98/Turnero-frontend/pull/14), ambos sobre `feature/TURN-99-staff-form`. QA manual aprobada. Sin revisión de CI ni merge; ajustar bases al integrar TURN-99 y entregar backend primero.
 
 - Integración de dependencias autorizada por el usuario el 2026-10-17 sin esperar approvals: TURN-98 [#11](https://github.com/Candela-98/Turnero-frontend/pull/11), TURN-77 [#12](https://github.com/Candela-98/Turnero-frontend/pull/12) y TURN-99 [#13](https://github.com/Candela-98/Turnero-frontend/pull/13) mergeados, en ese orden, a `dev`, después de sus backends. TURN-78 [#14](https://github.com/Candela-98/Turnero-frontend/pull/14) queda abierto sobre `dev`, sin conflictos; backend [#79](https://github.com/Candela-98/Turnero-api/pull/79) sobre `develop`. Sin consultar CI. Integrar TURN-78 backend antes del frontend.
+
+
+## TURN-79 — Horarios semanales por profesional (2026-10-17)
+
+- Implementación local en `feature/TURN-79-staff-hours`, basada en TURN-78. Servicios permanece visible en las filas; Más acciones reúne Editar datos y Horarios. Editor persistente con modal desktop/panel inferior mobile, semana completa y acciones fijas. Controles de día/hora extraídos y compartidos con Configuración sin cambiar su dominio.
+- Lectura fresca por negocio/profesional y cancelable; baseline independiente de refetches. Disponibilidad por día, horas requeridas y orden estricto, comparación normalizada, reversión, descarte y foco de errores. PUT completo con bloqueo inmediato de doble envío/cierre y errores que conservan borrador. Cache actualizada desde 200; recuperación de respuesta inválida solo por lectura.
+- QA automática: 119 unitarios y 27 E2E nuevos aprobados en los tres viewports. Capturas 1440×900, 390×844 y 412×915 revisadas, footer accesible, sin scroll horizontal ni infracciones axe básicas. Verificación completa registrada al finalizar.
+- QA manual pendiente: guía `docs/pruebas-locales-turn-79.md`. Reiniciar backend. La disponibilidad efectiva sigue limitada por los horarios del negocio; turnos existentes intactos, agenda/formularios de turnos siguen demo.
+- Integración pendiente: PRs separados después de aprobación manual; backend primero. Dependencias TURN-78 backend #79 / frontend #14 todavía abiertas. Sin revisión de CI ni merge automático.
+
+- Verificación completa final: `NEXT_DIST_DIR=.next-e2e npm run check` aprobada (lint, TypeScript, 119 unitarios, build y 307 E2E aprobados / 14 omisiones preexistentes). Los 27 recorridos nuevos de horarios pasan en los tres proyectos. Regresiones de Configuración, edición de profesionales y asignación de servicios incluidas. Sin fallos pendientes de frontend.
+
+- Backend final: 527 pruebas aprobadas, sin fallos ni omisiones; contrato normalizado y horas estrictas verificados. QA manual e integración continúan pendientes.
+
+- Mejora de QA solicitada: avisos informativos junto a los campos cuando el rango excede los horarios del negocio; contempla días cerrados y rangos sin intersección. Lectura real por BFF/apiFetch, key por negocio y AbortSignal, recuperación sin perder borrador y guardado permitido. Guía local ampliada; QA manual de esta mejora pendiente.
+
+- Verificación de los avisos: lint, TypeScript, 122 unitarios y build aprobados. E2E afectados: 61 aprobados y cinco omisiones preexistentes de Configuración, en los tres proyectos. Incluye persistir 19:00 con cierre 18:00, reversión, accesibilidad de ayudas, días cerrados, rangos sin intersección y error/reintento de comparación conservando borrador. Capturas de avisos revisadas en 1440×900, 390×844 y 412×915; sin scroll horizontal ni infracciones axe básicas. No se repitió la suite completa ajena a horarios para esta mejora.
+
+- QA manual final aprobada por el usuario el 2026-10-17, incluidos avisos de horarios del negocio y consultas canceladas en desarrollo. Creación de PRs separados autorizada. Bases TURN-78 mientras backend #79 / frontend #14 sigan abiertos; ajustar a develop/dev al integrar esas dependencias. Integrar backend primero, sin revisión de CI ni merge automático.
