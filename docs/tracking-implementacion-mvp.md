@@ -433,3 +433,9 @@ Preparada el 2026-10-13 en `feature/TURN-98-service-detail`, sobre la entrega de
 
 - Ajuste UX de avisos aprobado por el usuario: Profesionales comparte un catálogo de mensajes por acción entre listado y detalle, siguiendo Servicios. Se elimina el texto genérico repetido; las siete acciones incluyen descripciones específicas sobre el resultado, próximos pasos o datos conservados. Verificación de la versión inicial: lint, TypeScript, 145 unitarios, build y 156 E2E afectados aprobados en los tres viewports; capturas de avisos revisadas. Descripciones ampliadas según copy aprobado por el usuario.
 - Ajuste de copy en Servicios aprobado por el usuario: actualización informa que el catálogo ya muestra los datos nuevos; restauración informa que el servicio vuelve a aparecer entre los activos.
+
+### Integración de dependencias TURN-101 (2026-10-19)
+
+- Por instrucción del usuario, TURN-78 [#14](https://github.com/Candela-98/Turnero-frontend/pull/14) y TURN-79 [#15](https://github.com/Candela-98/Turnero-frontend/pull/15) se integraron a `dev`, sin esperar approvals y sin consultar CI. Commits de merge: `c76e08b` y `6eaa04d`.
+- Backends relacionados: TURN-78 #79 y TURN-79 #80 integrados a `develop`, antes de sus respectivos frontends.
+- Solo permanece abierto TURN-101 frontend [#16](https://github.com/Candela-98/Turnero-frontend/pull/16), con base `dev`. Backend [#81](https://github.com/Candela-98/Turnero-api/pull/81) permanece abierto sobre `develop`; integrar backend antes que frontend. El usuario aprobó la entrega y pidió conservar estos últimos PRs abiertos.
