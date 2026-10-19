@@ -13,10 +13,10 @@ export function StaffMemberCard({ member, actions, isCurrentUser = false }: { me
         {isCurrentUser ? <Badge title="Este profesional está vinculado a tu usuario">Vos</Badge> : null}
         <Badge tone={member.status === "ACTIVE" ? "positive" : "neutral"}>{member.status === "ACTIVE" ? "Activo" : "Inactivo"}</Badge>
       </div>
-      {member.roleLabel ? <p className="mt-1 break-words text-sm text-on-surface-variant">{member.roleLabel}</p> : null}
-      {member.specialty ? <p className="mt-1 break-words text-sm text-on-surface-variant">{member.specialty}</p> : null}
+      {member.roleLabel ? <p className="mt-1 break-words text-sm text-on-surface-variant"><span className="font-medium">Rol:</span> {member.roleLabel}</p> : null}
+      {member.specialty ? <p className="mt-1 break-words text-sm text-on-surface-variant"><span className="font-medium">Especialidad:</span> {member.specialty}</p> : null}
       </div>
-      {actions ? <div className="mt-3 flex justify-end gap-2 sm:mt-0 sm:shrink-0">{actions}</div> : null}
+      {actions ? <div className="mt-3 flex flex-wrap justify-end gap-2 sm:mt-0 sm:shrink-0">{actions}</div> : null}
     </div>
   </article>;
 }

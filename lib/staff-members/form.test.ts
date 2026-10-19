@@ -3,7 +3,7 @@ import { ApiError } from "@/lib/api/client";
 import { changedStaffFields, emptyStaffForm, hasStaffFormChanges, staffApiFieldErrors, toStaffFormValues, toStaffWriteRequest, validateStaffForm } from "./form";
 import type { StaffMember } from "./api";
 
-const member: StaffMember = { id: 2, userId: 3, name: "Ana", roleLabel: "Barbera", specialty: "Color", avatarUrl: "https://example.com/a.png", status: "INACTIVE" };
+const member: StaffMember = { serviceCount: null, id: 2, userId: 3, name: "Ana", roleLabel: "Barbera", specialty: "Color", avatarUrl: "https://example.com/a.png", status: "INACTIVE" };
 const baseline = toStaffFormValues(member);
 it("enforces required fields and actual API/database boundaries", () => {
   expect(validateStaffForm(emptyStaffForm)).toEqual({ name: expect.any(String), specialty: expect.any(String) });

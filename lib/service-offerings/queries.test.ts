@@ -1,3 +1,4 @@
+import { staffMemberKeys } from "@/lib/staff-members/queries";
 import { QueryClient } from "@tanstack/react-query";
 import { describe, expect, it } from "vitest";
 import { applyServiceStatus, applyServiceRemoval, serviceOfferingKeys } from "./queries";
@@ -51,7 +52,13 @@ describe("confirmed deactivation cache", () => {
     client.setQueryData(own, { data: [service], page });
     client.setQueryData(other, { data: [service], page });
     client.setQueryData(serviceOfferingKeys.detail(10, 1), service);
+    const staff = staffMemberKeys.list(10, { q: "", status: "ALL", page: 0, size: 20 });
+    const foreignStaff = staffMemberKeys.list(20, { q: "", status: "ALL", page: 0, size: 20 });
+    client.setQueryData(staff, { data: [{ id: 5, serviceCount: 1 }] });
+    client.setQueryData(foreignStaff, { data: [{ id: 5, serviceCount: 1 }] });
     await applyServiceRemoval(client, 10, 1);
+    expect(client.getQueryState(staff)?.isInvalidated).toBe(true);
+    expect(client.getQueryState(foreignStaff)?.isInvalidated).toBe(false);
     expect(client.getQueryData(own)).toMatchObject({ data: [], page: { total_elements: 0 } });
     expect(client.getQueryData(other)).toEqual({ data: [service], page });
     expect(client.getQueryData(serviceOfferingKeys.detail(10, 1))).toBeUndefined();

@@ -1,3 +1,4 @@
+import { staffMemberKeys } from "@/lib/staff-members/queries";
 import type { QueryClient } from "@tanstack/react-query";
 import type { getServiceOfferings, ServiceFilters, ServiceOffering } from "./api";
 
@@ -30,8 +31,11 @@ export async function applyServiceStatus(client: QueryClient, businessId: number
 export async function applyServiceRemoval(client: QueryClient, businessId: number, id: number) {
   await Promise.all([
     client.cancelQueries({ queryKey: serviceOfferingKeys.list(businessId) }),
+    client.cancelQueries({ queryKey: staffMemberKeys.all(businessId) }),
     client.cancelQueries({ queryKey: serviceOfferingKeys.detail(businessId, id), exact: true }),
   ]);
+  // Counts exclude removed services; refetch them when returning to the staff list.
+  await client.invalidateQueries({ queryKey: staffMemberKeys.all(businessId), refetchType: "none" });
   client.removeQueries({ queryKey: serviceOfferingKeys.detail(businessId, id), exact: true });
   for (const [key, data] of client.getQueriesData<Awaited<ReturnType<typeof getServiceOfferings>>>({ queryKey: serviceOfferingKeys.list(businessId) })) {
     if (!data?.data.some(item => item.id === id)) continue;

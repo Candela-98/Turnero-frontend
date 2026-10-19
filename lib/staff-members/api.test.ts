@@ -7,7 +7,7 @@ const dto = { id: 1, business_id: 10, user_id: null, name: "Ana Pérez", role_la
 const filters = { q: "  Ana & color  ", status: "INACTIVE" as const, page: 2, size: 20 };
 
 it("maps wire fields and omits blank optional content", () => {
-  expect(toStaffMember(dto)).toEqual({ id: 1, userId: null, name: "Ana Pérez", roleLabel: "Directora", specialty: null, avatarUrl: null, status: "ACTIVE" });
+  expect(toStaffMember(dto)).toEqual({ id: 1, userId: null, name: "Ana Pérez", roleLabel: "Directora", specialty: null, avatarUrl: null, serviceCount: null, status: "ACTIVE" });
 });
 it("encodes combined filters and omits default status and blank search", () => {
   expect(new URLSearchParams(staffMemberParams(filters)).get("q")).toBe("Ana & color");
@@ -50,4 +50,10 @@ it("looks up the current user's link independently of list parameters", async ()
   expect(await getMyStaffMember(signal)).toBeNull();
   expect(await getMyStaffMember(signal)).toMatchObject({ id: 1, userId: 1, status: "INACTIVE" });
   expect(fetch).toHaveBeenCalledWith("/api/backend/api/v1/staff-members/me", expect.objectContaining({ signal, credentials: "include", method: "GET" }));
+});
+
+it("maps list counts without treating a missing count as an empty assignment", () => {
+  expect(toStaffMember({ ...dto, service_count: 5 }).serviceCount).toBe(5);
+  expect(toStaffMember({ ...dto, service_count: 0 }).serviceCount).toBe(0);
+  expect(toStaffMember(dto).serviceCount).toBeNull();
 });
