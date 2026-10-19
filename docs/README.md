@@ -31,6 +31,10 @@ Consultar primero [patrones-pantallas.md](patrones-pantallas.md) y [componentes-
 1. `pruebas-locales-google-auth.md`
 2. `integracion-api-mvp.md`
 
+### Para probar horarios de profesionales
+
+Consultar [pruebas-locales-turn-79.md](pruebas-locales-turn-79.md): preparación, recorrido manual y automatización.
+
 ### Para trabajar con Stitch
 
 1. `stitch/progreso-stitch.md`

@@ -5,8 +5,8 @@ import Link from "next/link";
 import { Fragment, type FormEvent, useCallback, useEffect, useId, useState } from "react";
 
 import { AdminPageSection, AdminFormActions } from "@/components/layouts";
-import { Button, FloatingAlert, InlineAlert, Input, Skeleton } from "@/components/ui";
-import { Switch } from "@/components/ui/switch";
+import { Button, FloatingAlert, InlineAlert, Skeleton } from "@/components/ui";
+import { WeeklyDayRow } from "@/components/ui/weekly-day-row";
 import {
   businessDayLabels,
   getBusinessHours,
@@ -21,96 +21,14 @@ import {
 } from "@/lib/business-hours";
 import { useFocusInvalidField } from "@/lib/forms/use-focus-invalid-field";
 
-function TimeField({
-  ariaLabel,
-  error,
-  id,
-  label,
-  onChange,
-  value,
-}: {
-  ariaLabel: string;
-  error?: string;
-  id: string;
-  label: string;
-  onChange: (value: string) => void;
-  value: string;
-}) {
-  const errorId = `${id}-error`;
-
-  return (
-    <div>
-      <label className="mb-2 block text-sm font-medium text-on-surface-variant" htmlFor={id}>{label}</label>
-      <Input
-        aria-label={ariaLabel}
-        aria-describedby={error ? errorId : undefined}
-        aria-invalid={Boolean(error)}
-        id={id}
-        onChange={(event) => onChange(event.target.value)}
-        required
-        type="time"
-        value={value}
-      />
-      {error ? <p className="mt-2 text-sm text-error" id={errorId} role="alert">{error}</p> : null}
-    </div>
-  );
-}
-
-function BusinessHoursDayRow({
-  day,
-  errors,
-  formId,
-  onChange,
-}: {
-  day: BusinessHoursFormValues["days"][number];
-  errors?: BusinessHoursDayErrors;
-  formId: string;
+function BusinessHoursDayRow({ day, errors, formId, onChange }: {
+  day: BusinessHoursFormValues["days"][number]; errors?: BusinessHoursDayErrors; formId: string;
   onChange: (day: BusinessHoursFormValues["days"][number]) => void;
 }) {
-  const label = businessDayLabels[day.dayOfWeek];
-  const openingId = `${formId}-${day.dayOfWeek.toLowerCase()}-opens-at`;
-  const closingId = `${formId}-${day.dayOfWeek.toLowerCase()}-closes-at`;
-
-  return (
-    <fieldset className="rounded-lg border border-outline-variant bg-surface-container-lowest p-4">
-      <legend className="sr-only">{label}</legend>
-      <div className="flex min-h-touch items-center justify-between gap-4">
-        <div>
-          <p className="font-semibold">{label}</p>
-          <p className="mt-1 text-sm text-on-surface-variant">{day.isClosed ? "Cerrado" : "Abierto"}</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <span className="text-sm font-medium text-on-surface-variant">{day.isClosed ? "Cerrado" : "Abierto"}</span>
-          <Switch
-            aria-label={`${label}: abierto`}
-            checked={!day.isClosed}
-            onCheckedChange={(isOpen) => onChange({ ...day, isClosed: !isOpen })}
-          />
-        </div>
-      </div>
-
-      {!day.isClosed ? (
-        <div className="mt-4 grid gap-4 border-t border-outline-variant pt-4 sm:grid-cols-2">
-          <TimeField
-            ariaLabel={`${label}: apertura`}
-            error={errors?.opensAt}
-            id={openingId}
-            label="Apertura"
-            onChange={(opensAt) => onChange({ ...day, opensAt })}
-            value={day.opensAt}
-          />
-          <TimeField
-            ariaLabel={`${label}: cierre`}
-            error={errors?.closesAt}
-            id={closingId}
-            label="Cierre"
-            onChange={(closesAt) => onChange({ ...day, closesAt })}
-            value={day.closesAt}
-          />
-        </div>
-      ) : null}
-    </fieldset>
-  );
+  return <WeeklyDayRow dayLabel={businessDayLabels[day.dayOfWeek]} idPrefix={`${formId}-${day.dayOfWeek.toLowerCase()}`}
+    active={!day.isClosed} start={day.opensAt} end={day.closesAt} errors={{ start: errors?.opensAt, end: errors?.closesAt }}
+    onActiveChange={active => onChange({ ...day, isClosed: !active })} onStartChange={opensAt => onChange({ ...day, opensAt })} onEndChange={closesAt => onChange({ ...day, closesAt })}
+    labels={{ active: "Abierto", inactive: "Cerrado", start: "Apertura", end: "Cierre", switch: "abierto", startAccessible: "apertura", endAccessible: "cierre" }} startSuffix="opens-at" endSuffix="closes-at" />;
 }
 
 function hasUnsavedChanges(values: BusinessHoursFormValues, saved: BusinessHoursListApiResponse) {
