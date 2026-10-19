@@ -95,6 +95,7 @@ Eliminar un servicio del catálogo cancela las lecturas pendientes del listado d
 
 `WeeklyDayRow.hints` admite ayuda informativa junto a Inicio/Fin y por día, asociada mediante aria-describedby y separada de errores de validación. Profesionales consulta horarios del negocio por sesión con cancelación y lectura fresca al abrir; `staffHoursHints` explica límites de apertura/cierre, rangos sin intersección y días cerrados. Estos avisos no alteran el borrador ni bloquean el guardado. Si la comparación no puede cargarse, se ofrece reintento y se mantiene la edición; el backend sigue aplicando la disponibilidad efectiva.
 
+
 ## Detalle y estado de profesionales (TURN-101)
 
 `StaffMemberDetailPage` consulta el DTO existente por negocio/ID con AbortSignal; comparte StaffMemberCard, estados, shell y avisos con el listado. `StaffStatusConfirmation` se reutiliza en ambas pantallas, compone ConfirmActionDialog y conserva conflictos/errores hasta resolverlos. DELETE desactiva; PATCH con solo status ACTIVE reactiva. El vínculo Vos es de identidad y persiste en inactivos.

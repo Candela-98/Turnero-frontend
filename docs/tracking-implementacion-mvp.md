@@ -412,6 +412,7 @@ Preparada el 2026-10-13 en `feature/TURN-98-service-detail`, sobre la entrega de
 
 - PRs TURN-79 creados el 2026-10-17: [backend #80](https://github.com/Candela-98/Turnero-api/pull/80) y [frontend #15](https://github.com/Candela-98/Turnero-frontend/pull/15), ambos sobre feature/TURN-78-staff-services. QA manual aprobada; abiertos para revisión. Sin consultar CI ni mergear. Tras integrar TURN-78, ajustar bases a develop/dev e integrar TURN-79 backend primero.
 
+
 ## TURN-101 — Detalle y estado de profesionales (2026-10-17)
 
 - Implementación local en `feature/TURN-101-staff-status`, sobre TURN-79. Ampliación aprobada: reactivar, además de desactivar; conservar búsqueda, filtro y página mediante URL. `/profesionales/[id]` admite enlace directo/recarga; Ver detalle y Desactivar/Reactivar se incorporan al menú sin modificar alta/edición/servicios/horarios.

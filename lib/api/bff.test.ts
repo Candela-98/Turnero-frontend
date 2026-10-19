@@ -278,3 +278,19 @@ it("rejects invalid IDs and unsupported methods on professional removal",async()
   expect((await DELETE(new Request("http://localhost:3000/api/backend/api/v1/staff-members/me/catalog",{method:"DELETE"}),routeContext(["api","v1","staff-members","me","catalog"]))).status).toBe(404);
   expect(fetch).not.toHaveBeenCalled();
 });
+
+it.each([200, 400, 401, 403, 503])("forwards customer listing with contacts, query parameters, cookie and status %i", async status => {
+  vi.stubEnv("TURNERO_API_BASE_URL", "http://localhost:8080");
+  const body = status === 200 ? { data: [{ id: 1, name: "Ana", phone_number: "+54 (11) 5555-1234", status: "ACTIVE" }],
+    page: { number: 2, size: 20, total_elements: 41, total_pages: 3 } } : { code: "REJECTED", message: "Rejected" };
+  const fetch = vi.fn().mockResolvedValue(Response.json(body, { status })); global.fetch = fetch;
+  const query = "q=%2B54+%2811%29+5555-1234&status=ACTIVE&page=2&size=20&sort=name%2Cdesc";
+  const response = await GET(new Request("http://localhost:3000/api/backend/api/v1/customers?" + query, {
+    headers: { cookie: "turnero_session=opaque" },
+  }), routeContext(["api", "v1", "customers"]));
+  expect(response.status).toBe(status); expect(await response.json()).toEqual(body);
+  const [target, options] = fetch.mock.calls[0];
+  expect(target.toString()).toBe("http://localhost:8080/api/v1/customers?" + query);
+  expect(options.method).toBe("GET"); expect(options.headers.get("cookie")).toBe("turnero_session=opaque");
+  expect(options.cache).toBe("no-store");
+});
