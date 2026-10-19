@@ -1,11 +1,7 @@
-import { AdminPlaceholderPage } from "@/components/admin";
+import { Suspense } from "react";
+import { CustomersLoading, CustomersPage } from "@/components/customers/customers-page";
 
 export default function Customers() {
-  return (
-    <AdminPlaceholderPage
-      description="La gestión de clientes estará disponible en esta sección."
-      title="Clientes"
-    />
-  );
+  return <Suspense fallback={<div className="px-5 md:px-0"><CustomersLoading /></div>}><CustomersPage /></Suspense>;
 }
 

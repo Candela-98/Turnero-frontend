@@ -145,3 +145,7 @@ Fuente para la auditoria visual de implementacion:
 ## Referencias
 
 - `referencias/datos-demo.md` - datos demo para pantallas y estados visuales.
+
+### Para probar el listado real de clientes
+
+Consultar [pruebas-locales-turn-80.md](pruebas-locales-turn-80.md): búsqueda por nombre/email/teléfono sin formato, filtros, paginación y navegación responsive.

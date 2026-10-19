@@ -9,3 +9,5 @@ Disponible:
 
 Pendiente:
 - Registrar observaciones de drift visual.
+
+TURN-80 entrega el listado básico acordado: nombre, teléfono/email opcionales, iniciales y estado. Mantiene shell y jerarquía de los listados aprobados, con filas amplias y filtros compartidos en modal desktop/panel inferior mobile. Métricas, turnos/visitas, panel de perfil y acciones se excluyen de este alcance; se documentan como decisiones futuras. La búsqueda y los filtros usan el patrón de Servicios/Profesionales.

@@ -206,7 +206,8 @@ test.describe("admin authentication", () => {
     await expect(page.getByRole("heading", { name: "Ingresar al panel" })).toBeVisible();
   });
 
-  test("keeps administrative navigation reachable while sections are pending", async ({ page }, testInfo) => {
+  test("keeps administrative navigation reachable across catalog sections", async ({ page }, testInfo) => {
+    await page.route("**/api/backend/api/v1/customers?*", route => route.fulfill({ json: { data: [], page: { number: 0, size: 20, total_elements: 0, total_pages: 0 } } }));
     await page.route(authMeUrl, (route) =>
       route.fulfill({ contentType: "application/json", json: currentUser, status: 200 }),
     );
@@ -225,7 +226,8 @@ test.describe("admin authentication", () => {
     if (isMobileProject(testInfo.project.name)) {
       await expect(page.getByRole("heading", { name: "Servicios" })).toBeVisible();
     } else {
-      await expect(page.getByText("Esta sección estará disponible próximamente.")).toBeVisible();
+      await expect(page.getByRole("heading", { name: "Clientes", exact: true })).toBeVisible();
+      await expect(page.getByText("Todavía no hay clientes", { exact: true })).toBeVisible();
     }
   });
 });

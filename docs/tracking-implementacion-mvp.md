@@ -411,3 +411,15 @@ Preparada el 2026-10-13 en `feature/TURN-98-service-detail`, sobre la entrega de
 - QA manual final aprobada por el usuario el 2026-10-17, incluidos avisos de horarios del negocio y consultas canceladas en desarrollo. Creación de PRs separados autorizada. Bases TURN-78 mientras backend #79 / frontend #14 sigan abiertos; ajustar a develop/dev al integrar esas dependencias. Integrar backend primero, sin revisión de CI ni merge automático.
 
 - PRs TURN-79 creados el 2026-10-17: [backend #80](https://github.com/Candela-98/Turnero-api/pull/80) y [frontend #15](https://github.com/Candela-98/Turnero-frontend/pull/15), ambos sobre feature/TURN-78-staff-services. QA manual aprobada; abiertos para revisión. Sin consultar CI ni mergear. Tras integrar TURN-78, ajustar bases a develop/dev e integrar TURN-79 backend primero.
+
+## TURN-80 — Listado real de clientes (2026-10-19)
+
+- Implementación local en `feature/TURN-80-customer-list`, desde `dev`, independiente de TURN-101. Sustituye placeholder por consultas reales al BFF; DTO/adapter, parámetros y keys por negocio en `lib/customers`. Propaga AbortSignal y conserva la limpieza de caché de sesión.
+- Listado de nombre, contacto opcional, iniciales y estado, con buscador de 300 ms, filtros provisionales Todos/Activos/Inactivos, pills y páginas de 20. Contexto q/status/page en URL; se conservan búsquedas pendientes al filtrar y se corrigen páginas fuera de rango. Oculta resultados viejos durante consultas/debounce.
+- Reutiliza shell/header, Avatar/Badge, ListToolbar/SearchInput, ResponsiveDialog/FilterOptionGroup, Pagination y estados. Sin alta/edición (TURN-100), detalle/baja (TURN-102), métricas ni agenda demo modificada. Layout revisado en los tres viewports; las funcionalidades amplias de Stitch se reservan para sus tareas.
+- Backend previo requerido: GET customers con `{ data, page }`, búsqueda/estado/paginación en DB y teléfono sin formato; sin migraciones. BFF ya permite la ruta y se prueba el handler real con cookie/filtros/errores.
+- QA automática frontend completada (resultados abajo); QA manual e integración pendientes. Guía `docs/pruebas-locales-turn-80.md`; PRs separados después de aprobación manual, sobre develop/dev y backend primero. No revisar CI ni mergear automáticamente.
+
+- Verificación final TURN-80: backend 548 pruebas aprobadas, sin fallos ni omisiones (21 casos PostgreSQL nuevos). Frontend `npm run check` completo aprobado: lint, TypeScript, 138 unitarios, build y 343 E2E aprobados / 14 omisiones preexistentes. Incluye los 27 recorridos de Clientes en los tres tamaños; los 3 casos de respuesta tardía se repitieron tras reforzar la espera de la fixture. Capturas de listado, filtros y contactos largos revisadas en 1440×900, 390×844 y 412×915; sin scroll horizontal ni infracciones axe básicas en los recorridos cubiertos. QA manual e integración pendientes.
+
+- QA manual TURN-80 aprobada por el usuario el 2026-10-19, con clientes ficticios en la DB local. Autorizada la creación de PRs separados sobre develop/dev, sin consultar CI. Integración pendiente; backend primero.
