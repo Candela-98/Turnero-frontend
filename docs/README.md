@@ -35,6 +35,10 @@ Consultar primero [patrones-pantallas.md](patrones-pantallas.md) y [componentes-
 
 Consultar [pruebas-locales-turn-79.md](pruebas-locales-turn-79.md): preparación, recorrido manual y automatización.
 
+### Para probar detalle y estado de profesionales
+
+Consultar [pruebas-locales-turn-101.md](pruebas-locales-turn-101.md): navegación, desactivación, reactivación y conflictos.
+
 ### Para trabajar con Stitch
 
 1. `stitch/progreso-stitch.md`

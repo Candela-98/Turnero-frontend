@@ -4,9 +4,9 @@ import { createContext, useContext } from "react";
 
 export const serviceNotices = {
   created: { title: "Servicio creado", description: "Ya está disponible en tu catálogo." },
-  updated: { title: "Servicio actualizado", description: "Los cambios se guardaron correctamente." },
+  updated: { title: "Servicio actualizado", description: "El catálogo ya muestra la información actualizada del servicio." },
   deactivated: { title: "Servicio desactivado", description: "Podés restaurarlo desde los servicios inactivos." },
-  restored: { title: "Servicio restaurado", description: "El servicio vuelve a estar activo." },
+  restored: { title: "Servicio restaurado", description: "Vuelve a aparecer entre los servicios activos." },
   removed: { title: "Servicio eliminado", description: "Se quitó del catálogo. El historial de turnos se conserva." },
 } as const;
 

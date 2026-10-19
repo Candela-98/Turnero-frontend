@@ -13,12 +13,13 @@ export type ConfirmActionDialogProps = {
   confirmLabel: string;
   cancelLabel?: string;
   pending?: boolean;
+  confirmDisabled?: boolean;
   danger?: boolean;
   children?: ReactNode;
 };
 
 /** Confirmation remains open until its owner confirms success. Cancel receives initial focus. */
-export function ConfirmActionDialog({ open, onOpenChange, onConfirm, title, description, confirmLabel, cancelLabel = "Cancelar", pending = false, danger = false, children }: ConfirmActionDialogProps) {
+export function ConfirmActionDialog({ open, onOpenChange, onConfirm, title, description, confirmLabel, cancelLabel = "Cancelar", pending = false, confirmDisabled = false, danger = false, children }: ConfirmActionDialogProps) {
   return <AlertDialog.Root open={open} onOpenChange={next => { if (!pending) onOpenChange(next); }}>
     <AlertDialog.Portal>
       <AlertDialog.Overlay className="fixed inset-0 z-[60] bg-on-surface/40" />
@@ -28,7 +29,7 @@ export function ConfirmActionDialog({ open, onOpenChange, onConfirm, title, desc
         {children ? <div className="mt-4">{children}</div> : null}
         <div className="mt-5 flex flex-wrap justify-end gap-2">
           <AlertDialog.Cancel asChild><Button disabled={pending} variant="outline">{cancelLabel}</Button></AlertDialog.Cancel>
-          <AlertDialog.Action asChild><Button disabled={pending} variant={danger ? "danger" : "primary"} onClick={event => { event.preventDefault(); onConfirm(); }}>{confirmLabel}</Button></AlertDialog.Action>
+          <AlertDialog.Action asChild><Button disabled={pending || confirmDisabled} variant={danger ? "danger" : "primary"} onClick={event => { event.preventDefault(); onConfirm(); }}>{confirmLabel}</Button></AlertDialog.Action>
         </div>
       </AlertDialog.Content>
     </AlertDialog.Portal>
