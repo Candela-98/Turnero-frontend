@@ -95,11 +95,22 @@ Eliminar un servicio del catálogo cancela las lecturas pendientes del listado d
 
 `WeeklyDayRow.hints` admite ayuda informativa junto a Inicio/Fin y por día, asociada mediante aria-describedby y separada de errores de validación. Profesionales consulta horarios del negocio por sesión con cancelación y lectura fresca al abrir; `staffHoursHints` explica límites de apertura/cierre, rangos sin intersección y días cerrados. Estos avisos no alteran el borrador ni bloquean el guardado. Si la comparación no puede cargarse, se ofrece reintento y se mantiene la edición; el backend sigue aplicando la disponibilidad efectiva.
 
-## Clientes (TURN-80)
 
-`CustomersPage` consulta por negocio y parámetros de `lib/customers`; `CustomersList` y `CustomerCard` reciben modelos de presentación, sin HTTP. El adapter convierte phone_number y los metadatos de paginación a camelCase, normalizando contactos opcionales. No se muestran notas internas ni datos de visitas.
+## Detalle y estado de profesionales (TURN-101)
 
-Comparte los controles genéricos existentes: shell/header, Avatar/Badge, ListToolbar/SearchInput, ResponsiveDialog/FilterOptionGroup y Pagination. `CustomerFiltersDialog` conserva un borrador hasta Aplicar; Limpiar no consulta ni modifica filtros aplicados antes de confirmar. El hook de navegación mantiene q/status/page en la URL, preserva búsquedas pendientes al aplicar estado y limita la página a valores válidos. Las consultas cancelables ocultan filas anteriores durante debounce/refetch, con estados diferenciados de carga, vacío y error/reintento.
+`StaffMemberDetailPage` consulta el DTO existente por negocio/ID con AbortSignal; comparte StaffMemberCard, estados, shell y avisos con el listado. `StaffStatusConfirmation` se reutiliza en ambas pantallas, compone ConfirmActionDialog y conserva conflictos/errores hasta resolverlos. DELETE desactiva; PATCH con solo status ACTIVE reactiva. El vínculo Vos es de identidad y persiste en inactivos.
+
+`ActionMenu` admite acciones con href nativo para Ver detalle y estilo danger para Desactivar. No se abre el detalle como modal; mantiene URL navegable. `useStaffListNavigation` sincroniza filtros con los parámetros q/status/page usando replaceState y debounce, sin añadir historial por cada búsqueda. La página y el enlace de regreso comparten el parser de contexto; no aceptan URLs arbitrarias de retorno.
+
+`applyStaffStatus` refleja únicamente escrituras confirmadas: cancela consultas viejas de listado/detalle/vínculo, cambia estado sin perder contadores y retira filas que dejan de cumplir el filtro. `refreshStaffMembers` vuelve a leer; un fallo posterior no repite la escritura. Servicios y horarios se conservan; agenda y disponibilidad demo no reciben invalidaciones ficticias.
+
+`ConfirmActionDialog.confirmDisabled` permite impedir una acción que ya no corresponde sin bloquear Cancelar o Escape. Se usa ante un profesional inexistente; `pending` queda reservado para escrituras en curso. El borrador del buscador se sincroniza con cambios de q en la URL, sin borrarse por cambios independientes de estado/página durante el debounce.
+
+La extensión de eliminación reutiliza `StaffStatusConfirmation` con `removing` y `ConfirmActionDialog`: solo ofrece Eliminar para INACTIVE y explica conservación del historial y ausencia de restauración. DELETE `/{id}/catalog` está habilitado en el BFF exclusivamente con ID numérico. `applyStaffRemoval` cancela lecturas viejas, retira detalle/horarios/servicios cacheados y libera `/me` antes de refrescar listados. El reintento posterior omite el detalle eliminado y nunca repite DELETE.
+
+`StaffRemovalFeedbackProvider`, dentro del layout de Profesionales, transporta el resultado confirmado desde detalle al listado tras `router.replace`, conservando filtros sin introducir parámetros de éxito en la URL. La eliminación no borra la cuenta vinculada; el vínculo histórico se conserva en backend y deja de impedir un nuevo perfil operativo.
+
+Los avisos de éxito de Profesionales centralizan su copy por acción en `staff-feedback.ts`, compartido por listado y detalle, siguiendo el catálogo de mensajes de Servicios. Cada acción incluye una descripción específica: horarios iniciales al crear, perfil actualizado, disponibilidad al reactivar, cambios de horario/servicios, cómo reactivar y conservación del historial al desactivar/eliminar. Evitan el texto genérico de guardado.
 
 ## Formulario de clientes (TURN-100)
 

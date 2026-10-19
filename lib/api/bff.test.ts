@@ -268,6 +268,41 @@ it.each([["GET", 200], ["GET", 404], ["PUT", 200], ["PUT", 400], ["PUT", 401], [
   expect(options.method).toBe(method); expect(options.headers.get("cookie")).toBe("turnero_session=opaque");
   if (method === "PUT") expect(new TextDecoder().decode(options.body)).toBe(JSON.stringify(body));
 });
+
+it.each([["GET",200],["GET",404],["DELETE",204],["DELETE",409],["DELETE",404],["DELETE",503],["PATCH",200],["PATCH",401],["PATCH",409]] as const)("forwards professional state/detail %s status %i", async (method,status) => {
+  vi.stubEnv("TURNERO_API_BASE_URL","http://localhost:8080");
+  const body = {status:"ACTIVE"};
+  const returned = status === 409 ? {code:"STAFF_HAS_FUTURE_APPOINTMENTS",message:"Conflict"} : {id:5,status:"ACTIVE"};
+  const fetch = vi.fn().mockResolvedValue(status === 204 ? new Response(null,{status}) : Response.json(returned,{status})); global.fetch=fetch;
+  const response = await ({GET,DELETE,PATCH}[method])(new Request("http://localhost:3000/api/backend/api/v1/staff-members/5",{
+    method,headers:{cookie:"turnero_session=opaque","content-type":"application/json"},...(method==="PATCH"?{body:JSON.stringify(body)}:{})
+  }),routeContext(["api","v1","staff-members","5"]));
+  expect(response.status).toBe(status);
+  if(status !== 204) expect(await response.json()).toEqual(returned);
+  const [target,options]=fetch.mock.calls[0];
+  expect(target.toString()).toBe("http://localhost:8080/api/v1/staff-members/5");
+  expect(options.method).toBe(method); expect(options.headers.get("cookie")).toBe("turnero_session=opaque");
+  if(method==="PATCH") expect(new TextDecoder().decode(options.body)).toBe(JSON.stringify(body));
+});
+
+it.each([204,404,409,503])("forwards professional removal with status %i through the real handler",async status=>{
+  vi.stubEnv("TURNERO_API_BASE_URL","http://localhost:8080");
+  const body={code:"INVALID_STATE_TRANSITION",message:"Deactivate first"};
+  const fetch=vi.fn().mockResolvedValue(status===204?new Response(null,{status}):Response.json(body,{status})); global.fetch=fetch;
+  const response=await DELETE(new Request("http://localhost:3000/api/backend/api/v1/staff-members/5/catalog",{method:"DELETE",headers:{cookie:"turnero_session=opaque"}}),routeContext(["api","v1","staff-members","5","catalog"]));
+  expect(response.status).toBe(status);
+  if(status!==204) expect(await response.json()).toEqual(body);
+  expect(fetch).toHaveBeenCalledTimes(1);
+  const [target,options]=fetch.mock.calls[0]; expect(target.toString()).toBe("http://localhost:8080/api/v1/staff-members/5/catalog");
+  expect(options.method).toBe("DELETE"); expect(options.headers.get("cookie")).toBe("turnero_session=opaque");
+});
+it("rejects invalid IDs and unsupported methods on professional removal",async()=>{
+  const fetch=vi.fn();global.fetch=fetch;
+  expect((await GET(new Request("http://localhost:3000/api/backend/api/v1/staff-members/5/catalog"),routeContext(["api","v1","staff-members","5","catalog"]))).status).toBe(405);
+  expect((await DELETE(new Request("http://localhost:3000/api/backend/api/v1/staff-members/me/catalog",{method:"DELETE"}),routeContext(["api","v1","staff-members","me","catalog"]))).status).toBe(404);
+  expect(fetch).not.toHaveBeenCalled();
+});
+
 it.each([200, 400, 401, 403, 503])("forwards customer listing with contacts, query parameters, cookie and status %i", async status => {
   vi.stubEnv("TURNERO_API_BASE_URL", "http://localhost:8080");
   const body = status === 200 ? { data: [{ id: 1, name: "Ana", phone_number: "+54 (11) 5555-1234", status: "ACTIVE" }],

@@ -51,7 +51,7 @@ npm run test -- lib/customers lib/api/bff.test.ts
 npx playwright test tests/e2e/customer-form.spec.ts tests/e2e/customers.spec.ts
 ```
 
-QA manual e integración pendientes. Después de aprobar las pruebas, preparar PRs separados backend/frontend con la base correspondiente a TURN-80; al integrarse la dependencia, usar develop/dev. Integrar backend primero. Sin consultar CI ni mergear automáticamente.
+QA manual aprobada por el usuario. TURN-80 y TURN-101 integrados: preparar PRs separados backend/frontend contra develop/dev. Integración de TURN-100 pendiente. Integrar backend primero. Sin consultar CI ni mergear automáticamente.
 
 ## Resultado automático
 

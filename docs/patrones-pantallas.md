@@ -17,7 +17,7 @@ El layout de ruta ya renderiza `AdminAppShell`: aporta navegación, `main` y pad
       {hasSaved && (
         <FloatingAlert title="Cambios guardados" tone="positive"
           dismissLabel="Cerrar confirmación" onDismiss={() => setHasSaved(false)}>
-          Los cambios se guardaron correctamente.
+          {null}
         </FloatingAlert>
       )}
       {saveError && (
@@ -38,6 +38,8 @@ El layout de ruta ya renderiza `AdminAppShell`: aporta navegación, `main` y pad
 
 - `FloatingAlert` usa `placement="viewport"` por defecto: fijo a la derecha en desktop y 16 px sobre la navegación mobile, incluida su safe area. Dentro de `AdminFormActions` o `SaveActionFeedback` deja espacio sobre Guardar automáticamente en ambos viewports; un listado sin acción fija no reserva esa altura adicional.
 - Éxitos: cierre manual y automático a los 6 segundos; hover y foco pausan el temporizador. Al salir del aviso comienza un nuevo período de 6 segundos. Los renders y los cambios de identidad del callback no reinician el temporizador.
+- Copy de éxito: título específico de la acción confirmada, como «Profesional creado», «Horarios actualizados» o «Servicio eliminado». Omitir la descripción si solo repite el título o informa genéricamente que se guardaron datos; en el ejemplo anterior `{null}` deja el aviso con título solamente. Agregar descripción cuando explica una consecuencia o siguiente paso: cómo reactivar un recurso o que se conserva el historial tras eliminarlo. No afirmar efectos que la operación no garantiza.
+- Mantener los mensajes por acción en el catálogo del dominio y compartirlos entre listado y detalle, siguiendo `serviceNotices` y `staffNotices`. Al revisar una tarea, recorrer sus acciones con éxito, comprobar el copy de cada resultado en los E2E afectados y verificar posición, cierre y legibilidad con `expectAdminNotice` y capturas en los tres viewports. Esta revisión de significado forma parte del trabajo del agente; lint y TypeScript no validan la calidad del texto.
 - Errores recuperables: sin cierre automático; conservan el contexto y ofrecen reintento. Si la escritura funcionó pero falló el refresco, reintentar solo la lectura.
 - Formularios en modal: `ResponsiveDialog` aporta foco, Escape, bloqueo del fondo, panel inferior mobile y footer separado del scroll. Para un error de guardado en ese footer se elige explícitamente `FloatingAlert placement="dialog"`. `closeDisabled` bloquea el cierre mientras se guarda; `ConfirmDiscardDialog` confirma el descarte de cambios.
 
@@ -63,3 +65,7 @@ Playwright ejecuta desktop `1440×900`, mobile `390×844` y mobile `412×915`. A
 ### Acciones secundarias en filas
 
 Cuando una fila de Profesionales ofrece Servicios, Editar datos y Horarios, conservar Servicios visible con su cantidad y agrupar las otras acciones en `ActionMenu` (Más acciones). Mantener los diálogos controlados en la pantalla, fuera del árbol de resultados que se desmonta al consultar. Abrirlos después del cierre del menú y devolver foco a la fila o al buscador si desapareció. Los horarios reutilizan `WeeklyDayRow`, con reglas y etiquetas por dominio, dentro de ResponsiveDialog con footer fijo.
+
+### Detalles navegables y acciones de estado
+
+Profesionales usa `/profesionales/[id]` con el shell admin existente, encabezado y tarjeta compartidos, más enlace explícito de regreso. q/status/page conservan el contexto entre detalle y listado; las acciones por menú admiten enlaces nativos. Desactivar/Reactivar comparten una confirmación persistente fuera del árbol de resultados, con Cancelar como foco inicial, bloqueo durante envío y reintentos de lectura tras cambios ya confirmados.
