@@ -149,3 +149,7 @@ Fuente para la auditoria visual de implementacion:
 ### Para probar el listado real de clientes
 
 Consultar [pruebas-locales-turn-80.md](pruebas-locales-turn-80.md): búsqueda por nombre/email/teléfono sin formato, filtros, paginación y navegación responsive.
+
+### Para probar alta y edición de clientes
+
+Consultar [pruebas-locales-turn-100.md](pruebas-locales-turn-100.md): datos obligatorios, notas internas, edición, descarte y recuperación de errores.

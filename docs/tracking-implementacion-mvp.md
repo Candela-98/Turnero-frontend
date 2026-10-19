@@ -425,3 +425,12 @@ Preparada el 2026-10-13 en `feature/TURN-98-service-detail`, sobre la entrega de
 - QA manual TURN-80 aprobada por el usuario el 2026-10-19, con clientes ficticios en la DB local. Autorizada la creación de PRs separados sobre develop/dev, sin consultar CI. Integración pendiente; backend primero.
 
 - PRs TURN-80 creados: [backend #82](https://github.com/Candela-98/Turnero-api/pull/82), base `develop`, y [frontend #17](https://github.com/Candela-98/Turnero-frontend/pull/17), base `dev`. QA manual aprobada; integración pendiente, backend primero. Sin consultar CI.
+
+## TURN-100 — Crear y editar clientes (2026-10-19)
+
+- Implementación local en `feature/TURN-100-customer-form`, sobre TURN-80, independiente de TURN-101. Alta y edición mediante BFF/apiFetch, detalle fresco y adapters en lib/customers. Nombre/teléfono obligatorios, email/notas opcionales; compatibilidad con registros antiguos sin teléfono.
+- CustomerEditor/CustomerForm reutilizan ResponsiveDialog, controles, footer, confirmación de descarte, validación con foco y avisos. Diálogo controlado fuera de resultados; PATCH solo campos modificados, baseline estable, bloqueo inmediato de doble submit y cierre durante envío.
+- Keys y refresco por negocio, cancelación de lecturas antiguas y detalle confirmado en caché. Fallo posterior de refresco reintenta solo lecturas. Catálogo de éxitos con título y descripción específicos; no se modifica la agenda demo ni se agregan acciones de TURN-102.
+- QA automática completada: lint sin advertencias, TypeScript, 156 unitarios y build aprobados. Suite E2E completa: 376 aprobados y 14 omisiones preexistentes. Después se agregaron dos casos de edición/paginación y se reforzó la espera de respuestas tardías; los 39 recorridos finales de formulario aprobaron en los tres viewports. Backend: 572 aprobados sin omisiones, incluidos 24 nuevos casos PostgreSQL. Capturas de alta, edición, éxito, errores y textos largos revisadas en 1440×900, 390×844 y 412×915. QA manual e integración pendientes. Guía: docs/pruebas-locales-turn-100.md. Crear PRs separados después de aprobación manual; bases en TURN-80 si sigue abierto y luego develop/dev, backend primero. Sin consultar CI ni mergear automáticamente.
+
+- QA manual TURN-100 aprobada por el usuario el 2026-10-19. Autorizada la integración de los PRs anteriores y la creación de los PRs de esta entrega contra develop/dev. Sin consultar CI.

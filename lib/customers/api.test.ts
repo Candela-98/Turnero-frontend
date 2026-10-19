@@ -1,9 +1,25 @@
 import { afterEach, expect, it, vi } from "vitest";
-import { customerParams, getCustomers, toCustomerSummary, type CustomerFilters } from "./api";
+import { createCustomer, customerParams, getCustomer, getCustomers, toCustomerDetail, toCustomerSummary, updateCustomer, type CustomerFilters } from "./api";
 import { customerKeys } from "./queries";
 
 afterEach(() => vi.unstubAllGlobals());
 const filters: CustomerFilters = { q: "", status: "ALL", page: 0, size: 20 };
+it("maps detail separately from summaries and preserves absent notes", () => {
+  expect(toCustomerDetail({ id: 1, name: "Ana", status: "ACTIVE", internal_notes: " Nota " })).toMatchObject({ internalNotes: "Nota" });
+  expect(toCustomerDetail({ id: 1, name: "Ana", status: "ACTIVE" }).internalNotes).toBeNull();
+});
+it("loads a cancellable detail and writes canonical POST/PATCH bodies through the BFF", async () => {
+  const fetch = vi.fn().mockImplementation(() => Promise.resolve(Response.json({ id: 1, name: "Ana", status: "INACTIVE", internal_notes: "Nota" })));
+  vi.stubGlobal("fetch", fetch);
+  const signal = new AbortController().signal;
+  expect(await getCustomer(1, signal)).toMatchObject({ id: 1, internalNotes: "Nota", status: "INACTIVE" });
+  expect(fetch).toHaveBeenLastCalledWith("/api/backend/api/v1/customers/1", expect.objectContaining({ method: "GET", signal, credentials: "include" }));
+  const body = { name: "Ana", phone_number: "+54 (11) 123", email: "", internal_notes: "Nota" };
+  await createCustomer(body);
+  expect(fetch).toHaveBeenLastCalledWith("/api/backend/api/v1/customers", expect.objectContaining({ method: "POST", body: JSON.stringify(body), credentials: "include" }));
+  await updateCustomer(1, { internal_notes: "" });
+  expect(fetch).toHaveBeenLastCalledWith("/api/backend/api/v1/customers/1", expect.objectContaining({ method: "PATCH", body: '{"internal_notes":""}' }));
+});
 it("maps summaries explicitly and treats empty or missing contacts as absent", () => {
   expect(toCustomerSummary({ id: 1, name: "Ana", email: " ana@example.com ", phone_number: " +54 (11) 1234 ", status: "ACTIVE" }))
     .toEqual({ id: 1, name: "Ana", email: "ana@example.com", phoneNumber: "+54 (11) 1234", status: "ACTIVE" });

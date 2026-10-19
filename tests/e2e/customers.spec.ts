@@ -40,7 +40,7 @@ test("renders contact summaries, paginates and debounces literal searches", asyn
   await expect(page.getByText("AP", { exact: true })).toBeVisible();
   await expect(page.getByText("+54 (11) 5555-1234", { exact: true })).toBeVisible();
   await expect(page.getByText("ANA@example.com", { exact: true })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Nuevo cliente" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Nuevo cliente" })).toBeVisible();
   await expectAdminViewport(page);
   await page.screenshot({ path: info.outputPath("customers-list.png"), fullPage: false });
   await page.getByRole("button", { name: "Siguiente", exact: true }).click();

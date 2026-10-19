@@ -14,6 +14,30 @@ afterEach(() => {
 });
 
 describe("BFF route handler", () => {
+  it.each([
+    ["POST", 201], ["POST", 400], ["POST", 401], ["POST", 403], ["PATCH", 200], ["PATCH", 404], ["PATCH", 503], ["GET", 200], ["GET", 404],
+  ] as const)("forwards customer %s with its body, cookie and response %i", async (method, status) => {
+    vi.stubEnv("TURNERO_API_BASE_URL", "http://localhost:8080");
+    const path = method === "POST" ? ["api", "v1", "customers"] : ["api", "v1", "customers", "7"];
+    const body = method === "POST" ? { name: "Ana", phone_number: "+54 (11) 123", email: "", internal_notes: "Nota privada" } : { internal_notes: "" };
+    const upstream = { id: 7, name: "Ana", internal_notes: "Nota privada" };
+    const fetchMock = vi.fn().mockResolvedValue(Response.json(upstream, { status }));
+    global.fetch = fetchMock;
+    const request = new Request("http://localhost:3000/api/backend/" + path.join("/"), {
+      method, headers: { cookie: "turnero_session=opaque", "content-type": "application/json" },
+      ...(method === "GET" ? {} : { body: JSON.stringify(body) }),
+    });
+    const response = await ({ POST, PATCH, GET }[method])(request, routeContext(path));
+    expect(response.status).toBe(status);
+    expect(await response.json()).toEqual(upstream);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const [target, options] = fetchMock.mock.calls[0];
+    expect(target.toString()).toBe("http://localhost:8080/" + path.join("/"));
+    expect(options.method).toBe(method);
+    expect(options.cache).toBe("no-store");
+    expect(options.headers.get("cookie")).toBe("turnero_session=opaque");
+    if (method !== "GET") expect(new TextDecoder().decode(options.body)).toBe(JSON.stringify(body));
+  });
   it.each([204, 404, 409])("forwards catalog removal and preserves backend status %i", async status => {
     vi.stubEnv("TURNERO_API_BASE_URL", "http://localhost:8080");
     const fetchMock = vi.fn().mockResolvedValue(new Response(status === 204 ? null : JSON.stringify({ message: "Rejected" }), {

@@ -15,6 +15,22 @@ export type CustomerSummary = {
   phoneNumber: string | null;
   status: CustomerStatus;
 };
+export type CustomerDetailDto = CustomerSummaryDto & { internal_notes?: string | null };
+export type CustomerDetail = CustomerSummary & { internalNotes: string | null };
+export type CustomerWriteRequest = { name: string; phone_number: string; email: string; internal_notes: string };
+
+export function toCustomerDetail(dto: CustomerDetailDto): CustomerDetail {
+  return { ...toCustomerSummary(dto), internalNotes: dto.internal_notes?.trim() || null };
+}
+export async function getCustomer(id: number, signal?: AbortSignal) {
+  return toCustomerDetail(await apiFetch<CustomerDetailDto>(`/api/v1/customers/${id}`, { signal }));
+}
+export async function createCustomer(body: CustomerWriteRequest) {
+  return toCustomerDetail(await apiFetch<CustomerDetailDto>("/api/v1/customers", { method: "POST", body }));
+}
+export async function updateCustomer(id: number, body: Partial<CustomerWriteRequest>) {
+  return toCustomerDetail(await apiFetch<CustomerDetailDto>(`/api/v1/customers/${id}`, { method: "PATCH", body }));
+}
 export type CustomerFilters = { q: string; status: "ALL" | CustomerStatus; page: number; size: number };
 export type CustomerPageDto = {
   data: CustomerSummaryDto[];

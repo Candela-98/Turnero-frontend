@@ -100,3 +100,11 @@ Eliminar un servicio del catálogo cancela las lecturas pendientes del listado d
 `CustomersPage` consulta por negocio y parámetros de `lib/customers`; `CustomersList` y `CustomerCard` reciben modelos de presentación, sin HTTP. El adapter convierte phone_number y los metadatos de paginación a camelCase, normalizando contactos opcionales. No se muestran notas internas ni datos de visitas.
 
 Comparte los controles genéricos existentes: shell/header, Avatar/Badge, ListToolbar/SearchInput, ResponsiveDialog/FilterOptionGroup y Pagination. `CustomerFiltersDialog` conserva un borrador hasta Aplicar; Limpiar no consulta ni modifica filtros aplicados antes de confirmar. El hook de navegación mantiene q/status/page en la URL, preserva búsquedas pendientes al aplicar estado y limita la página a valores válidos. Las consultas cancelables ocultan filas anteriores durante debounce/refetch, con estados diferenciados de carga, vacío y error/reintento.
+
+## Formulario de clientes (TURN-100)
+
+`CustomerEditor` se controla desde `CustomersPage`, fuera del árbol de resultados. Compone `ResponsiveDialog`, carga fresca por negocio/cliente y `ConfirmDiscardDialog`. `CustomerForm` comparte alta y edición con baseline estable, `Input`, `Textarea`, foco de validación y footer fijo; bloquea doble envío/cierre y conserva borradores ante errores.
+
+El alta requiere nombre/teléfono; email y notas son opcionales. Edición permite conservar un teléfono ausente en registros antiguos. Solo se envían campos editables y PATCH contiene los modificados. Los helpers de `lib/customers` adaptan snake_case, normalizan valores, cancelan lecturas obsoletas e invalidan listados/detalle. Los futuros selectores reales deben usar el prefijo por negocio del mismo dominio; la agenda demo no se conecta en esta tarea.
+
+`customer-feedback.ts` centraliza títulos y descripciones de alta/edición. Escritura exitosa con refresco fallido muestra confirmación y advertencia con reintento de lecturas, sin repetir la mutación. La pantalla devuelve foco al disparador o al buscador si ya no existe la fila.
