@@ -13,6 +13,7 @@ Este archivo aplica al repositorio `turnero-frontend` en todas las sesiones. Ant
 ## Criterio de revisión
 
 - Señalar duplicación de comportamiento ya resuelto por un componente compartido y estados inconsistentes entre páginas equivalentes.
+- Antes de entregar una acción con feedback, revisar su mensaje de éxito: título específico del resultado y descripción solo si aporta una consecuencia o siguiente paso útil. Evitar frases genéricas repetidas como «Los datos se guardaron correctamente». Reutilizar el catálogo de mensajes del dominio en listado y detalle; tomar Servicios y `staff-feedback.ts` como referencia. En los E2E afectados comprobar el mensaje correspondiente a cada acción y revisar su presentación desktop/mobile con `expectAdminNotice`.
 - No forzar una abstracción genérica que oculte reglas de dominio distintas; por ejemplo, un día cerrado no compara horas ocultas.
 - Mantener las instrucciones de este archivo breves y actualizarlas solo cuando una decisión se convierta en patrón estable del producto.
 
