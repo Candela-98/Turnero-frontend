@@ -14,6 +14,33 @@ afterEach(() => {
 });
 
 describe("BFF route handler", () => {
+  it.each([204, 400, 401, 403, 404, 503])("forwards customer deactivation, cookie and backend status %i", async status => {
+    vi.stubEnv("TURNERO_API_BASE_URL", "http://localhost:8080");
+    const body = { code: "REJECTED", message: "Rejected" };
+    const fetch = vi.fn().mockResolvedValue(status === 204 ? new Response(null, { status }) : Response.json(body, { status }));
+    global.fetch = fetch;
+    const response = await DELETE(new Request("http://localhost:3000/api/backend/api/v1/customers/4", {
+      method: "DELETE", headers: { cookie: "turnero_session=opaque" },
+    }), routeContext(["api", "v1", "customers", "4"]));
+    expect(response.status).toBe(status);
+    if (status === 204) expect(await response.text()).toBe(""); else expect(await response.json()).toEqual(body);
+    const [target, options] = fetch.mock.calls[0];
+    expect(target.toString()).toBe("http://localhost:8080/api/v1/customers/4");
+    expect(options.method).toBe("DELETE"); expect(options.body).toBeUndefined();
+    expect(options.headers.get("cookie")).toBe("turnero_session=opaque");
+  });
+  it.each([200, 400, 401, 403, 404, 503])("forwards customer reactivation with only status and preserves response %i", async status => {
+    vi.stubEnv("TURNERO_API_BASE_URL", "http://localhost:8080");
+    const body = status === 200 ? { id: 4, name: "Ana", status: "ACTIVE" } : { code: "REJECTED" };
+    const fetch = vi.fn().mockResolvedValue(Response.json(body, { status })); global.fetch = fetch;
+    const response = await PATCH(new Request("http://localhost:3000/api/backend/api/v1/customers/4", {
+      method: "PATCH", headers: { cookie: "turnero_session=opaque", "content-type": "application/json" }, body: '{"status":"ACTIVE"}',
+    }), routeContext(["api", "v1", "customers", "4"]));
+    expect(response.status).toBe(status); expect(await response.json()).toEqual(body);
+    const [target, options] = fetch.mock.calls[0];
+    expect(target.toString()).toBe("http://localhost:8080/api/v1/customers/4"); expect(options.method).toBe("PATCH");
+    expect(new TextDecoder().decode(options.body)).toBe('{"status":"ACTIVE"}'); expect(options.headers.get("cookie")).toBe("turnero_session=opaque");
+  });
   it.each([
     ["POST", 201], ["POST", 400], ["POST", 401], ["POST", 403], ["PATCH", 200], ["PATCH", 404], ["PATCH", 503], ["GET", 200], ["GET", 404],
   ] as const)("forwards customer %s with its body, cookie and response %i", async (method, status) => {
@@ -317,4 +344,36 @@ it.each([200, 400, 401, 403, 503])("forwards customer listing with contacts, que
   expect(target.toString()).toBe("http://localhost:8080/api/v1/customers?" + query);
   expect(options.method).toBe("GET"); expect(options.headers.get("cookie")).toBe("turnero_session=opaque");
   expect(options.cache).toBe("no-store");
+});
+
+it.each([200, 400, 401, 403, 404, 503])("preserves both customer block commands and backend status %i", async status => {
+  vi.stubEnv("TURNERO_API_BASE_URL", "http://localhost:8080");
+  for (const body of [{ public_booking_blocked: true, public_booking_block_reason: "Motivo interno" }, { public_booking_blocked: false }]) {
+    const responseBody = status === 200 ? { id: 4, public_booking_blocked: body.public_booking_blocked } : { code: "REJECTED" };
+    const fetch = vi.fn().mockResolvedValue(Response.json(responseBody, { status })); global.fetch = fetch;
+    const response = await PATCH(new Request("http://localhost:3000/api/backend/api/v1/customers/4", {
+      method: "PATCH", headers: { cookie: "turnero_session=opaque", "content-type": "application/json" }, body: JSON.stringify(body),
+    }), routeContext(["api", "v1", "customers", "4"]));
+    expect(response.status).toBe(status); expect(await response.json()).toEqual(responseBody);
+    const [target, options] = fetch.mock.calls[0];
+    expect(target.toString()).toBe("http://localhost:8080/api/v1/customers/4");
+    expect(options.headers.get("cookie")).toBe("turnero_session=opaque");
+    expect(JSON.parse(new TextDecoder().decode(options.body))).toEqual(body);
+  }
+});
+it.each([[403, "CUSTOMER_BOOKING_BLOCKED"], [409, "CUSTOMER_IDENTITY_AMBIGUOUS"]] as const)("preserves public booking rejection %s without private reason", async (status, code) => {
+  vi.stubEnv("TURNERO_API_BASE_URL", "http://localhost:8080");
+  global.fetch = vi.fn().mockResolvedValue(Response.json({ code, message: "Contact the business to arrange your appointment." }, { status }));
+  const response = await POST(new Request("http://localhost:3000/api/backend/api/v1/public/businesses/studio/appointments", {
+    method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ customer: { email: "a@example.com" } }),
+  }), routeContext(["api", "v1", "public", "businesses", "studio", "appointments"]));
+  expect(response.status).toBe(status); expect(await response.json()).toEqual({ code, message: "Contact the business to arrange your appointment." });
+});
+it("forwards combined archive and booking filters through the real BFF", async () => {
+  vi.stubEnv("TURNERO_API_BASE_URL", "http://localhost:8080");
+  const fetch = vi.fn().mockResolvedValue(Response.json({ data: [], page: {} })); global.fetch = fetch;
+  const query = "q=Ana&status=INACTIVE&public_booking_blocked=false&page=1&size=20&sort=name%2Casc";
+  await GET(new Request("http://localhost:3000/api/backend/api/v1/customers?" + query, { headers: { cookie: "turnero_session=opaque" } }), routeContext(["api", "v1", "customers"]));
+  expect(fetch.mock.calls[0][0].toString()).toBe("http://localhost:8080/api/v1/customers?" + query);
+  expect(fetch.mock.calls[0][1].headers.get("cookie")).toBe("turnero_session=opaque");
 });

@@ -5,7 +5,7 @@ import { changedCustomerFields, customerApiFieldErrors, emptyCustomerForm, hasCu
 const values = { name: " Ana ", phoneNumber: " +54 (11) 123 ", email: " ana@example.com ", internalNotes: " Nota\nprivada " };
 it("serializes only editable fields and trims without changing phone format or note line breaks", () => {
   expect(toCustomerWriteRequest(values)).toEqual({ name: "Ana", phone_number: "+54 (11) 123", email: "ana@example.com", internal_notes: "Nota\nprivada" });
-  expect(toCustomerFormValues({ id: 1, name: "Ana", phoneNumber: null, email: null, internalNotes: null, status: "INACTIVE" }))
+  expect(toCustomerFormValues({ id: 1, name: "Ana", phoneNumber: null, email: null, internalNotes: null, publicBookingBlocked: false, publicBookingBlockReason: null, status: "INACTIVE" }))
     .toEqual({ name: "Ana", phoneNumber: "", email: "", internalNotes: "" });
 });
 it("requires name and phone on create, accepts optional email and enforces all limits", () => {

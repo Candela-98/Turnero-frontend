@@ -3,7 +3,7 @@ import { expect, it } from "vitest";
 import { applyCustomerWrite, customerKeys, refreshCustomers } from "./queries";
 import type { CustomerDetail } from "./api";
 
-const saved: CustomerDetail = { id: 3, name: "Ana", status: "ACTIVE", phoneNumber: "123", email: null, internalNotes: "Private" };
+const saved: CustomerDetail = { id: 3, name: "Ana", status: "ACTIVE", phoneNumber: "123", email: null, internalNotes: "Private", publicBookingBlocked: false, publicBookingBlockReason: null };
 const filters = { q: "", status: "ALL" as const, page: 0, size: 20 };
 it("cancels old detail reads before applying a confirmed write, without affecting another business", async () => {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
