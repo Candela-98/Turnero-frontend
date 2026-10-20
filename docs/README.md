@@ -157,3 +157,7 @@ Consultar [pruebas-locales-turn-80.md](pruebas-locales-turn-80.md): búsqueda po
 ### Para probar alta y edición de clientes
 
 Consultar [pruebas-locales-turn-100.md](pruebas-locales-turn-100.md): datos obligatorios, notas internas, edición, descarte y recuperación de errores.
+
+### Para probar detalle y estado de clientes
+
+Consultar [pruebas-locales-turn-102.md](pruebas-locales-turn-102.md): URL navegable, notas internas, edición reutilizada y desactivación/reactivación administrativa.

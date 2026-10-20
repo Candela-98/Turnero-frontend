@@ -17,7 +17,7 @@ export function useStaffListNavigation() {
     const timer = window.setTimeout(() => write({ ...filters, q: search.trim(), page: 0 }), 300);
     return () => window.clearTimeout(timer);
   }, [search, filters, write]);
-  const setStatus = useCallback((status: StaffFilters["status"]) => write({ ...filters, status, page: 0 }), [filters, write]);
+  const setStatus = useCallback((status: StaffFilters["status"]) => write({ ...filters, q: search.trim(), status, page: 0 }), [filters, search, write]);
   const setPage = useCallback((page: number) => write({ ...filters, page }), [filters, write]);
   return { filters, search, setSearch, context: staffContextSearch(filters),
     setStatus, setPage };

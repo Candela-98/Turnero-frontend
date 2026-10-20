@@ -31,7 +31,7 @@ test.beforeEach(async ({ page }) => {
       reads++;
       if (listFailed) return route.fulfill({ status: 503, json: { message: "Unavailable" } });
       const q = (url.searchParams.get("q") ?? "").toLowerCase(), status = url.searchParams.get("status");
-      const found = rows.filter(row => (!status || row.status === status) && (!q || row.name.toLowerCase().includes(q)))
+      const found = rows.filter(row => (!status || status === "ALL" || row.status === status) && (!q || row.name.toLowerCase().includes(q)))
         .sort((a, b) => a.name.localeCompare(b.name, "es") || a.id - b.id);
       const number = Number(url.searchParams.get("page")), size = Number(url.searchParams.get("size"));
       return route.fulfill({ json: { data: found.slice(number * size, (number + 1) * size).map(customer => ({ id: customer.id, name: customer.name, email: customer.email, phone_number: customer.phone_number, status: customer.status })),
@@ -97,7 +97,7 @@ test("validates and creates a client without email, shows the exact success noti
   await dialog.getByRole("button", { name: "Crear cliente", exact: true }).click();
   await expect(dialog).toHaveCount(0);
   expect(writes).toEqual([{ method: "POST", body: { name: "Zoe nueva", phone_number: "+54 (11) 1234-5678", email: "", internal_notes: "Prefiere silencio.\nSin perfume." } }]);
-  await expect(page.getByText("27 clientes", { exact: true })).toBeVisible();
+  await expect(page.getByText("26 clientes", { exact: true })).toBeVisible();
   await expect(page.getByText("Cliente creado", { exact: true })).toBeVisible();
   await expect(page.getByText("El cliente quedó registrado en tu negocio.", { exact: true })).toBeVisible();
   await expectAdminNotice(page);
@@ -143,7 +143,7 @@ test("edits an inactive legacy client without adding a phone and preserves list 
   await expect(dialog).toHaveCount(0);
   expect(writes).toEqual([{ method: "PATCH", body: { internal_notes: "Nueva nota" } }]);
   await expect(page).toHaveURL(/status=INACTIVE&q=Bruno/);
-  await expect(row(page, "Bruno Gómez").getByText("Inactivo", { exact: true })).toBeVisible();
+  await expect(row(page, "Bruno Gómez").getByText("Archivado", { exact: true })).toBeVisible();
 });
 
 test("confirms dirty dismissal and restores focus while clean cancellation closes immediately", async ({ page }) => {
@@ -209,11 +209,11 @@ test("retries only reads after a successful write and failed list refresh", asyn
   await dialog.getByRole("button", { name: "Crear cliente", exact: true }).click();
   await expect(dialog).toHaveCount(0);
   await expect(page.getByText("Cliente creado", { exact: true })).toBeVisible();
-  await expect(page.getByText("El cliente se guardó, pero no pudimos actualizar los datos", { exact: true })).toBeVisible();
+  await expect(page.getByText("El cambio se guardó, pero no pudimos actualizar los datos", { exact: true })).toBeVisible();
   expect(writes).toHaveLength(1); const before = reads;
   listFailed = false;
   await page.getByRole("button", { name: "Reintentar actualización", exact: true }).click();
-  await expect(page.getByText("27 clientes", { exact: true })).toBeVisible();
+  await expect(page.getByText("26 clientes", { exact: true })).toBeVisible();
   expect(reads).toBeGreaterThan(before); expect(writes).toHaveLength(1);
   await expect(page.getByRole("button", { name: "Reintentar actualización", exact: true })).toHaveCount(0);
 });

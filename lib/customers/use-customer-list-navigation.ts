@@ -22,6 +22,9 @@ export function useCustomerListNavigation() {
   const setStatus = useCallback((status: CustomerFilters["status"]) => {
     write({ ...filters, q: search.trim(), status, page: 0 });
   }, [filters, search, write]);
+  const setFilters = useCallback((next: Pick<CustomerFilters, "status" | "publicBookingBlocked">) => {
+    write({ ...filters, ...next, q: search.trim(), page: 0 });
+  }, [filters, search, write]);
   const setPage = useCallback((page: number) => write({ ...filters, page }), [filters, write]);
-  return { filters, search, setSearch, setStatus, setPage };
+  return { filters, search, setSearch, setStatus, setPage, setFilters };
 }

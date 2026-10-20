@@ -69,3 +69,7 @@ Cuando una fila de Profesionales ofrece Servicios, Editar datos y Horarios, cons
 ### Detalles navegables y acciones de estado
 
 Profesionales usa `/profesionales/[id]` con el shell admin existente, encabezado y tarjeta compartidos, más enlace explícito de regreso. q/status/page conservan el contexto entre detalle y listado; las acciones por menú admiten enlaces nativos. Desactivar/Reactivar comparten una confirmación persistente fuera del árbol de resultados, con Cancelar como foco inicial, bloqueo durante envío y reintentos de lectura tras cambios ya confirmados.
+
+Clientes reutiliza el patrón de detalle navegable en `/clientes/[id]`: contacto y notas reales, edición existente y confirmación compartida de estado. El layout del dominio conserva los avisos entre listado/detalle; la actualización de caché preserva datos de detalle que no existen en el resumen. La edición debe esperar una primera lectura fresca también cuando otro observador mantiene el detalle activo.
+
+En Clientes el archivo organiza el listado, mientras el bloqueo restringe solo reservas públicas. Son estados independientes con acciones explícitas, confirmaciones y filtros combinados; el motivo del bloqueo se presenta como información interna en el detalle. La agenda demo permanece separada de estas reglas reales.

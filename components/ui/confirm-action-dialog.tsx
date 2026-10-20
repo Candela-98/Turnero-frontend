@@ -15,15 +15,16 @@ export type ConfirmActionDialogProps = {
   pending?: boolean;
   confirmDisabled?: boolean;
   danger?: boolean;
+  onCloseAutoFocus?: (event: Event) => void;
   children?: ReactNode;
 };
 
 /** Confirmation remains open until its owner confirms success. Cancel receives initial focus. */
-export function ConfirmActionDialog({ open, onOpenChange, onConfirm, title, description, confirmLabel, cancelLabel = "Cancelar", pending = false, confirmDisabled = false, danger = false, children }: ConfirmActionDialogProps) {
+export function ConfirmActionDialog({ open, onOpenChange, onConfirm, title, description, confirmLabel, cancelLabel = "Cancelar", pending = false, confirmDisabled = false, danger = false, onCloseAutoFocus, children }: ConfirmActionDialogProps) {
   return <AlertDialog.Root open={open} onOpenChange={next => { if (!pending) onOpenChange(next); }}>
     <AlertDialog.Portal>
       <AlertDialog.Overlay className="fixed inset-0 z-[60] bg-on-surface/40" />
-      <AlertDialog.Content onEscapeKeyDown={event => { if (pending) event.preventDefault(); }} className="fixed left-1/2 top-1/2 z-[60] max-h-[calc(100dvh-2rem)] w-[calc(100%_-_2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-2xl border border-outline-variant bg-surface-container-lowest p-5 text-on-surface shadow-panel">
+      <AlertDialog.Content onCloseAutoFocus={onCloseAutoFocus} onEscapeKeyDown={event => { if (pending) event.preventDefault(); }} className="fixed left-1/2 top-1/2 z-[60] max-h-[calc(100dvh-2rem)] w-[calc(100%_-_2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-2xl border border-outline-variant bg-surface-container-lowest p-5 text-on-surface shadow-panel">
         <AlertDialog.Title className="break-words text-xl font-semibold">{title}</AlertDialog.Title>
         <AlertDialog.Description className="mt-2 text-sm text-on-surface-variant">{description}</AlertDialog.Description>
         {children ? <div className="mt-4">{children}</div> : null}

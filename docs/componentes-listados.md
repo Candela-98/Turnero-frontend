@@ -31,6 +31,8 @@ El grupo admite `children` para mostrar carga o error antes de las opciones. La 
 
 Para usar `ResponsiveDialog`, colocar el botón en su prop `trigger` y manejar la apertura con `open` y `onOpenChange`. Mantener las selecciones provisionales en el componente de la pantalla, copiarlas desde los filtros aplicados al abrir y confirmar únicamente desde la acción Aplicar. El diálogo no impone cómo se guarda ni se limpia un formulario.
 
+Las confirmaciones controladas pueden aportar `onCloseAutoFocus` a `ConfirmActionDialog` cuando la acción elimina su disparador del listado. Clientes restaura el foco al buscador tras un cambio de estado confirmado y al disparador al cancelar; así el cierre de Radix no intenta enfocar una fila desmontada.
+
 ## Componentes de Servicios
 
 - `ServiceFiltersDialog`: compone los controles genéricos y mantiene las selecciones provisionales de estado/categoría, limpiar, cancelar y aplicar.
@@ -119,3 +121,13 @@ Los avisos de éxito de Profesionales centralizan su copy por acción en `staff-
 El alta requiere nombre/teléfono; email y notas son opcionales. Edición permite conservar un teléfono ausente en registros antiguos. Solo se envían campos editables y PATCH contiene los modificados. Los helpers de `lib/customers` adaptan snake_case, normalizan valores, cancelan lecturas obsoletas e invalidan listados/detalle. Los futuros selectores reales deben usar el prefijo por negocio del mismo dominio; la agenda demo no se conecta en esta tarea.
 
 `customer-feedback.ts` centraliza títulos y descripciones de alta/edición. Escritura exitosa con refresco fallido muestra confirmación y advertencia con reintento de lecturas, sin repetir la mutación. La pantalla devuelve foco al disparador o al buscador si ya no existe la fila.
+
+## Detalle y estado de clientes (TURN-102)
+
+`CustomerDetailPage` usa el shell y CustomerCard existentes en `/clientes/[id]`, muestra contacto y notas internas y conserva q/status/page al regresar. Más acciones ofrece Ver detalle, Archivar/Restaurar y Bloquear/Desbloquear reservas públicas; Editar sigue visible. Archivo y bloqueo son independientes. El listado omite archivados por defecto; conserva ambos filtros en URL y pills.
+
+`CustomerStatusConfirmation` comparte ConfirmActionDialog entre ambas pantallas. DELETE archiva y responde 204; PATCH status ACTIVE restaura. Bloquear/desbloquear envía solo flag y motivo cuando corresponde. La confirmación de bloqueo reutiliza Textarea con motivo obligatorio, foco de validación, límite de 500 caracteres y explicación de contactos compartidos; no usa las notas como motivo. Los errores permanecen en la confirmación; un 404 impide otra escritura sin bloquear Cancelar. `applyCustomerStatus` cancela lecturas obsoletas, conserva notas al actualizar el detalle cacheado y elimina filas incompatibles con el filtro. No fabrica un detalle a partir del resumen del listado; los prefijos por negocio invalidan también los futuros selectores reales.
+
+`CustomersWorkspace`, en el layout de Clientes, comparte los avisos tipados de creación, edición y estado y el reintento de lecturas. Un error de refresco posterior no repite la mutación. El editor de TURN-100 espera la primera lectura fresca exitosa aun con el detalle ya activo en caché; un fallo inicial o reintento pendiente no monta el formulario vacío, y los refrescos posteriores no reemplazan el borrador.
+
+La ficha agrega Reservas públicas y motivo interno privado; archivar/restaurar conserva ese estado. Los éxitos de las cuatro acciones usan el catálogo del dominio con título y descripción. El filtro de reservas públicas usa true/false/omisión, independiente de status ACTIVE/INACTIVE/ALL. Textarea admite ref para enfocar la validación sin copiar controles.

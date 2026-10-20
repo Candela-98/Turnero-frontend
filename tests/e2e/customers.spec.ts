@@ -24,7 +24,7 @@ test.beforeEach(async ({ page }) => {
     const state = url.searchParams.get("status");
     const digits = q.replace(/[^0-9]/g, "");
     const telephone = /^[0-9+().\s-]+$/.test(q) && digits.length > 0;
-    const found = rows.filter(row => (!state || row.status === state) && (!q || row.name.toLowerCase().includes(q) ||
+    const found = rows.filter(row => (!state || state === "ALL" || row.status === state) && (!q || row.name.toLowerCase().includes(q) ||
       row.email?.toLowerCase().includes(q) || row.phone_number?.includes(q) || telephone && row.phone_number?.replace(/[^0-9]/g, "").includes(digits)))
       .sort((a, b) => a.name.localeCompare(b.name, "es") || a.id - b.id);
     const number = Number(url.searchParams.get("page")); const size = Number(url.searchParams.get("size"));
@@ -35,7 +35,7 @@ test.beforeEach(async ({ page }) => {
 
 test("renders contact summaries, paginates and debounces literal searches", async ({ page }, info) => {
   await page.goto("/clientes");
-  await expect(page.getByText("26 clientes", { exact: true })).toBeVisible();
+  await expect(page.getByText("25 clientes", { exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Ana Pérez", exact: true })).toBeVisible();
   await expect(page.getByText("AP", { exact: true })).toBeVisible();
   await expect(page.getByText("+54 (11) 5555-1234", { exact: true })).toBeVisible();
@@ -64,18 +64,18 @@ test("renders contact summaries, paginates and debounces literal searches", asyn
 
 test("keeps filters provisional, supports keyboard cancellation, clear and removable pills", async ({ page }, info) => {
   await page.goto("/clientes");
-  await expect(page.getByText("26 clientes", { exact: true })).toBeVisible();
+  await expect(page.getByText("25 clientes", { exact: true })).toBeVisible();
   const trigger = page.getByRole("button", { name: /^Filtros/ });
   await trigger.click();
   const dialog = page.getByRole("dialog", { name: "Filtrar clientes" });
   const before = requests.length;
-  await dialog.getByRole("radio", { name: "Activos", exact: true }).check();
+  await dialog.getByRole("radio", { name: "Sin archivar", exact: true }).check();
   expect(requests).toHaveLength(before);
   await page.screenshot({ path: info.outputPath("customers-filters.png"), fullPage: false });
   expect((await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze()).violations).toEqual([]);
   await page.keyboard.press("Escape"); await expect(trigger).toBeFocused();
-  await trigger.click(); await expect(dialog.getByRole("radio", { name: "Todos", exact: true })).toBeChecked();
-  await dialog.getByRole("radio", { name: "Inactivos", exact: true }).check();
+  await trigger.click(); await expect(dialog.getByRole("radio", { name: "Sin archivar", exact: true })).toBeChecked();
+  await dialog.getByRole("radio", { name: "Archivados", exact: true }).check();
   await dialog.getByRole("button", { name: "Aplicar filtros", exact: true }).click();
   await expect(page.getByText("1 cliente", { exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Bruno Gómez", exact: true })).toBeVisible();
@@ -83,22 +83,22 @@ test("keeps filters provisional, supports keyboard cancellation, clear and remov
   await expect(page).toHaveURL(/status=INACTIVE/);
   await trigger.click(); await dialog.getByRole("button", { name: "Limpiar", exact: true }).click();
   await page.getByRole("button", { name: "Cerrar filtros", exact: true }).click();
-  await expect(page.getByRole("button", { name: "Quitar filtro de estado" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Quitar filtro de archivo" })).toBeVisible();
   await trigger.click(); await dialog.getByRole("button", { name: "Limpiar", exact: true }).click();
   await dialog.getByRole("button", { name: "Aplicar filtros", exact: true }).click();
-  await expect(page.getByText("26 clientes", { exact: true })).toBeVisible();
-  await trigger.click(); await dialog.getByRole("radio", { name: "Activos", exact: true }).check();
-  await dialog.getByRole("button", { name: "Aplicar filtros", exact: true }).click();
   await expect(page.getByText("25 clientes", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Quitar filtro de estado" }).click();
+  await trigger.click(); await dialog.getByRole("radio", { name: "Todos", exact: true }).check();
+  await dialog.getByRole("button", { name: "Aplicar filtros", exact: true }).click();
   await expect(page.getByText("26 clientes", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Quitar filtro de archivo" }).click();
+  await expect(page.getByText("25 clientes", { exact: true })).toBeVisible();
 });
 
 test("keeps a pending search when applying a status and resets the page", async ({ page }) => {
   await page.goto("/clientes?page=1"); await expect(page.getByText("Página 2 de 2", { exact: true })).toBeVisible();
   await page.getByRole("searchbox", { name: search }).fill("Ana");
   await page.getByRole("button", { name: /^Filtros/ }).click();
-  await page.getByRole("radio", { name: "Activos", exact: true }).check();
+  await page.getByRole("radio", { name: "Sin archivar", exact: true }).check();
   await page.getByRole("button", { name: "Aplicar filtros", exact: true }).click();
   await expect(page.getByRole("searchbox", { name: search })).toHaveValue("Ana");
   await expect(page.getByText("1 cliente", { exact: true })).toBeVisible();
@@ -143,10 +143,11 @@ test("shows recoverable errors without confusing them with empty results", async
   await expect(page.getByText("Todavía no hay clientes", { exact: true })).toHaveCount(0);
   await page.screenshot({ path: info.outputPath("customers-error.png"), fullPage: false });
   failed = false; await page.getByRole("button", { name: "Reintentar", exact: true }).click();
-  await expect(page.getByText("26 clientes", { exact: true })).toBeVisible();
+  await expect(page.getByText("25 clientes", { exact: true })).toBeVisible();
 });
 
 test("ignores a late response from a superseded search", async ({ page }) => {
+  rows[1].status = "ACTIVE";
   let release!: () => void; let waiting = false;
   const pending = new Promise<void>(resolve => { release = resolve; });
   await page.route("**/api/backend/api/v1/customers?*", async route => {
@@ -167,7 +168,7 @@ test("ignores a late response from a superseded search", async ({ page }) => {
 test("wraps long contact data and omits absent fields with accessible rows", async ({ page }, info) => {
   rows = [{ id: 1, name: "Cliente".repeat(17), email: "a".repeat(125) + "@example.com", phone_number: "+54 (11) 5555-1234", status: "ACTIVE" },
     { id: 2, name: "Sin contacto", status: "INACTIVE" }];
-  await page.goto("/clientes"); await expect(page.getByText("2 clientes", { exact: true })).toBeVisible();
+  await page.goto("/clientes?status=ALL"); await expect(page.getByText("2 clientes", { exact: true })).toBeVisible();
   const absent = page.getByRole("article").filter({ has: page.getByRole("heading", { name: "Sin contacto", exact: true }) });
   await expect(absent.getByText("Teléfono:", { exact: true })).toHaveCount(0);
   await expect(absent.getByText("Email:", { exact: true })).toHaveCount(0);

@@ -37,9 +37,11 @@ function EditorContent({ id, businessId, formRef, footerTarget, onSavingChange, 
 }) {
   const client = useQueryClient();
   const detail = useQuery({ queryKey: customerKeys.detail(businessId, id), queryFn: ({ signal }) => getCustomer(id!, signal),
-    enabled: id !== undefined, staleTime: 0, refetchOnWindowFocus: false });
-  if (id !== undefined && detail.isPending) return <div role="status" aria-label="Cargando cliente" className="space-y-4"><Skeleton className="h-11 w-full" /><Skeleton className="h-11 w-full" /></div>;
-  if (id !== undefined && detail.isError && !detail.data) {
+    enabled: id !== undefined, staleTime: 0, refetchOnMount: "always", refetchOnWindowFocus: false });
+  const [initialCustomer, setInitialCustomer] = useState<CustomerDetail | null>(null);
+  if (id !== undefined && !initialCustomer && detail.isSuccess && detail.isFetchedAfterMount) setInitialCustomer(detail.data);
+  if (id !== undefined && !initialCustomer && (detail.isPending || detail.isFetching || !detail.isFetchedAfterMount)) return <div role="status" aria-label="Cargando cliente" className="space-y-4"><Skeleton className="h-11 w-full" /><Skeleton className="h-11 w-full" /></div>;
+  if (id !== undefined && !initialCustomer && detail.isError) {
     const missing = detail.error instanceof ApiError && detail.error.status === 404;
     return <InlineAlert tone="error" title={missing ? "El cliente ya no está disponible" : "No pudimos cargar el cliente"}>
       <p>{missing ? "Volvé al listado para consultar los clientes disponibles." : "Intentá nuevamente para cargar sus datos."}</p>
@@ -47,6 +49,6 @@ function EditorContent({ id, businessId, formRef, footerTarget, onSavingChange, 
         <Button variant="ghost" onClick={() => void detail.refetch()}>Reintentar</Button>}
     </InlineAlert>;
   }
-  return <CustomerForm ref={formRef} footerTarget={footerTarget} businessId={businessId} customer={id === undefined ? undefined : detail.data}
+  return <CustomerForm ref={formRef} footerTarget={footerTarget} businessId={businessId} customer={id === undefined ? undefined : initialCustomer ?? detail.data}
     onSavingChange={onSavingChange} onCancel={onCancel} onSaved={onSaved} />;
 }
