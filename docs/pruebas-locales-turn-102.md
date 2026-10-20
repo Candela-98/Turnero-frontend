@@ -62,3 +62,5 @@ DOCKER_HOST=unix:///Users/xavimeen/.colima/default/docker.sock TESTCONTAINERS_DO
 ```
 
 QA automática aprobada: 609 pruebas backend, lint, TypeScript, build, 222 unitarios y 490 E2E frontend; 14 omisiones preexistentes. Los 63 recorridos de detalle/archivo/bloqueo pasaron en los tres viewports y se revisaron las capturas. QA manual aprobada por el usuario el 2026-10-20 y creación de ambos PRs autorizada. Integración pendiente, backend primero; bases en TURN-100 mientras #83/#18 sigan abiertos, luego develop/dev. Sin consultar CI ni mergear automáticamente.
+
+PRs abiertos: [backend #84](https://github.com/Candela-98/Turnero-api/pull/84), [frontend #19](https://github.com/Candela-98/Turnero-frontend/pull/19). Base actual TURN-100; retarget a develop/dev después de integrar las dependencias.
