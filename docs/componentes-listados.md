@@ -111,3 +111,11 @@ La extensión de eliminación reutiliza `StaffStatusConfirmation` con `removing`
 `StaffRemovalFeedbackProvider`, dentro del layout de Profesionales, transporta el resultado confirmado desde detalle al listado tras `router.replace`, conservando filtros sin introducir parámetros de éxito en la URL. La eliminación no borra la cuenta vinculada; el vínculo histórico se conserva en backend y deja de impedir un nuevo perfil operativo.
 
 Los avisos de éxito de Profesionales centralizan su copy por acción en `staff-feedback.ts`, compartido por listado y detalle, siguiendo el catálogo de mensajes de Servicios. Cada acción incluye una descripción específica: horarios iniciales al crear, perfil actualizado, disponibilidad al reactivar, cambios de horario/servicios, cómo reactivar y conservación del historial al desactivar/eliminar. Evitan el texto genérico de guardado.
+
+## Formulario de clientes (TURN-100)
+
+`CustomerEditor` se controla desde `CustomersPage`, fuera del árbol de resultados. Compone `ResponsiveDialog`, carga fresca por negocio/cliente y `ConfirmDiscardDialog`. `CustomerForm` comparte alta y edición con baseline estable, `Input`, `Textarea`, foco de validación y footer fijo; bloquea doble envío/cierre y conserva borradores ante errores.
+
+El alta requiere nombre/teléfono; email y notas son opcionales. Edición permite conservar un teléfono ausente en registros antiguos. Solo se envían campos editables y PATCH contiene los modificados. Los helpers de `lib/customers` adaptan snake_case, normalizan valores, cancelan lecturas obsoletas e invalidan listados/detalle. Los futuros selectores reales deben usar el prefijo por negocio del mismo dominio; la agenda demo no se conecta en esta tarea.
+
+`customer-feedback.ts` centraliza títulos y descripciones de alta/edición. Escritura exitosa con refresco fallido muestra confirmación y advertencia con reintento de lecturas, sin repetir la mutación. La pantalla devuelve foco al disparador o al buscador si ya no existe la fila.

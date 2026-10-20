@@ -440,3 +440,19 @@ Preparada el 2026-10-13 en `feature/TURN-98-service-detail`, sobre la entrega de
 - Por instrucción del usuario, TURN-78 [#14](https://github.com/Candela-98/Turnero-frontend/pull/14) y TURN-79 [#15](https://github.com/Candela-98/Turnero-frontend/pull/15) se integraron a `dev`, sin esperar approvals y sin consultar CI. Commits de merge: `c76e08b` y `6eaa04d`.
 - Backends relacionados: TURN-78 #79 y TURN-79 #80 integrados a `develop`, antes de sus respectivos frontends.
 - Solo permanece abierto TURN-101 frontend [#16](https://github.com/Candela-98/Turnero-frontend/pull/16), con base `dev`. Backend [#81](https://github.com/Candela-98/Turnero-api/pull/81) permanece abierto sobre `develop`; integrar backend antes que frontend. El usuario aprobó la entrega y pidió conservar estos últimos PRs abiertos.
+
+## TURN-100 — Crear y editar clientes (2026-10-19)
+
+- Implementación local en `feature/TURN-100-customer-form`, sobre TURN-80, independiente de TURN-101. Alta y edición mediante BFF/apiFetch, detalle fresco y adapters en lib/customers. Nombre/teléfono obligatorios, email/notas opcionales; compatibilidad con registros antiguos sin teléfono.
+- CustomerEditor/CustomerForm reutilizan ResponsiveDialog, controles, footer, confirmación de descarte, validación con foco y avisos. Diálogo controlado fuera de resultados; PATCH solo campos modificados, baseline estable, bloqueo inmediato de doble submit y cierre durante envío.
+- Keys y refresco por negocio, cancelación de lecturas antiguas y detalle confirmado en caché. Fallo posterior de refresco reintenta solo lecturas. Catálogo de éxitos con título y descripción específicos; no se modifica la agenda demo ni se agregan acciones de TURN-102.
+- QA automática completada: lint sin advertencias, TypeScript, 156 unitarios y build aprobados. Suite E2E completa: 376 aprobados y 14 omisiones preexistentes. Después se agregaron dos casos de edición/paginación y se reforzó la espera de respuestas tardías; los 39 recorridos finales de formulario aprobaron en los tres viewports. Backend: 572 aprobados sin omisiones, incluidos 24 nuevos casos PostgreSQL. Capturas de alta, edición, éxito, errores y textos largos revisadas en 1440×900, 390×844 y 412×915. QA manual e integración pendientes. Guía: docs/pruebas-locales-turn-100.md. Crear PRs separados después de aprobación manual; bases en TURN-80 si sigue abierto y luego develop/dev, backend primero. Sin consultar CI ni mergear automáticamente.
+
+- QA manual TURN-100 aprobada por el usuario el 2026-10-19. Autorizada la integración de los PRs anteriores y la creación de los PRs de esta entrega contra develop/dev. Sin consultar CI.
+
+### Integración previa a TURN-100 (2026-10-19)
+
+- Por autorización del usuario, TURN-101 backend [#81](https://github.com/Candela-98/Turnero-api/pull/81) y frontend [#16](https://github.com/Candela-98/Turnero-frontend/pull/16) se integraron a develop/dev, seguidos de TURN-80 backend [#82](https://github.com/Candela-98/Turnero-api/pull/82) y frontend [#17](https://github.com/Candela-98/Turnero-frontend/pull/17). Backend antes que frontend en cada entrega, sin esperar approvals ni consultar CI.
+- Conflictos de documentación resueltos conservando las dos entregas; en el BFF se conservaron las pruebas de Clientes y Profesionales (53 pruebas locales aprobadas). TURN-100 actualizado sobre las bases integradas develop/dev. QA manual aprobada; abrir ambos PRs y mantenerlos sin mergear.
+
+- PRs TURN-100 creados y abiertos: [backend #83](https://github.com/Candela-98/Turnero-api/pull/83), base `develop`, y [frontend #18](https://github.com/Candela-98/Turnero-frontend/pull/18), base `dev`. Integrar backend primero. Comprobación local tras integrar dependencias: 24 casos PostgreSQL de escritura aprobados, 179 unitarios frontend, lint y TypeScript aprobados. Sin consultar CI.
