@@ -49,7 +49,17 @@ Antes de cerrar una pantalla mobile:
 
 ## Referencias de implementación
 
-- `AdminAppShell` y Agenda mobile: shell administrativo y CTA contextual.
+- `AdminAppShell` y Agenda mobile: shell administrativo y lista cronológica de lectura, sin CTA demo de crear turnos.
 - Configuración del negocio: formulario con `AdminMobileStickyAction`.
 - `TaskMobileHeader`: flujos de crear/editar.
 - `BookingPublicShell`: reserva cliente mobile-first.
+
+### Grilla temporal de agenda — mejora aprobada por el usuario
+
+Escala continua con divisiones según `slot_interval_minutes` de `GET /booking-settings` (15, 30, 45 o 60), y altura proporcional a duración, cabeceras profesionales sticky y eje horario sticky dentro de una región con scroll y foco. Profesionales ordenados alfabéticamente; condición Inactivo/Eliminado/No disponible desde lectura explícita, sin inferir eliminación por ausencia en catálogo. Fecha completa y Hoy; reloj reactivo por minuto en la zona del negocio y marcador solo en el día actual. Tarjeta desktop compacta sin profesional redundante; mobile conserva profesional y condición. Solapamientos en carriles laterales; intervalos adyacentes reutilizan carril. La escala usa instantes para respetar duración real durante DST, con etiquetas de offset cuando se repiten horas. En turnos breves o textos largos, el contenido tiene scroll y foco, más descripción accesible completa.
+
+La agenda consulta el intervalo con key aislada por negocio, cancelación y lectura fresca al volver/foco. No presenta una grilla provisional de 30 minutos durante carga o error; ofrece reintento. Configuración comparte los valores permitidos y publica en caché el intervalo confirmado por el servidor, cancelando lecturas anteriores. El intervalo solo cambia las marcas y límites del eje: nunca redondea ni mueve turnos o altera la escala por minuto.
+
+La agenda muestra el horario del negocio de la fecha seleccionada o «Negocio cerrado en esta fecha» sobre la lista mobile. Los márgenes grisados son contexto de la grilla desktop: no agregar tarjetas vacías ni márgenes de la grilla a la lista.
+
+El botón «Hoy» de Agenda usa `subtle` con texto primary y `aria-current="date"` cuando la fecha seleccionada coincide con la fecha actual del negocio; permanece habilitado y conserva su nombre. En otras fechas usa `outline` sin aria-current. El badge junto a la fecha se conserva; el estado también responde a anterior/siguiente y al selector de fecha.

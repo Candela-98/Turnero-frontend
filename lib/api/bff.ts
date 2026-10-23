@@ -189,6 +189,9 @@ export async function proxyApiRequest(request: Request, pathname: string) {
   }
 
   const controller = new AbortController();
+  const abortRequest = () => controller.abort(request.signal.reason);
+  request.signal.addEventListener("abort", abortRequest, { once: true });
+  if (request.signal.aborted) abortRequest();
   const timeout = setTimeout(() => controller.abort(), UPSTREAM_TIMEOUT_MS);
 
   try {
@@ -221,6 +224,7 @@ export async function proxyApiRequest(request: Request, pathname: string) {
     );
   } finally {
     clearTimeout(timeout);
+    request.signal.removeEventListener("abort", abortRequest);
   }
 }
 

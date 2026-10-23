@@ -73,12 +73,12 @@ export function AdminShellDesktop({
           ))}
         </nav>
 
-        <div className="p-5">
+        {onNewAppointment ? <div className="p-5">
           <Button className="h-12 w-full text-base shadow-floating" onClick={onNewAppointment}>
             <CalendarDays />
             Nuevo turno
           </Button>
-        </div>
+        </div> : null}
       </aside>
 
       <div className="min-h-screen md:ml-80">

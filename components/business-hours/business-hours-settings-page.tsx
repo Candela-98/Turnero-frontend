@@ -1,5 +1,8 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/components/auth/auth-provider";
+import { applyBusinessHours } from "@/lib/business-hours/queries";
 import { CheckCircle2, ChevronLeft, Clock3 } from "lucide-react";
 import Link from "next/link";
 import { Fragment, type FormEvent, useCallback, useEffect, useId, useState } from "react";
@@ -43,6 +46,8 @@ function hasUnsavedChanges(values: BusinessHoursFormValues, saved: BusinessHours
 }
 
 export function BusinessHoursSettingsPage() {
+  const client = useQueryClient();
+  const { business } = useAuth();
   const [hours, setHours] = useState<BusinessHoursListApiResponse | null>(null);
   const [values, setValues] = useState<BusinessHoursFormValues | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<BusinessDay, BusinessHoursDayErrors>>>({});
@@ -94,6 +99,7 @@ export function BusinessHoursSettingsPage() {
 
     try {
       const response = await replaceBusinessHours(toBusinessHoursReplaceRequest(valuesToSave));
+      if (business) await applyBusinessHours(client, business.id, response);
       setHours(response);
       setValues(toBusinessHoursFormValues(response));
       setFieldErrors({});

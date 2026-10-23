@@ -377,3 +377,24 @@ it("forwards combined archive and booking filters through the real BFF", async (
   expect(fetch.mock.calls[0][0].toString()).toBe("http://localhost:8080/api/v1/customers?" + query);
   expect(fetch.mock.calls[0][1].headers.get("cookie")).toBe("turnero_session=opaque");
 });
+
+ describe("agenda BFF reads", () => {
+  it.each([200, 400, 401, 403, 503])("forwards filters, cookie and upstream response %i", async status => {
+   vi.stubEnv("TURNERO_API_BASE_URL", "http://localhost:8080");
+   const body = { data: [], page: { number: 1 } };
+   const fetch = vi.fn().mockResolvedValue(Response.json(body, { status })); global.fetch = fetch;
+   const response = await GET(new Request("http://localhost:3000/api/backend/api/v1/appointments?date=2026-10-20&page=1&status=PENDING%2CCONFIRMED", { headers: { cookie: "turnero_session=opaque" } }), routeContext(["api", "v1", "appointments"]));
+   expect(response.status).toBe(status); expect(await response.json()).toEqual(body);
+   expect(fetch.mock.calls[0][0].searchParams.get("status")).toBe("PENDING,CONFIRMED");
+   expect(fetch.mock.calls[0][1].headers.get("cookie")).toBe("turnero_session=opaque");
+  });
+  it("cancels the upstream fetch when the incoming read is aborted", async () => {
+   vi.stubEnv("TURNERO_API_BASE_URL", "http://localhost:8080"); const controller = new AbortController();
+   global.fetch = vi.fn((_url, options) => new Promise<Response>((_resolve, reject) => {
+    options!.signal!.addEventListener("abort", () => reject(new DOMException("Aborted", "AbortError")));
+    controller.abort();
+   }));
+   const result = await GET(new Request("http://localhost:3000/api/backend/api/v1/appointments", { signal: controller.signal }), routeContext(["api", "v1", "appointments"]));
+   expect(result.status).toBe(504);
+  });
+ });

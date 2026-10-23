@@ -1,3 +1,10 @@
+export const slotIntervalOptions = [15, 30, 45, 60] as const;
+export type SlotIntervalMinutes = typeof slotIntervalOptions[number];
+export function toSlotIntervalMinutes(value: unknown): SlotIntervalMinutes {
+  if (typeof value !== "number" || !slotIntervalOptions.some(option => option === value)) throw new Error("Intervalo de agenda no válido");
+  return value as SlotIntervalMinutes;
+}
+
 export type BookingSettingsApiResponse = {
   public_booking_enabled: boolean;
   requires_customer_login: boolean;

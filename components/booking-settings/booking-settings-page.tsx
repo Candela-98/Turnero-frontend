@@ -1,5 +1,9 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/components/auth/auth-provider";
+import { applyBookingSettings } from "@/lib/booking-settings/queries";
+import { slotIntervalOptions } from "@/lib/booking-settings/types";
 import { CheckCircle2, ChevronLeft, SlidersHorizontal } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useCallback, useEffect, useId, useState } from "react";
@@ -18,8 +22,6 @@ import {
 } from "@/lib/booking-settings";
 import { hasChangedFields } from "@/lib/forms/has-changed-fields";
 import { useFocusInvalidField } from "@/lib/forms/use-focus-invalid-field";
-
-const slotIntervalOptions = [15, 30, 45, 60] as const;
 
 type FieldName = keyof BookingSettingsFormValues;
 type FieldErrors = Partial<Record<FieldName, string>>;
@@ -180,6 +182,8 @@ function ToggleField({
 }
 
 export function BookingSettingsPage() {
+  const client = useQueryClient();
+  const { business } = useAuth();
   const [settings, setSettings] = useState<BookingSettingsApiResponse | null>(null);
   const [values, setValues] = useState<BookingSettingsFormValues | null>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
@@ -240,6 +244,7 @@ export function BookingSettingsPage() {
 
     try {
       const response = await updateBookingSettings(toBookingSettingsUpdateRequest(valuesToSave));
+      if (business) await applyBookingSettings(client, business.id, response);
       setSettings(response);
       setValues(toBookingSettingsFormValues(response));
       setFieldErrors({});
