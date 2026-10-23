@@ -2,8 +2,8 @@ import { apiFetch } from "@/lib/api/client";
 
 import type { BookingSettingsApiResponse, BookingSettingsUpdateRequest } from "./types";
 
-export function getBookingSettings() {
-  return apiFetch<BookingSettingsApiResponse>("/api/v1/booking-settings");
+export function getBookingSettings(signal?: AbortSignal) {
+  return apiFetch<BookingSettingsApiResponse>("/api/v1/booking-settings", { signal });
 }
 
 export function updateBookingSettings(request: BookingSettingsUpdateRequest) {

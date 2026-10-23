@@ -2,8 +2,8 @@ import { apiFetch } from "@/lib/api/client";
 
 import type { BusinessApiResponse, BusinessUpdateRequest } from "./types";
 
-export function getBusiness() {
-  return apiFetch<BusinessApiResponse>("/api/v1/business");
+export function getBusiness(signal?: AbortSignal) {
+  return apiFetch<BusinessApiResponse>("/api/v1/business", { signal });
 }
 
 export function updateBusiness(request: BusinessUpdateRequest) {

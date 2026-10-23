@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {
   CalendarDays,
   Ellipsis,
@@ -55,7 +55,6 @@ function isRouteActive(pathname: string, href: string) {
 export function AdminAppShell({ children }: { children: ReactNode }) {
   const { business } = useAuth();
   const pathname = usePathname();
-  const router = useRouter();
   const [isDesktop, setIsDesktop] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -81,17 +80,13 @@ export function AdminAppShell({ children }: { children: ReactNode }) {
   );
   const currentRoute = [...adminRoutes, moreRoute].find((route) => isRouteActive(pathname, route.href));
 
-  function openNewAppointment() {
-    router.push("/agenda?new=1");
-  }
-
   if (isDesktop === null) {
     return <div className="min-h-screen bg-surface" />;
   }
 
   if (isDesktop) {
     return (
-      <AdminShellDesktop businessName={business?.name} navItems={desktopNavItems} onNewAppointment={openNewAppointment}>
+      <AdminShellDesktop businessName={business?.name} navItems={desktopNavItems}>
         {children}
       </AdminShellDesktop>
     );
