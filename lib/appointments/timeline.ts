@@ -53,3 +53,14 @@ export function buildTimeline(appointments: Appointment[], timezone: string, dat
   ]).filter(band => band.end > band.start);
   return { professionals, ordered, current, midnight, start, end, ticks, outsideHours, opens };
 }
+
+/** Group by instant, keeping repeated local hours at DST fallback distinct. */
+export function groupAppointmentsByStart(ordered: Appointment[]) {
+  const groups: { startsAt: string; items: Appointment[] }[] = [];
+  for (const appointment of ordered) {
+    const last = groups.at(-1);
+    if (last && Date.parse(last.startsAt) === Date.parse(appointment.startsAt)) last.items.push(appointment);
+    else groups.push({ startsAt: appointment.startsAt, items: [appointment] });
+  }
+  return groups;
+}

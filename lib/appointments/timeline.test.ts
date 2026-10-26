@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { toAppointment, type AppointmentDto } from "./api";
 import { businessDayStart, relativeDayLabel } from "./dates";
-import { buildTimeline, positionAppointments, professionalCondition } from "./timeline";
+import { buildTimeline, groupAppointmentsByStart, positionAppointments, professionalCondition } from "./timeline";
 const dto: AppointmentDto = {
   id: 1, customer_id: 1, staff_member_id: 1, service_offering_id: 1,
   starts_at: "2026-10-20T09:00:00-03:00", ends_at: "2026-10-20T09:30:00-03:00", duration_minutes: 30, price_cents: 5000,
@@ -80,4 +80,11 @@ describe("business hours context", () => {
   expect(spring.ticks[0].label).toBe("08:30");expect(spring.ticks.at(-1)?.label).toBe("18:30");
   expect(spring.outsideHours).toEqual([{start:450,end:480},{start:1020,end:1050}]);
  });
+});
+
+it("groups simultaneous starts without merging repeated DST clock labels",()=>{
+ const same=[appointment(1,"09:00","09:30"),appointment(2,"09:00","10:00"),appointment(3,"09:30","10:00")];
+ expect(groupAppointmentsByStart(same).map(g=>g.items.map(a=>a.id))).toEqual([[1,2],[3]]);
+ const repeated=[{...same[0],startsAt:"2026-11-01T01:30:00-04:00"},{...same[1],startsAt:"2026-11-01T01:30:00-05:00"}];
+ expect(groupAppointmentsByStart(repeated)).toHaveLength(2);
 });

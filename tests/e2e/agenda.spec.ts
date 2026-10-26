@@ -12,6 +12,7 @@ const appointments = Array.from({ length: 106 }, (_, index) => ({
   staff_member: { id: index === 105 ? 999 : index % 3 + 1, name: index === 105 ? "Profesional histórico eliminado" : `Profesional ${index % 3 + 1}`, available: true, status: index === 105 ? "INACTIVE" : "ACTIVE", deleted_at: index === 105 ? "2026-10-19T10:00:00-03:00" : null },
   service_offering: { id: 1, name: "Corte y cuidado", available: true, status: "INACTIVE" },
 }));
+function filterTrigger(page: Page) { return page.getByRole("button",{name:page.viewportSize()!.width<768 ? /^Estado/ : /^Profesional:/}); }
 function list(page: Page) { return page.getByTestId(page.viewportSize()!.width < 768 ? "mobile-agenda-list" : "desktop-agenda-board"); }
 async function session(page: Page, expired = false) {
   await page.route("**/api/backend/api/v1/auth/me", route => route.fulfill({ status: expired ? 401 : 200, json: expired ? { code: "UNAUTHORIZED" } : {
@@ -48,35 +49,49 @@ test("loads every page, all statuses, overlapping slots and historical professio
   await expectAdminViewport(page);
   await page.screenshot({ path: info.outputPath("agenda-real.png"), fullPage: false });
 });
-test("keeps draft filters, searches beyond first catalog page and clears chips", async ({ page }) => {
+test("applies desktop filters immediately, keeps mobile drafts and searches the full catalog", async ({ page }) => {
+  if(page.viewportSize()!.width<768){
+    await page.goto("/agenda?date=2026-10-20");await expect(list(page).getByTestId("agenda-appointment")).toHaveCount(106);
+    await filterTrigger(page).click();const dialog=page.getByRole("dialog");
+    await dialog.getByRole("radio",{name:"Pendiente",exact:true}).check();await dialog.getByRole("button",{name:"Cerrar filtros"}).click();
+    await expect(list(page).getByTestId("agenda-appointment")).toHaveCount(106);
+    await page.getByRole("button",{name:"Buscar profesional",exact:true}).click();
+    await dialog.getByRole("searchbox",{name:"Buscar profesional"}).fill("102");
+    await expect(dialog.getByRole("radio",{name:/Profesional 102/})).toBeVisible();
+    await dialog.getByRole("searchbox",{name:"Buscar profesional"}).fill("histórico");
+    await dialog.getByRole("radio",{name:/Profesional histórico eliminado/}).click();
+    await expect(page).toHaveURL(/staff=999/);await expect(list(page).getByTestId("agenda-appointment")).toHaveCount(1);
+    await page.getByTestId("agenda-professionals").getByRole("radio",{name:"Todos",exact:true}).click();
+    await expect(list(page).getByTestId("agenda-appointment")).toHaveCount(106);
+    await filterTrigger(page).click();await dialog.getByRole("radio",{name:"Ausente",exact:true}).check();await dialog.getByRole("button",{name:"Aplicar filtros"}).click();
+    await expect(list(page).getByTestId("agenda-appointment")).toHaveCount(21);
+    await page.getByRole("button",{name:"Día siguiente"}).click();await expect(page).toHaveURL(/date=2026-10-21.*status=NO_SHOW/);
+    await expect(page.getByText("No hay coincidencias",{exact:true})).toBeVisible();
+    await page.getByRole("button",{name:"Ir a hoy",exact:true}).click();
+    await expect(page.getByLabel("Fecha",{exact:true})).toHaveValue("2026-10-20");
+    await filterTrigger(page).click();await dialog.getByRole("button",{name:"Limpiar",exact:true}).click();await dialog.getByRole("button",{name:"Aplicar filtros"}).click();
+    await expect(list(page).getByTestId("agenda-appointment")).toHaveCount(106);return;
+  }
+
   await page.goto("/agenda?date=2026-10-20"); await expect(list(page).getByTestId("agenda-appointment")).toHaveCount(106);
-  await page.getByRole("button", { name: "Filtros", exact: true }).click();
-  const dialog = page.getByRole("dialog");
-  await dialog.getByRole("radio", { name: "Pendiente", exact: true }).check();
-  await dialog.getByRole("button", { name: "Cerrar filtros" }).click();
-  await expect(list(page).getByTestId("agenda-appointment")).toHaveCount(106);
-  await page.getByRole("button", { name: "Filtros", exact: true }).click();
-  await dialog.getByRole("searchbox", { name: "Buscar profesional" }).fill("102");
-  await expect(dialog.getByRole("radio", { name: "Profesional 102", exact: true })).toBeVisible();
-  await dialog.getByRole("searchbox", { name: "Buscar profesional" }).fill("histórico");
-  await dialog.getByRole("radio", { name: "Profesional histórico eliminado" }).check();
-  await dialog.getByRole("button", { name: "Aplicar filtros" }).click();
-  await expect(page).toHaveURL(/staff=999/); await expect(list(page).getByTestId("agenda-appointment")).toHaveCount(1);
-  await page.getByRole("button", { name: "Quitar filtro de profesional" }).click();
-  await expect(list(page).getByTestId("agenda-appointment")).toHaveCount(106);
-  await page.getByRole("button", { name: "Filtros", exact: true }).click();
-  await dialog.getByRole("radio", { name: "Ausente", exact: true }).check(); await dialog.getByRole("button", { name: "Aplicar filtros" }).click();
-  await expect(page).toHaveURL(/status=NO_SHOW/); await expect(list(page).getByTestId("agenda-appointment")).toHaveCount(21);
-  await page.getByRole("button", { name: "Día siguiente" }).click(); await expect(page).toHaveURL(/date=2026-10-21.*status=NO_SHOW/);
-  await expect(page.getByText("No hay coincidencias", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Hoy", exact: true }).click();
-  await expect(page.getByLabel("Fecha", { exact: true })).toHaveValue("2026-10-20");
-  await page.getByRole("button", { name: "Limpiar filtros", exact: true }).click();
-  await expect(list(page).getByTestId("agenda-appointment")).toHaveCount(106);
+  await filterTrigger(page).click();const dialog=page.getByRole("dialog",{name:"Elegir profesional"});
+  await dialog.getByRole("searchbox",{name:"Buscar profesional"}).fill("102");
+  await expect(dialog.getByRole("radio",{name:"Profesional 102 · Inactivo",exact:true})).toBeVisible();
+  await page.keyboard.press("Escape");await expect(list(page).getByTestId("agenda-appointment")).toHaveCount(106);
+  await filterTrigger(page).click();await dialog.getByRole("searchbox",{name:"Buscar profesional"}).fill("histórico");
+  await dialog.getByRole("radio",{name:"Profesional histórico eliminado · Eliminado",exact:true}).click();
+  await expect(dialog).toHaveCount(0);await expect(page).toHaveURL(/staff=999/);await expect(list(page).getByTestId("agenda-appointment")).toHaveCount(1);
+  await page.getByRole("button",{name:"Quitar filtro de profesional"}).click();await expect(list(page).getByTestId("agenda-appointment")).toHaveCount(106);
+  await page.getByRole("combobox",{name:"Estado",exact:true}).selectOption("NO_SHOW");
+  await expect(list(page).getByTestId("agenda-appointment")).toHaveCount(21);
+  await page.getByRole("button",{name:"Día siguiente"}).click();await expect(page).toHaveURL(/date=2026-10-21.*status=NO_SHOW/);
+  await expect(page.getByText("No hay coincidencias",{exact:true})).toBeVisible();
+  await page.getByRole("button",{name:/^(Ir a hoy|Hoy)$/}).click();await expect(page.getByLabel("Fecha",{exact:true})).toHaveValue("2026-10-20");
+  await page.getByRole("button",{name:"Limpiar filtros",exact:true}).click();await expect(list(page).getByTestId("agenda-appointment")).toHaveCount(106);
 });
 test("navigates month/year boundaries, uses date picker and preserves empty state shell", async ({ page }, info) => {
   await page.goto("/agenda?date=2026-12-31");
-  const today=page.getByRole("button",{name:"Hoy",exact:true});
+  const today=page.getByRole("button",{name: /^(Ir a hoy|Hoy)$/});
   await expect(today).not.toHaveAttribute("aria-current");
   await expect(page.getByText("No hay turnos este día", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Día siguiente" }).click(); await expect(page.getByLabel("Fecha", { exact: true })).toHaveValue("2027-01-01");
@@ -132,9 +147,9 @@ test("401 recovers the session through auth me and redirects when expired", asyn
 });
 test("keyboard filters and accessibility", async ({ page }) => {
   await page.goto("/agenda?date=2026-10-21"); await expect(page.getByText("No hay turnos este día", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Filtros", exact: true }).focus(); await page.keyboard.press("Enter");
+  await filterTrigger(page).focus(); await page.keyboard.press("Enter");
   await expect(page.getByRole("dialog")).toBeVisible(); await page.keyboard.press("Escape");
-  await expect(page.getByRole("button", { name: "Filtros", exact: true })).toBeFocused();
+  await expect(filterTrigger(page)).toBeFocused();
   const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze(); expect(results.violations).toEqual([]);
 });
 
@@ -354,4 +369,248 @@ test("saved business hours update the agenda when returning from settings",async
   await expect(page.getByText("Los horarios del negocio están actualizados.")).toBeVisible();
   await page.getByRole("link",{name:"Agenda",exact:true}).click();
   await expect(page.getByTestId("agenda-business-hours")).toContainText("10:00–18:00");
+});
+
+test("mobile keeps compact date and filters in view and groups simultaneous appointments",async({page},info)=>{
+  const data=[
+    {...appointments[0],id:1001,starts_at:"2026-10-20T09:00:00-03:00",ends_at:"2026-10-20T09:30:00-03:00"},
+    {...appointments[1],id:1002,starts_at:"2026-10-20T09:00:00-03:00",ends_at:"2026-10-20T10:00:00-03:00",customer:{...appointments[1].customer,name:"María de los Ángeles Fernández de la Torre"}},
+    ...Array.from({length:12},(_,index)=>({...appointments[0],id:1100+index,starts_at:`2026-10-20T${String(10+index).padStart(2,"0")}:00:00-03:00`,ends_at:`2026-10-20T${String(10+index).padStart(2,"0")}:30:00-03:00`})),
+  ];
+  await page.route("**/api/backend/api/v1/appointments?*",route=>route.fulfill({json:{data,page:{number:0,size:100,total_elements:data.length,total_pages:1}}}));
+  await page.goto("/agenda?date=2026-10-20");
+  await expect(list(page).getByTestId("agenda-appointment")).toHaveCount(14);
+  if(page.viewportSize()!.width>=768){await expect(page.getByTestId("agenda-context-bar")).toHaveCSS("position","static");await expectAdminViewport(page);await page.screenshot({path:info.outputPath("agenda-desktop-regression.png"),fullPage:false});return;}
+  await expect(page.getByText("Agenda del negocio",{exact:true})).toBeVisible();
+  await expect(page.getByText("Agenda de hoy",{exact:true})).toHaveCount(0);
+  const results=list(page),bar=page.getByTestId("agenda-context-bar");
+  const groups=results.getByTestId("agenda-time-group");await expect(groups).toHaveCount(13);
+  await expect(groups.first().getByTestId("agenda-appointment")).toHaveCount(2);
+  expect((await results.getByTestId("agenda-appointment").first().boundingBox())!.y).toBeLessThan(370);
+  await expect(results.getByText("María de los Ángeles Fernández de la Torre",{exact:true})).toBeVisible();
+  await expectAdminViewport(page);await page.screenshot({path:info.outputPath("agenda-mobile-compact.png"),fullPage:false});
+  await page.evaluate(()=>window.scrollTo(0,650));
+  await expect(page.getByRole("button",{name: /^(Ir a hoy|Hoy)$/})).toBeInViewport();
+  await expect(filterTrigger(page)).toBeInViewport();
+  const header=page.locator('header').filter({hasText:"Agenda del negocio"});
+  expect((await bar.boundingBox())!.y).toBeCloseTo((await header.boundingBox())!.y+(await header.boundingBox())!.height,0);
+  await page.getByRole("button",{name:"Abrir menú de cuenta"}).click();
+  await page.getByRole("menuitem",{name:"Cerrar sesión"}).click({trial:true});
+  await page.getByRole("button",{name:"Abrir menú de cuenta"}).click();
+  await filterTrigger(page).click();
+  const dialog=page.getByRole("dialog");await dialog.getByRole("radio",{name:"Pendiente",exact:true}).check();
+  await dialog.getByRole("button",{name:"Aplicar filtros"}).click();
+  await expect(filterTrigger(page)).toBeInViewport();
+  await expect(filterTrigger(page)).toHaveText(/Estado: Pendiente1/);
+  expect((await bar.boundingBox())!.height).toBeLessThan(210);
+  await page.screenshot({path:info.outputPath("agenda-mobile-sticky.png"),fullPage:false});
+  await filterTrigger(page).click();await dialog.getByRole("button",{name:"Limpiar",exact:true}).click();await dialog.getByRole("button",{name:"Aplicar filtros"}).click();
+  const axe=await new AxeBuilder({page}).withTags(["wcag2a","wcag2aa"]).analyze();expect(axe.violations).toEqual([]);
+  const last=results.getByTestId("agenda-appointment").last();await last.scrollIntoViewIfNeeded();
+  await page.evaluate(()=>window.scrollTo(0,document.documentElement.scrollHeight));
+  const card=(await last.boundingBox())!,nav=(await page.getByRole("navigation",{name:"Navegación principal"}).boundingBox())!;
+  expect(card.y+card.height).toBeLessThanOrEqual(nav.y);
+});
+
+
+test("mobile professional selection is immediate, independent of state and preserved across dates",async({page},info)=>{
+ if(page.viewportSize()!.width>=768)return;
+ await page.goto("/agenda?date=2026-10-20");await expect(list(page).getByTestId("agenda-appointment")).toHaveCount(106);
+ const strip=page.getByTestId("agenda-professionals");
+ await strip.getByRole("radio",{name:"Profesional 1",exact:true}).click();
+ await expect(page).toHaveURL(/staff=1/);await expect(list(page).getByTestId("agenda-appointment")).toHaveCount(35);
+ await expect(page.getByRole("dialog")).toHaveCount(0);
+ await expect(list(page).getByText("Profesional 1",{exact:true}).first()).toBeVisible();
+ await filterTrigger(page).click();const dialog=page.getByRole("dialog");
+ await expect(dialog.getByRole("group",{name:"Profesional",exact:true})).toHaveCount(0);
+ await dialog.getByRole("radio",{name:"Confirmado",exact:true}).check();await dialog.getByRole("button",{name:"Aplicar filtros"}).click();
+ await expect(page).toHaveURL(/staff=1.*status=CONFIRMED/);await expect(list(page).getByTestId("agenda-appointment")).toHaveCount(7);
+ await strip.getByRole("radio",{name:"Todos",exact:true}).click();
+ await expect(page).not.toHaveURL(/staff=/);await expect(page).toHaveURL(/status=CONFIRMED/);
+ await expect(list(page).getByTestId("agenda-appointment")).toHaveCount(21);
+ await expect(list(page).getByText("Profesional 1",{exact:true}).first()).toBeVisible();
+ await strip.getByRole("radio",{name:/^Profesional 4 · Inactivo$/}).click();
+ await expect(page.getByText("No hay coincidencias",{exact:true})).toBeVisible();
+ await page.getByRole("button",{name:"Día siguiente"}).click();await expect(page).toHaveURL(/date=2026-10-21.*staff=4.*status=CONFIRMED/);
+ await expect(strip.getByRole("radio",{name:/^Profesional 4 · Inactivo$/})).toBeChecked();
+ await page.screenshot({path:info.outputPath("agenda-direct-empty.png"),fullPage:false});
+});
+
+test("mobile can return to the current marker without resetting professional or state",async({page},info)=>{
+ if(page.viewportSize()!.width>=768)return;
+ await page.emulateMedia({reducedMotion:"reduce"});
+ await page.clock.setFixedTime(new Date("2026-10-20T12:15:00Z"));
+ await page.goto("/agenda?date=2026-10-21&staff=1");await expect(page.getByRole("button",{name:"Ir a hoy",exact:true})).toBeVisible();
+ await expect(page.getByRole("button",{name:"Ahora",exact:true})).toHaveCount(0);
+ await page.getByRole("button",{name:"Ir a hoy",exact:true}).click();
+ await expect(page.getByRole("button",{name:"Hoy",exact:true})).toHaveAttribute("aria-current","date");
+ await expect(list(page).getByTestId("agenda-appointment")).toHaveCount(35);
+ await page.evaluate(()=>window.scrollTo(0,document.documentElement.scrollHeight));
+ await page.getByRole("button",{name:"Ahora",exact:true}).click();
+ const marker=list(page).getByRole("note",{name:"Hora actual 09:15"});await expect(marker).toBeInViewport();await expect(marker).toBeFocused();
+ expect((await marker.boundingBox())!.y).toBeGreaterThanOrEqual((await page.getByTestId("agenda-context-bar").boundingBox())!.y+(await page.getByTestId("agenda-context-bar").boundingBox())!.height);
+ await expect(page).toHaveURL(/staff=1/);
+ await page.screenshot({path:info.outputPath("agenda-now-shortcut.png"),fullPage:false});
+});
+
+test("professional edge fades follow overflow, scroll position and viewport changes",async({page},info)=>{
+ if(page.viewportSize()!.width>=768){await page.goto("/agenda?date=2026-10-21");await expect(page.getByTestId("agenda-professionals")).toHaveCount(0);return;}
+ await page.goto("/agenda?date=2026-10-20");await expect(list(page).getByTestId("agenda-appointment")).toHaveCount(106);
+ const strip=page.getByTestId("agenda-professionals"),row=strip.locator("[data-filter-options]");
+ const left=strip.locator('[data-filter-fade="start"]'),right=strip.locator('[data-filter-fade="end"]');
+ await expect(left).toHaveCount(0);await expect(right).toBeVisible();await expect(right).toHaveCSS("pointer-events","none");
+ const position=await page.evaluate(()=>({x:window.scrollX,y:window.scrollY}));
+ await row.evaluate(element=>{element.scrollLeft=(element.scrollWidth-element.clientWidth)/2;});
+ await expect(left).toBeVisible();await expect(right).toBeVisible();
+ await page.screenshot({path:info.outputPath("agenda-fades-middle.png"),fullPage:false});
+ await row.evaluate(element=>{element.scrollLeft=element.scrollWidth;});await expect(right).toHaveCount(0);await expect(left).toBeVisible();
+ await page.screenshot({path:info.outputPath("agenda-fades-end.png"),fullPage:false});
+ await row.evaluate(element=>{element.scrollLeft=0;});await expect(left).toHaveCount(0);await expect(right).toBeVisible();
+ expect(await page.evaluate(()=>({x:window.scrollX,y:window.scrollY}))).toEqual(position);
+ await expectAdminViewport(page);
+ // No overflow initially; resizing the same mounted row must recalculate the fades.
+ await page.route("**/api/backend/api/v1/staff-members?*",route=>route.fulfill({json:{data:[{id:1,name:"Mateo Ruiz",status:"ACTIVE"},{id:2,name:"Lucas Fernández",status:"ACTIVE"}],page:{number:0,size:100,total_elements:2,total_pages:1}}}));
+ await page.goto("/agenda?date=2026-10-21");await expect(page.getByText("No hay turnos este día",{exact:true})).toBeVisible();
+ await expect(strip.getByRole("radio")).toHaveCount(3);await expect(left).toHaveCount(0);await expect(right).toHaveCount(0);
+ const size=page.viewportSize()!;await page.setViewportSize({width:300,height:size.height});await expect(right).toBeVisible();
+ await page.setViewportSize(size);await expect(left).toHaveCount(0);await expect(right).toHaveCount(0);
+ await page.screenshot({path:info.outputPath("agenda-fades-fit.png"),fullPage:false});
+});
+
+test("professional selection is revealed after delayed catalog, search, reload and keyboard navigation",async({page},info)=>{
+ if(page.viewportSize()!.width>=768)return;
+ let release!:()=>void;const pending=new Promise<void>(resolve=>{release=resolve;});
+ await page.route("**/api/backend/api/v1/staff-members?*",async route=>{await pending;await route.fallback();});
+ await page.goto("/agenda?date=2026-10-20&staff=102");
+ try{await expect(page.getByTestId("agenda-professionals").getByRole("radio",{name:/Profesional #102/})).toBeChecked();}finally{release();}
+ const strip=page.getByTestId("agenda-professionals"),row=strip.locator("[data-filter-options]");
+ const selected=strip.getByRole("radio",{name:/^Profesional 102 · Inactivo$/});
+ const assertRevealed=async()=>{
+   await expect(selected).toBeChecked();
+   await expect.poll(async()=>{
+     const item=(await selected.boundingBox())!,box=(await row.boundingBox())!;
+     const left=await strip.locator('[data-filter-fade="start"]').count()?16:0,right=await strip.locator('[data-filter-fade="end"]').count()?16:0;
+     return item.x>=box.x+left-1&&item.x+item.width<=box.x+box.width-right+1;
+   }).toBe(true);
+   expect(await page.evaluate(()=>window.scrollX)).toBe(0);
+ };
+ await assertRevealed();const y=await page.evaluate(()=>window.scrollY);
+ const checkedColor=await selected.locator('..').locator('span').evaluate(element=>getComputedStyle(element).backgroundColor);
+ const otherColor=await strip.getByRole("radio",{name:"Todos",exact:true}).locator('..').locator('span').evaluate(element=>getComputedStyle(element).backgroundColor);
+ expect(checkedColor).not.toBe(otherColor);
+ await page.reload();await assertRevealed();
+ await row.evaluate(element=>{element.scrollLeft=0;});
+ await page.clock.setFixedTime(new Date("2026-10-21T01:01:00Z"));await page.clock.runFor(1000);
+ expect(await row.evaluate(element=>element.scrollLeft)).toBe(0);
+ await strip.getByRole("radio",{name:"Todos",exact:true}).click();await expect(page).not.toHaveURL(/staff=/);
+ await page.getByRole("button",{name:"Buscar profesional",exact:true}).click();
+ const dialog=page.getByRole("dialog");await dialog.getByRole("searchbox",{name:"Buscar profesional"}).fill("102");
+ await dialog.getByRole("radio",{name:/^Profesional 102 · Inactivo$/}).click();await assertRevealed();
+ expect(await page.evaluate(()=>window.scrollY)).toBe(y);
+ await selected.focus();await page.keyboard.press("ArrowLeft");await expect(page).toHaveURL(/staff=101/);
+ await page.keyboard.press("ArrowRight");await expect(page).toHaveURL(/staff=102/);await assertRevealed();
+ await page.screenshot({path:info.outputPath("agenda-selection-revealed.png"),fullPage:false});
+ await page.getByRole("button",{name:"Día siguiente"}).click();await expect(page).toHaveURL(/date=2026-10-21.*staff=102/);await assertRevealed();
+ await expectAdminViewport(page);
+ const axe=await new AxeBuilder({page}).withTags(["wcag2a","wcag2aa"]).analyze();expect(axe.violations).toEqual([]);
+});
+
+test("mobile cards show professional then service in one wrapping row for all and filtered results",async({page},info)=>{
+ const longProfessional="María de los Ángeles Fernández de la Torre";
+ const longService="Corte clásico con cuidado de barba y tratamiento completo";
+ const rows=[
+  {name:"Mateo Ruiz",customer:"Karina Díaz",service:"Corte clásico",id:1,status:"ACTIVE",deleted_at:null},
+  {name:"Xavi",customer:longProfessional,service:"Barbitaa",id:2,status:"ACTIVE",deleted_at:null},
+  {name:longProfessional,customer:"Olivia Suárez",service:longService,id:3,status:"INACTIVE",deleted_at:null},
+  {name:"Profesional histórico",customer:"Walter Sosa",service:"Barbitaa",id:999,status:"INACTIVE",deleted_at:"2026-10-19T10:00:00-03:00"},
+ ].map((member,index)=>({...appointments[index],id:index+1,staff_member_id:member.id,
+  starts_at:`2026-10-20T${index<2?"09:00":index===2?"09:30":"10:00"}:00-03:00`,ends_at:`2026-10-20T${index<2?"09:30":index===2?"10:00":"10:30"}:00-03:00`,duration_minutes:30,
+  customer:{...appointments[index].customer,name:member.customer},staff_member:{id:member.id,name:member.name,available:true,status:member.status,deleted_at:member.deleted_at},service_offering:{...appointments[index].service_offering,name:member.service}}));
+ await page.route("**/api/backend/api/v1/staff-members?*",route=>route.fulfill({json:{data:rows.slice(0,3).map(row=>row.staff_member),page:{number:0,size:100,total_elements:3,total_pages:1}}}));
+ await page.route("**/api/backend/api/v1/appointments?*",route=>{
+  const staff=new URL(route.request().url()).searchParams.get("staff_member_id"),data=rows.filter(row=>!staff||String(row.staff_member_id)===staff);
+  return route.fulfill({json:{data,page:{number:0,size:100,total_elements:data.length,total_pages:1}}});
+ });
+ await page.goto("/agenda?date=2026-10-20");
+ await expect(list(page).getByTestId("agenda-appointment")).toHaveCount(4);
+ if(page.viewportSize()!.width>=768){
+  await expect(list(page).getByTestId("agenda-appointment-details")).toHaveCount(0);await expect(list(page).getByText("Corte clásico",{exact:true})).toBeVisible();
+  await filterTrigger(page).click();
+  await expect.poll(()=>page.getByRole("dialog").getByRole("group",{name:"Profesional",exact:true}).getByRole("radio").evaluateAll(inputs=>inputs.map(input=>(input as HTMLInputElement).value))).toEqual(["","1","2","3","999"]);
+  await page.keyboard.press("Escape");
+  await page.screenshot({path:info.outputPath("agenda-desktop-overview.png"),fullPage:false});
+  return;
+ }
+ await expect.poll(()=>page.getByTestId("agenda-professionals").getByRole("radio").evaluateAll(inputs=>inputs.map(input=>(input as HTMLInputElement).value))).toEqual(["","1","2","3","999"]);
+ const first=list(page).getByTestId("agenda-appointment").first(),details=first.getByTestId("agenda-appointment-details");
+ await expect(details).toContainText(/Mateo Ruiz.*Corte clásico/);
+ const staffBox=(await details.getByText("Mateo Ruiz",{exact:true}).boundingBox())!,serviceBox=(await details.getByText("Corte clásico",{exact:true}).boundingBox())!;
+ expect(staffBox.x).toBeLessThan(serviceBox.x);expect(Math.abs(staffBox.y-serviceBox.y)).toBeLessThan(2);
+ await expect(page.getByRole("button",{name:/^Mostrar .* en profesionales$/})).toHaveCount(0);
+ await page.screenshot({path:info.outputPath("agenda-card-metadata-all.png"),fullPage:false});
+ const strip=page.getByTestId("agenda-professionals"),row=strip.locator("[data-filter-options]");
+ await strip.getByRole("radio",{name:"Xavi",exact:true}).click();await expect(page).toHaveURL(/staff=2/);
+ await expect(list(page).getByTestId("agenda-appointment")).toHaveCount(1);
+ await expect(list(page).getByTestId("agenda-appointment-details")).toContainText(/Xavi.*Barbitaa/);
+ await expect(page.getByText("Turnos de Xavi",{exact:true})).toHaveCount(0);
+ await row.evaluate(element=>{element.scrollLeft=0;});
+ await page.clock.runFor(1000);expect(await row.evaluate(element=>element.scrollLeft)).toBe(0);
+ await expect(strip.getByRole("radio",{name:"Xavi",exact:true})).toBeChecked();
+ await expect(strip.getByRole("radio",{name:"Todos",exact:true})).not.toBeChecked();
+ await expect(list(page).getByTestId("agenda-appointment-details")).toContainText("Xavi");
+ await page.screenshot({path:info.outputPath("agenda-card-metadata-filtered.png"),fullPage:false});
+ await strip.getByRole("radio",{name:`${longProfessional} · Inactivo`,exact:true}).click();
+ const longDetails=list(page).getByTestId("agenda-appointment-details");
+ await expect(longDetails).toContainText(longProfessional);await expect(longDetails).toContainText(longService);await expect(longDetails.getByText("Inactivo",{exact:true})).toBeVisible();
+ expect((await longDetails.boundingBox())!.height).toBeGreaterThan(40);
+ await expectAdminViewport(page);
+ await page.screenshot({path:info.outputPath("agenda-card-metadata-long.png"),fullPage:false});
+ await strip.getByRole("radio",{name:"Profesional histórico · Eliminado",exact:true}).click();
+ await expect(list(page).getByTestId("agenda-appointment-details").getByText("Eliminado",{exact:true})).toBeVisible();
+ const axe=await new AxeBuilder({page}).withTags(["wcag2a","wcag2aa"]).analyze();expect(axe.violations).toEqual([]);
+});
+
+test("desktop compact controls leave room for the grid and preserve date and filters",async({page},info)=>{
+ if(page.viewportSize()!.width<768)return;
+ await page.goto("/agenda?date=2026-10-20");await expect(list(page).getByTestId("agenda-appointment")).toHaveCount(106);
+ await expect(page.getByText("Administración",{exact:true})).toHaveCount(0);
+ await expect(page.getByRole("button",{name:"Filtros",exact:true})).toHaveCount(0);
+ const board=page.getByTestId("desktop-agenda-board");expect((await board.boundingBox())!.y).toBeLessThan(420);
+ const heading=page.getByRole("heading",{name:"Martes, 20 de octubre de 2026",exact:true}),date=page.getByLabel("Fecha",{exact:true});
+ expect(Math.abs((await heading.boundingBox())!.y-(await date.boundingBox())!.y)).toBeLessThan(20);
+ await expect(page.getByTestId("agenda-business-hours")).toHaveText(/Horario: 09:00–18:00.*Fuera de horario/);
+ await page.getByRole("combobox",{name:"Estado",exact:true}).selectOption("CONFIRMED");
+ await expect(page).toHaveURL(/status=CONFIRMED/);
+ await filterTrigger(page).click();const chooser=page.getByRole("dialog",{name:"Elegir profesional"});
+ await chooser.getByRole("searchbox",{name:"Buscar profesional"}).fill("Profesional 1");
+ await chooser.getByRole("radio",{name:"Profesional 1",exact:true}).click();
+ await expect(page).toHaveURL(/staff=1.*status=CONFIRMED/);await expect(chooser).toHaveCount(0);
+ await expect(list(page).getByTestId("agenda-appointment")).toHaveCount(7);
+ await page.getByRole("button",{name:"Día siguiente"}).click();await expect(page).toHaveURL(/date=2026-10-21.*staff=1.*status=CONFIRMED/);
+ await expect(filterTrigger(page)).toHaveAccessibleName("Profesional: Profesional 1");
+ await expect(page.getByRole("combobox",{name:"Estado",exact:true})).toHaveValue("CONFIRMED");
+ await page.getByRole("button",{name:"Día anterior"}).click();await expect(list(page).getByTestId("agenda-appointment")).toHaveCount(7);
+ await page.screenshot({path:info.outputPath("agenda-desktop-compact.png"),fullPage:false});
+ await expectAdminViewport(page);
+});
+
+test("desktop long card content scrolls with keyboard while time and status stay visible",async({page},info)=>{
+ if(page.viewportSize()!.width<768)return;
+ const row={...appointments[1],starts_at:"2026-10-20T09:00:00-03:00",ends_at:"2026-10-20T09:30:00-03:00",duration_minutes:30,customer:{...appointments[1].customer,name:"María de los Ángeles Fernández de la Torre ".repeat(5)},service_offering:{...appointments[1].service_offering,name:"Corte y cuidado completo de barba con tratamiento ".repeat(4)}};
+ await page.route("**/api/backend/api/v1/appointments?*",route=>route.fulfill({json:{data:[row],page:{number:0,size:100,total_elements:1,total_pages:1}}}));
+ await page.goto("/agenda?date=2026-10-20");const card=list(page).getByTestId("agenda-appointment");
+ await expect(card).toHaveCount(1);
+ const customer=card.getByText(row.customer.name,{exact:true});
+ await expect(customer).toHaveCSS("text-overflow","ellipsis");await expect(customer).toHaveCSS("white-space","nowrap");
+ expect(await customer.evaluate(element=>element.scrollWidth>element.clientWidth)).toBe(true);
+ await expect(card).toHaveAccessibleName(/María de los Ángeles.*Corte y cuidado completo/);
+ await page.screenshot({path:info.outputPath("agenda-desktop-customer-ellipsis.png"),fullPage:false});
+ await card.focus();await page.keyboard.press("End");
+ await expect.poll(()=>card.evaluate(element=>element.scrollTop)).toBeGreaterThan(0);
+ const header=card.getByTestId("agenda-card-time-status");await expect(header.getByText("Confirmado",{exact:true})).toBeVisible();
+ const headerBox=(await header.boundingBox())!,cardBox=(await card.boundingBox())!;
+ expect(headerBox.y).toBeGreaterThanOrEqual(cardBox.y-1);expect(headerBox.y+headerBox.height).toBeLessThanOrEqual(cardBox.y+cardBox.height);
+ await expect(card).toHaveAttribute("title",/María de los Ángeles.*Corte y cuidado completo/);
+ await page.screenshot({path:info.outputPath("agenda-desktop-card-scroll.png"),fullPage:false});
+ const axe=await new AxeBuilder({page}).withTags(["wcag2a","wcag2aa"]).analyze();expect(axe.violations).toEqual([]);
 });
