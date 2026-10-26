@@ -22,7 +22,7 @@ Usar Java 21/Docker y `make run` en `Turnero-api`; frontend con `TURNERO_API_BAS
 
 El backend incluye `scripts/seed-local-agenda.sql`: ejecutar solo en la DB local con `psql "$DATABASE_URL" -v business_id=ID_DEL_NEGOCIO -v agenda_date=2026-10-20 -f scripts/seed-local-agenda.sql`. Crea 106 turnos ficticios del día, cinco estados, cliente archivado y profesional/servicio histórico; no usa el volumen del benchmark. Ejecutarlo una vez: una segunda ejecución agrega datos adicionales. Ver guía `Turnero-api/docs/referencias/agenda-lectura.md`.
 
-Abrir `/agenda?date=2026-10-20`. Con la muestra local ya normalizada, comprobar los turnos repartidos dentro de los horarios laborales, búsqueda de profesional histórico, todos los estados por defecto, filtros provisionales/aplicar/pills/Limpiar, selector de fecha, anterior/siguiente/Hoy. Navegar a otra sección y comprobar que sus filtros no se mezclan; recargar la URL conserva los de agenda.
+Abrir `/agenda?date=2026-10-20`. Con la muestra local ya normalizada, comprobar los turnos repartidos dentro de los horarios laborales, búsqueda de profesional histórico, todos los estados por defecto, filtros directos desktop, estado provisional mobile, pills/Limpiar, selector de fecha, anterior/siguiente/Hoy. Navegar a otra sección y comprobar que sus filtros no se mezclan; recargar la URL conserva los de agenda.
 
 Revisar 1440×900, 390×844 y 412×915; teclado/foco, nombres largos, scroll horizontal interno de columnas y último elemento sobre la navegación mobile. No hay acciones demo ni disponibilidad. La referencia Stitch conserva colores, shell, cards y badges; los controles usan los patrones compartidos vigentes. Paneles laterales, Semana y CTA de escritura se retiran por alcance.
 
@@ -98,3 +98,42 @@ Verificación (2026-10-23): lint, TypeScript, 271 unitarios, build y 9 E2E de na
 Usar `Turnero-api/scripts/seed-local-appointments.py` mediante `make seed-local-appointments BUSINESS_ID=1` en el backend. Simula por defecto 106 turnos totales entre hoy y los dos días siguientes; `AGENDA_APPLY=1` crea si hay capacidad. Reutiliza catálogo, disponibilidad y POST reales; no reprograma el historial. Guía completa: `Turnero-api/docs/referencias/seed-agenda-local.md`. Si no alcanza la capacidad en esos tres días, reducir el objetivo explícitamente; no se fuerza la DB.
 
 Entrega autorizada el 2026-10-23: el usuario aprobó la agenda y solicitó los PRs backend/frontend. La carga autenticada del nuevo script local sigue pendiente; su cobertura automática usa una API simulada. Integración manual, backend primero.
+
+## Lectura mobile compacta
+
+En 390×844 y 412×915 abrir /agenda?date=2026-10-27: el primer turno debe aparecer antes y los inicios simultáneos comparten un encabezado horario. Las tarjetas conservan nombres completos y muestran el profesional junto a un icono. Al bajar, fecha/Hoy/Filtros y horario siguen accesibles debajo del header; aplicar/quitar filtros conserva su contador y pills visibles. El header debe decir «Agenda del negocio» incluso cuando se consulta otra fecha. Probar navegación, vacío, error/reintento, teclado y último turno por encima del menú inferior. Desktop conserva su grilla y fecha completa.
+
+Verificación mobile (2026-10-24): lint, TypeScript, 272 unitarios y build aprobados; 75 recorridos de agenda y 27 de autenticación aprobados. Capturas: [390×844](qa/turn-70/compact-mobile.png), [412×915](qa/turn-70/compact-mobile-large.png), [barra al bajar](qa/turn-70/sticky-mobile-large.png), [desktop](qa/turn-70/mobile-refinement-desktop.png). Comprobar también el menú de cuenta mientras la barra está fija. QA manual del usuario y publicación pendientes.
+
+## Acceso directo a profesionales en mobile
+
+1. Abrir /agenda?date=2026-10-27 en 390×844 y 412×915. No hay título visible extra; la fila de fecha abre el selector nativo y muestra Ir a hoy cuando corresponde. Fecha completa accesible y año disponible en el selector.
+2. Elegir Xavi en la fila: una sola selección aplica sin diálogo ni pill adicional. Las tarjetas dejan de repetir Xavi. Elegir Todos conserva fecha/estado y vuelve a mostrar el profesional en las tarjetas. Catálogos grandes tienen búsqueda; inactivos/históricos se identifican y seleccionar uno sin resultados muestra el vacío conservando selección.
+3. Abrir Estado: solo aparece ese filtro. Aplicar mantiene profesional; Limpiar dentro del diálogo restablece solo estado. El botón refleja el estado aplicado y contador. No hay Limpiar filtros global redundante en mobile.
+4. Cambiar fecha conserva ambos filtros. Horario del negocio se desplaza con el contenido; fecha/profesionales/estado permanecen accesibles. El menú de cuenta sigue por encima de la barra.
+5. En Hoy con turnos, bajar por la lista y tocar Ahora: el marcador queda visible debajo de la barra y recibe foco, sin perder filtros. Con movimiento reducido no anima. En otra fecha no aparece Ahora.
+6. Desktop conserva grilla y ofrece profesional/estado directos; revisar también Ir a hoy/Hoy. No se modificaron datos del negocio.
+
+Verificación final del acceso directo: lint, TypeScript, 272 unitarios, build y 108 E2E aprobados (Agenda/Auth en los tres tamaños). Capturas: [mobile](qa/turn-70/direct-mobile.png), [412×915](qa/turn-70/direct-mobile-large.png), [selección sin resultados](qa/turn-70/direct-empty-mobile-large.png), [Ahora](qa/turn-70/now-mobile-large.png), [desktop](qa/turn-70/direct-desktop.png). Revisión manual y publicación pendientes.
+
+## Degradados y selección visible
+
+En mobile, recorrer la fila profesional: inicio solo degradado derecho, medio ambos, final solo izquierdo. Con pocos profesionales y todo visible no debe haber degradados; redimensionar recalcula el estado. Elegir uno desde la búsqueda, recargar una URL con staff=ID o navegar con flechas del teclado: el elegido queda resaltado y visible fuera del degradado, sin mover la página. Desplazar la fila manualmente y dejar avanzar el reloj: no debe regresar automáticamente a la selección. La búsqueda conserva nombres completos; el scrollbar nativo mantiene su comportamiento. Verificar también que tocar opciones en los extremos sigue funcionando.
+
+Verificación del 2026-10-25: lint, TypeScript, 272 unitarios, build y 114 E2E aprobados. Capturas: [inicio](qa/turn-70/fades-start-mobile.png), [ambos extremos](qa/turn-70/fades-middle-mobile.png), [final](qa/turn-70/fades-end-mobile.png), [todo visible](qa/turn-70/fades-fit-mobile-large.png), [selección revelada](qa/turn-70/selection-revealed-mobile-large.png). Revisión manual/publicación pendientes.
+
+### Profesional y servicio en una fila mobile
+
+En Todos, comprobar que cada tarjeta muestra horario/estado y cliente destacado, seguido de icono + profesional + separador + servicio. Con nombres cortos, profesional y servicio comparten línea; los nombres largos pueden ocupar varias líneas sin cortarse. Filtrar por un profesional: la fila sigue presente y no aparece «Turnos de {nombre}» sobre los resultados. Mover manualmente el selector hasta ocultar la selección: no debe regresar solo; el nombre sigue en las tarjetas. Comprobar inactivos y eliminados, teclado, ausencia de scroll horizontal de página y último turno visible sobre la navegación. Desktop conserva la grilla y sus tarjetas.
+
+### Orden del selector de profesionales
+
+Comprobar que Todos aparece primero y después los profesionales activos en orden alfabético, seguidos de inactivos, eliminados y no disponibles (cada grupo alfabético). Un inactivo cuyo nombre empiece antes que los activos debe permanecer al final del grupo activo. Su opción y sus turnos históricos siguen disponibles. Verificar también búsqueda, filtro seleccionado y el selector desktop.
+
+### Agenda desktop compacta
+
+En 1440×900, comprobar que Agenda no muestra eyebrow/introducción visual y que fecha/navegación comparten fila. Profesional abre directamente un selector con búsqueda de todo el catálogo; elegir aplica y cierra. Escape cierra sin cambios. Estado aplica inmediatamente. Cambiar fecha conserva ambos; pills y Limpiar permiten restablecer. Horario y leyenda gris son compactos; la grilla debe comenzar antes de los 420 px en este viewport. Verificar errores y reintento de catálogo.
+
+En un turno corto con cliente/servicio largos, enfocar la tarjeta y usar flechas/Inicio/Fin para leer el contenido, o desplazar dentro con mouse; horario y estado permanecen visibles. Hover ofrece texto completo mediante título nativo. No repetir profesional dentro de la tarjeta desktop. Verificar cabeceras/eje sticky, columnas históricas, menú profesional con teclado/axe y que mobile mantenga su presentación.
+
+Con un nombre de cliente largo en desktop, comprobar una sola línea con puntos suspensivos y el servicio debajo. Hover y descripción accesible mantienen el nombre completo; en mobile el nombre continúa completo con salto de línea.

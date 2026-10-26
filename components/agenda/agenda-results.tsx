@@ -1,26 +1,30 @@
-import { useLayoutEffect, useRef } from "react";
+import { UserRound } from "lucide-react";
+import { useLayoutEffect, useRef, type RefObject } from "react";
 import type { BusinessHoursDayFormValues } from "@/lib/business-hours/types";
 import type { SlotIntervalMinutes } from "@/lib/booking-settings/types";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui";
 import { statusLabels, type Appointment } from "@/lib/appointments/api";
 import { businessDate, clockTime, relativeDayLabel } from "@/lib/appointments/dates";
-import { buildTimeline, MINUTE_HEIGHT, professionalCondition } from "@/lib/appointments/timeline";
+import { buildTimeline, groupAppointmentsByStart, MINUTE_HEIGHT, professionalCondition } from "@/lib/appointments/timeline";
 
 export function AgendaAppointmentCard({ appointment: a, timezone, compact = false }: { appointment: Appointment; timezone: string; compact?: boolean }) {
   const nextDay = businessDate(timezone, new Date(a.endsAt)) !== businessDate(timezone, new Date(a.startsAt));
   const condition = professionalCondition(a);
   const description = `${clockTime(a.startsAt, timezone)} – ${clockTime(a.endsAt, timezone)}${nextDay ? " (+1 día)" : ""} · ${a.customerName} · ${a.serviceOfferingName} · ${a.staffMemberName} · ${statusLabels[a.status]}${condition ? ` · ${condition}` : ""}`;
-  return <article className={cn("min-w-0 space-y-2 rounded-lg border-l-4 bg-surface-container-lowest shadow-soft", compact ? "h-full overflow-auto p-3 focus-visible:outline-focus-ring" : "p-4", a.status === "CONFIRMED" || a.status === "COMPLETED" ? "border-tertiary-fixed-dim" : "border-primary")}
+  return <article className={cn("min-w-0 rounded-lg border-l-4 bg-surface-container-lowest shadow-soft", compact ? "h-full space-y-2 overflow-auto p-3 focus-visible:outline-focus-ring" : "space-y-1.5 p-3.5", a.status === "CONFIRMED" || a.status === "COMPLETED" ? "border-tertiary-fixed-dim" : "border-primary")}
     data-testid="agenda-appointment" data-appointment-id={a.id} aria-label={description} title={compact ? description : undefined} tabIndex={compact ? 0 : undefined}>
-    <div className="flex flex-wrap items-center justify-between gap-2"><p className="text-sm font-semibold"><time dateTime={a.startsAt}>{clockTime(a.startsAt, timezone)}</time> – <time dateTime={a.endsAt}>{clockTime(a.endsAt, timezone)}</time>{nextDay ? " (+1 día)" : ""}</p><Badge tone={a.status === "PENDING" ? "pending" : a.status === "CONFIRMED" || a.status === "COMPLETED" ? "positive" : "neutral"}>{statusLabels[a.status]}</Badge></div>
-    <p className="break-words font-semibold">{a.customerName}</p>
-    <p className="break-words text-sm text-on-surface-variant">{a.serviceOfferingName}</p>
-    {!compact ? <div className="flex flex-wrap items-center gap-2"><p className="break-words text-sm text-on-surface-variant">{a.staffMemberName}</p>{condition ? <Badge tone="neutral">{condition}</Badge> : null}</div> : null}
+    <div data-testid="agenda-card-time-status" className={cn("flex flex-wrap items-center justify-between gap-2", compact && "sticky -top-3 z-10 -mx-3 bg-surface-container-lowest px-3 py-1")}><p className="text-sm font-semibold"><time dateTime={a.startsAt}>{clockTime(a.startsAt, timezone)}</time> – <time dateTime={a.endsAt}>{clockTime(a.endsAt, timezone)}</time>{nextDay ? " (+1 día)" : ""}</p><Badge tone={a.status === "PENDING" ? "pending" : a.status === "CONFIRMED" || a.status === "COMPLETED" ? "positive" : "neutral"}>{statusLabels[a.status]}</Badge></div>
+    <p className={cn("font-semibold", compact ? "truncate" : "break-words")}>{a.customerName}</p>
+    {compact ? <p className="break-words text-sm text-on-surface-variant">{a.serviceOfferingName}</p> :
+      <div className="flex min-w-0 items-start gap-1.5 text-sm text-on-surface-variant" data-testid="agenda-appointment-details">
+        <UserRound aria-hidden="true" className="mt-0.5 size-3.5 shrink-0" />
+        <p className="min-w-0 break-words"><span className="font-medium">{a.staffMemberName}</span>{condition ? <> <Badge tone="neutral">{condition}</Badge></> : null}<span aria-hidden="true"> · </span><span className="sr-only">. Servicio: </span><span>{a.serviceOfferingName}</span></p>
+      </div>}
   </article>;
 }
 
-export function AgendaResults({ appointments, timezone, date, now, slotIntervalMinutes, businessHours }: { appointments: Appointment[]; timezone: string; date: string; now: number | null; slotIntervalMinutes: SlotIntervalMinutes; businessHours: BusinessHoursDayFormValues }) {
+export function AgendaResults({ appointments, timezone, date, now, slotIntervalMinutes, businessHours, mobileNowRef }: { appointments: Appointment[]; timezone: string; date: string; now: number | null; slotIntervalMinutes: SlotIntervalMinutes; businessHours: BusinessHoursDayFormValues; mobileNowRef?: RefObject<HTMLParagraphElement|null> }) {
   const timeline = buildTimeline(appointments, timezone, date, now, slotIntervalMinutes, businessHours);
   const boardRef = useRef<HTMLDivElement>(null);
   const positionedSelection = useRef<string | null>(null);
@@ -43,11 +47,11 @@ export function AgendaResults({ appointments, timezone, date, now, slotIntervalM
   const axisLabelHeight = 28;
   const height = (timeline.end - timeline.start) * MINUTE_HEIGHT + axisLabelHeight;
   const currentLabel = now === null ? "" : clockTime(new Date(now).toISOString(), timezone);
-  const marker = <p role="note" aria-label={`Hora actual ${currentLabel}`} className="flex items-center gap-3 text-sm font-semibold text-primary"><span className="size-2 rounded-full bg-primary" />Ahora · {currentLabel}<span className="h-px flex-1 bg-primary" /></p>;
-  const mobileMarkerIndex = timeline.current === null ? -1 : timeline.ordered.findIndex(a => Date.parse(a.startsAt) >= now!);
+  const marker = <p ref={mobileNowRef} tabIndex={-1} role="note" aria-label={`Hora actual ${currentLabel}`} className="flex items-center gap-3 text-sm font-semibold text-primary"><span className="size-2 rounded-full bg-primary" />Ahora · {currentLabel}<span className="h-px flex-1 bg-primary" /></p>;
+  const mobileGroups = groupAppointmentsByStart(timeline.ordered);
+  const mobileMarkerIndex = timeline.current === null ? -1 : mobileGroups.findIndex(group => Date.parse(group.startsAt) >= now!);
   const bandStyle = (band: { start: number; end: number }) => ({ top: (band.start - timeline.start) * MINUTE_HEIGHT, height: (band.end - band.start) * MINUTE_HEIGHT + (band.end === timeline.end ? axisLabelHeight : 0) });
   return <>
-    <p className="mb-3 text-sm text-on-surface-variant" data-testid="agenda-business-hours">{businessHours.isClosed ? "Negocio cerrado en esta fecha" : `Horario del negocio: ${businessHours.opensAt}–${businessHours.closesAt}`}<span className="hidden md:inline"> · Gris: fuera del horario del negocio</span></p>
     <div className="hidden min-w-0 max-w-full overflow-auto overscroll-contain rounded-xl border border-outline-variant bg-surface-container-lowest focus-visible:outline-focus-ring md:block" style={{ maxHeight: "min(72vh, 900px)" }}
       ref={boardRef} tabIndex={0} role="region" aria-label={`Agenda por profesional, escala de ${slotIntervalMinutes} minutos`} data-testid="desktop-agenda-board">
       <div style={{ minWidth }}>
@@ -84,6 +88,14 @@ export function AgendaResults({ appointments, timezone, date, now, slotIntervalM
         </div>
       </div>
     </div>
-    <div className="space-y-4 md:hidden" data-testid="mobile-agenda-list">{timeline.ordered.map((a, index) => <div key={a.id} className="space-y-4">{index === mobileMarkerIndex ? marker : null}<AgendaAppointmentCard appointment={a} timezone={timezone} /></div>)}{timeline.current !== null && mobileMarkerIndex < 0 ? marker : null}</div>
+    <div className="space-y-5 md:hidden" data-testid="mobile-agenda-list">{mobileGroups.map((group, index) => {
+      const label = clockTime(group.startsAt, timezone);
+      const repeated = mobileGroups.filter(other => clockTime(other.startsAt, timezone) === label).length > 1;
+      const offset = repeated ? new Intl.DateTimeFormat("es", { timeZone: timezone, timeZoneName: "shortOffset" }).formatToParts(new Date(group.startsAt)).find(part => part.type === "timeZoneName")?.value : "";
+      return <div key={group.startsAt} className="space-y-2">{index === mobileMarkerIndex ? marker : null}<section aria-label={`Turnos de las ${label}${offset ? ` ${offset}` : ""}`} data-testid="agenda-time-group" className="space-y-2">
+        <h3 className="flex items-center gap-3 text-sm font-semibold tabular-nums text-on-surface-variant"><time dateTime={group.startsAt}>{label}{offset ? ` ${offset}` : ""}</time><span aria-hidden="true" className="h-px flex-1 bg-outline-variant" /></h3>
+        {group.items.map(a => <AgendaAppointmentCard key={a.id} appointment={a} timezone={timezone} />)}
+      </section></div>;
+    })}{timeline.current !== null && mobileMarkerIndex < 0 ? marker : null}</div>
   </>;
 }

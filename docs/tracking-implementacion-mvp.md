@@ -544,3 +544,60 @@ Corrección final del margen (2026-10-22): un intervalo por extremo y gris hasta
 - Backend TURN-90: [PR #87](https://github.com/Candela-98/Turnero-api/pull/87), `feature/TURN-90-agenda-read` → `develop`.
 - Frontend TURN-70: [PR #20](https://github.com/Candela-98/Turnero-frontend/pull/20), `feature/TURN-70-real-agenda` → `dev`.
 - Aprobación manual y publicación autorizadas por el usuario. Integrar backend #87 antes de frontend #20. El script local conserva pendiente su ejecución autenticada real; 15 pruebas simuladas aprobadas. PR #85 excluido. Sin consultar CI ni realizar merge automático.
+
+### Legibilidad de agenda mobile (2026-10-24)
+
+- Implementación local en feat/agenda-mobile-readability: header compacto solo en Agenda mobile mediante prop compartida, fecha abreviada visible con nombre accesible completo/año en selector y barra sticky bajo el header con navegación, Hoy, Filtros/contador, pills en fila desplazable y horario. «Agenda del negocio» reemplaza el subtítulo relativo que era incorrecto en otras fechas.
+- Lista cronológica agrupada por instante de inicio con encabezados horarios, preservando grupos separados/offset durante DST; tarjetas con menos espacio, rango completo, cliente sin truncar, servicio y profesional con icono/condición. Desktop conserva grilla, encabezado completo y controles. El shell comparte altura del header mediante variable CSS.
+- QA: lint, TypeScript, 272 unitarios y build aprobados; los 75 E2E de agenda pasan. Smokes de autenticación: 27 aprobados tras aislar respuestas API y precisar el selector de título Servicios. Se detectó/corrigió superposición del menú de cuenta por la barra sticky, dando prioridad al header; cobertura de click real/trial del menú después de scroll y logout. Repetición final de los 27 smokes más 3 recorridos de nueva UI: 30/30, sin omisiones.
+- Capturas revisadas en 1440×900, 390×844 y 412×915: compact-mobile*.png, sticky-mobile*.png y mobile-refinement-desktop.png en docs/qa/turn-70. Teclado/axe, filtros, nombres largos, primer turno más arriba, contención horizontal y último turno sobre navegación inferior verificados. Guía/patrones actualizados. Revisión manual y publicación pendientes; sin cambios backend/DB ni consulta de CI.
+
+### Navegación mobile y profesionales de un toque (2026-10-24)
+
+- Refinamiento adicional local en feat/agenda-mobile-readability: H1 accesible sin título visible mobile, fecha nativa compacta en una fila, Ir a hoy/Hoy dinámico por negocio, fila profesional con selección inmediata y búsqueda de catálogo grande, condiciones históricas y catálogo completo. Referencias históricas conservadas en caché de consultas del negocio; Todos cambia solo profesional, sin afectar fecha/estado.
+- Estado queda en diálogo separado en mobile con borrador, contador y etiqueta aplicada; Limpiar afecta solo estado. Sin pills de profesional ni Limpiar global redundante en mobile. Tarjetas filtradas omiten el nombre profesional visible repetido y mantienen condición/descripción accesible. Horario del negocio fuera de barra fija. Ahora solo en Hoy con resultados: scroll/foco al marcador debajo de la barra, con movimiento reducido respetado. Desktop mantiene grilla y diálogo combinado, con texto Ir a hoy/Hoy consistente.
+- QA final: lint sin warnings, TypeScript, 272 unitarios y build aprobados; ejecución completa de Agenda/Auth con 108 E2E aprobados en 1440×900, 390×844 y 412×915. Cubre búsqueda después del primer centenar, selección histórica/inactiva sin resultados, filtros independientes y conservación al navegar, native date, labels de Hoy, Ahora, menú de cuenta, scroll horizontal acotado y eje/lista sin pérdidas. Los controles de selección inmediata se prueban con click + espera del URL/resultado; no se exige confirmación síncrona antes de completar la navegación.
+- Capturas finales direct-*.png, direct-empty-*.png, now-*.png y direct-desktop.png revisadas y conservadas en docs/qa/turn-70. Patrones y guía actualizados. Sin cambios backend/DB, CI ni publicación; revisión manual pendiente.
+
+### Degradados y selección profesional visible (2026-10-25)
+
+- Implementación local sobre feat/agenda-mobile-readability: FilterOptionGroup ofrece degradados opcionales en layout scroll, activados solo para profesionales de Agenda. Señala contenido oculto en inicio/medio/final y desaparece cuando todo entra. Observa scroll, ancho y opciones (incluidos cambios de fuente) sin capturar eventos de puntero; conserva navegación nativa, scrollbar y resaltado.
+- Selección revelada con margen frente a los degradados, desplazando solo la fila. Cubre cambios de catálogo tras una carga demorada, búsqueda, URL/recarga y teclado; al redimensionar revela la selección si hace falta. Las actualizaciones de reloj no reinician el scroll manual. Para etiquetas mayores que el ancho útil se alinea el inicio; búsqueda con nombre completo disponible.
+- QA final: lint, TypeScript, 272 unitarios, build y 114 E2E de Agenda/Auth aprobados en 1440×900, 390×844 y 412×915. Nuevos escenarios cubren extremos, ambos lados, ausencia de overflow y resize, selección fuera de primer centenar, resaltado, carga demorada, búsqueda, recarga, teclado, URL, conservación de scroll y axe. Capturas revisadas fades-{start,middle,end,fit}-mobile*.png y selection-revealed-mobile*.png en docs/qa/turn-70; guía y patrones actualizados.
+- Cambios locales pendientes de revisión manual/publicación. Sin modificaciones backend/DB ni consulta de CI.
+
+### Contexto del profesional seleccionado en mobile (2026-10-25)
+
+Implementado localmente «Turnos de {nombre}» sobre los resultados. Revela y focaliza el radio seleccionado con preventScroll, reutilizando el cálculo de márgenes/degradados de la fila. No cambia URL, fecha, estado ni scroll vertical; el desplazamiento horizontal manual posterior se conserva. Se omite en Todos y desktop. Patrones y guía local actualizados.
+
+QA automática: lint, TypeScript, 272 unitarios, build aislado y 90 E2E de Agenda aprobados en desktop 1440×900 y mobile 390×844 / 412×915. Capturas revisadas en `docs/qa/turn-70/professional-context-mobile.png` y `professional-context-mobile-large.png`. Pendiente aprobación visual del usuario y publicación; sin cambios de backend, DB o integración y sin consultar CI.
+
+### Tarjetas mobile con profesional y servicio en la misma fila (2026-10-25)
+
+Revisión aprobada por el usuario: icono actual + profesional con peso medio + condición histórica si corresponde + separador + servicio en la misma fila con salto natural. Siempre visible en Todos y con filtro profesional. Se mantienen horario, badge y cliente destacado; nombres completos, descripción accesible y etiquetas Inactivo/Eliminado/No disponible. Se retira «Turnos de {nombre}» y su acción/ref imperativa, reemplazando la mejora anterior de contexto externo. Se conservan degradados, selección resaltada, revelado al seleccionar y scroll manual posterior. Desktop conserva su presentación.
+
+QA: lint, TypeScript, 272 unitarios, build aislado y 90 E2E de Agenda aprobados en 1440×900, 390×844 y 412×915. Capturas revisadas en `docs/qa/turn-70/card-metadata-{all,filtered,long}-{mobile,mobile-large}.png`. Patrones y guía local actualizados. Cambios locales pendientes de revisión visual del usuario y publicación; sin cambios de backend/DB ni consulta de CI.
+
+### Prioridad de activos en el selector de Agenda (2026-10-25)
+
+Corregido el orden alfabético global que dejaba inactivos antes de los activos. Todos permanece primero; después activos, inactivos, eliminados y no disponibles. Orden alfabético en español e ID dentro de cada grupo. Se comparte en la fila mobile, búsqueda y diálogo desktop; conserva selección y referencias históricas. No modifica el orden de turnos/columnas ni datos persistidos.
+
+QA: lint, TypeScript, 272 unitarios, build aislado y 90 E2E de Agenda aprobados. Verificado orden de activos antes que un inactivo de nombre alfabéticamente anterior, seguido por eliminado, en los tres viewports. Capturas de tarjetas actualizadas. Pendiente publicación; sin consultar CI.
+
+### Agenda desktop: distribución compacta y filtros directos (2026-10-25)
+
+Implementado encabezado compacto opt-in en AdminPageHeader: título visible, descripción accesible y sin eyebrow/introducción visual. Fecha legible y navegación en una fila; profesional en Popover con búsqueda del catálogo completo y selección inmediata, estado en Select nativo inmediato. Conserva fecha/otro filtro, pills, Limpiar y reintentos. Leyenda compacta de horario/muestra gris. Grilla inicia aproximadamente a 290 px en 1440×900 sin filtros aplicados, conserva cabeceras/eje sticky y scroll propio. Tarjetas conservan cliente/servicio completos desplazables con teclado/mouse y título nativo; horario/estado quedan sticky dentro de cada tarjeta. Sin repetir profesional dentro de ellas ni abrir detalle TURN-73. Mobile conserva su flujo.
+
+QA: lint, TypeScript, 272 unitarios, build aislado y 123 E2E Agenda/Auth aprobados en los tres viewports. Pruebas de selección inmediata, catálogo paginado/búsqueda, Escape/foco, navegación que conserva filtros, umbral de inicio de grilla, tarjeta con contenido largo desplazada por teclado y cabecera visible, axe y sesión. Capturas revisadas: `desktop-compact-overview.png`, `desktop-direct-filters.png`, `desktop-card-scroll.png` en `docs/qa/turn-70`. Patrones y guía local actualizados. Implementación y QA automática completas; pendiente revisión visual del usuario y publicación. Sin cambios de backend/DB ni consulta de CI.
+
+### Nombre de cliente en una línea en tarjetas desktop (2026-10-25)
+
+Ajuste solicitado: nombre del cliente con ellipsis en una sola línea solo en desktop para reservar espacio al servicio. Texto completo conservado en DOM, aria-label y título nativo de hover. Mobile mantiene salto de línea y nombre completo; profesional sigue en la cabecera de columna.
+
+QA: lint, TypeScript, 272 unitarios, build aislado y 9 E2E afectados aprobados en los tres viewports. Verificados ellipsis real, texto accesible completo, servicio, scroll de teclado con horario/estado sticky y conservación de tarjetas mobile. Captura `docs/qa/turn-70/desktop-customer-ellipsis.png` revisada y capturas overview/scroll actualizadas. Cambios locales sin publicar.
+
+### Entrega de mejoras de Agenda — TURN-70 (2026-10-25)
+
+El usuario revisó las capturas mobile y desktop, aprobó la distribución y los ajustes finales y solicitó abrir los PRs. Se prepara una única entrega frontend contra dev: barra mobile compacta/sticky, profesionales directos ordenados por condición con búsqueda y degradados, tarjetas agrupadas por horario con profesional/servicio en una fila, Ir a hoy/Hoy y Ahora; desktop con filtros inmediatos, encabezado compacto y nombres de clientes con ellipsis accesible. Backend limpio, sin entrega adicional.
+
+Validaciones previas: lint, TypeScript, 272 unitarios, build aislado; 123 E2E Agenda/Auth en los tres viewports y 9 E2E afectados tras el ajuste final de ellipsis. Revisión visual del usuario completada. Publicación del PR en curso; integración pendiente, sin consultar CI ni mergear.

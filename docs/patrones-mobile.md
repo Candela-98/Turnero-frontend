@@ -63,3 +63,35 @@ La agenda consulta el intervalo con key aislada por negocio, cancelación y lect
 La agenda muestra el horario del negocio de la fecha seleccionada o «Negocio cerrado en esta fecha» sobre la lista mobile. Los márgenes grisados son contexto de la grilla desktop: no agregar tarjetas vacías ni márgenes de la grilla a la lista.
 
 El botón «Hoy» de Agenda usa `subtle` con texto primary y `aria-current="date"` cuando la fecha seleccionada coincide con la fecha actual del negocio; permanece habilitado y conserva su nombre. En otras fechas usa `outline` sin aria-current. El badge junto a la fecha se conserva; el estado también responde a anterior/siguiente y al selector de fecha.
+
+### Agenda mobile — lectura compacta (2026-10-24)
+
+Usar AdminPageHeader con compactOnMobile para conservar el título y omitir eyebrow/descripción en mobile sin alterar desktop. La barra de contexto de Agenda combina fecha corta visible (nombre accesible completo y año en selector), anterior/siguiente/Hoy, Filtros con contador y chips aplicados en una sola fila desplazable, y horario del negocio. Permanece sticky bajo el header del shell usando la variable compartida --admin-mobile-header-height; no agregar otro shell ni duplicar controles o consultas. Header del shell: «Agenda del negocio», independiente del día consultado.
+
+La lista cronológica agrupa inicios simultáneos por instante con secciones y encabezados horarios. Horas locales repetidas en DST se mantienen en grupos distintos con offset. Conservar rango completo y cruce de medianoche en cada tarjeta, nombres completos, servicio, profesional con icono y condición histórica. Reducir padding/espaciado sin ocultar información ni targets de navegación/filtros; marcador Ahora queda entre grupos. Desktop mantiene grilla temporal y navegación existentes. Verificar sticky al scrollear, filtros/teclado/axe, textos largos y último turno sobre navegación inferior.
+
+### Agenda mobile — profesionales directos (2026-10-24)
+
+El título de Agenda permanece accesible y se oculta visualmente solo en mobile. Navegación en una fila con fecha abreviada sobre input date nativo accesible (año en selector y descripción completa), anterior/siguiente e «Ir a hoy»; este último cambia a «Hoy» resaltado si corresponde a la fecha del negocio. Mantener una sola instancia de cada control según viewport.
+
+Segunda fila de profesionales con selección única nativa: Todos y catálogo completo paginado; un toque navega con el profesional, sin aplicar en otro diálogo. Catálogos grandes ofrecen búsqueda en ResponsiveDialog con selección inmediata. Identificar inactivos/eliminados/no disponibles y conservar referencias históricas de consultas del negocio en la caché de sesión, sin mezclar negocios. Todos elimina solo profesional y conserva estado/fecha. No repetir pill profesional ni Limpiar filtros en mobile. Estado tiene su propio diálogo provisional, contador y etiqueta aplicada; Limpiar de ese diálogo solo restablece estado.
+
+Barra sticky con fecha, profesionales y acceso al estado. Horario del negocio queda fuera de la barra. «Ahora» aparece solo en Hoy con resultados y desplaza/focaliza el marcador por debajo de la barra, respetando movimiento reducido. Las tarjetas mobile siempre muestran icono, profesional y servicio en una fila que admite salto de línea, incluyendo el profesional seleccionado y su condición histórica. Desktop conserva la grilla y ofrece controles directos de profesional y estado; el texto Ir a hoy/Hoy es consistente en ambos tamaños.
+
+### Señales de desplazamiento en profesionales (2026-10-25)
+
+La fila mobile muestra degradados decorativos de 16 px solo donde hay opciones ocultas: derecha al inicio, ambos en el medio e izquierda al final. Si todo entra, no muestra ninguno. Recalcular ante scroll, cambios de catálogo, fuentes o ancho del contenedor; los degradados no capturan puntero ni afectan teclado/swipe. La selección se revela moviendo solo la fila, con margen para no quedar cubierta por los degradados. Recalcular al cambiar valor/catálogo y al variar dimensiones, incluyendo URL, recarga, búsqueda y carga tardía. No reiniciar el desplazamiento manual en actualizaciones del reloj. Si un nombre excepcional supera el ancho útil de la fila, alinear su inicio sin forzar el ancho o scroll de la página; la búsqueda mantiene disponible el nombre completo.
+
+### Profesional y servicio en la tarjeta mobile (2026-10-25)
+
+Cada tarjeta mantiene horario, estado y cliente destacado; debajo muestra el icono UserRound, el nombre del profesional con peso medio, su condición histórica cuando corresponde, un separador y el servicio en texto secundario. Es una sola fila de texto con salto natural, nombres completos y sin truncado ni ancho fijo. Mismo comportamiento en Todos y con profesional filtrado. La descripción accesible conserva todos los datos. Se retira el contexto externo «Turnos de {nombre}» y su acceso para revelar la opción; el contexto vive en cada tarjeta. La selección del profesional, degradados y revelado al cambiar de opción se mantienen, sin reiniciar el scroll manual posterior. Desktop conserva grilla y lectura por columna, con horario/estado sticky dentro de cada tarjeta desplazable.
+
+En los selectores de profesionales de Agenda, Todos permanece primero, seguido por activos, inactivos, eliminados y no disponibles, en ese orden. Cada grupo se ordena alfabéticamente en español con ID como desempate. Se mantienen las referencias históricas y la selección existente; no cambiar el orden de los turnos ni de las columnas desktop.
+
+### Agenda desktop compacta (2026-10-25)
+
+AdminPageHeader admite compact: conserva título y descripción accesible, omite eyebrow y descripción visual y reduce margen/tamaño de título. Es opt-in de Agenda. Fecha legible, anterior/siguiente, date nativo e Ir a hoy/Hoy comparten fila con wrap en anchos intermedios. Debajo, profesional abre un Popover accesible con catálogo completo, búsqueda y selección inmediata; estado usa Select nativo de cinco estados más Todos, también inmediato. Ambos mantienen URL, fecha y el otro filtro; pills y Limpiar permiten deshacer. No hay diálogo general de Filtros en desktop. Errores del catálogo mantienen agenda y reintento.
+
+Leyenda compacta de horario y muestra gris decorativa con texto Fuera de horario. Grilla comienza más arriba y conserva desplazamiento interno, cabeceras sticky y eje horario fijo. Tarjetas desktop siguen sin repetir profesional (lo aporta la columna); el contenedor es desplazable por mouse/teclado y su cabecera de horario/estado queda sticky durante ese desplazamiento. Título nativo y descripción accesible conservan datos completos; no abre un detalle de turno. Mobile mantiene filas y filtros aprobados.
+
+En tarjetas desktop, el cliente ocupa una sola línea con puntos suspensivos para reservar espacio al servicio. Se conserva el texto completo en el DOM, la descripción accesible y el título nativo de hover. El profesional lo aporta la columna. Mobile mantiene el cliente completo con salto de línea.
