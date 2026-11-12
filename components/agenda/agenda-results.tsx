@@ -1,4 +1,5 @@
 import { UserRound } from "lucide-react";
+import { Tooltip } from "radix-ui";
 import { useLayoutEffect, useRef, type RefObject } from "react";
 import type { BusinessHoursDayFormValues } from "@/lib/business-hours/types";
 import type { SlotIntervalMinutes } from "@/lib/booking-settings/types";
@@ -12,16 +13,20 @@ export function AgendaAppointmentCard({ appointment: a, timezone, compact = fals
   const nextDay = businessDate(timezone, new Date(a.endsAt)) !== businessDate(timezone, new Date(a.startsAt));
   const condition = professionalCondition(a);
   const description = `${clockTime(a.startsAt, timezone)} – ${clockTime(a.endsAt, timezone)}${nextDay ? " (+1 día)" : ""} · ${a.customerName} · ${a.serviceOfferingName} · ${a.staffMemberName} · ${statusLabels[a.status]}${condition ? ` · ${condition}` : ""}`;
-  return <article className={cn("min-w-0 rounded-lg border-l-4 bg-surface-container-lowest shadow-soft", compact ? "h-full space-y-2 overflow-auto p-3 focus-visible:outline-focus-ring" : "space-y-1.5 p-3.5", a.status === "CONFIRMED" || a.status === "COMPLETED" ? "border-tertiary-fixed-dim" : "border-primary")}
-    data-testid="agenda-appointment" data-appointment-id={a.id} aria-label={description} title={compact ? description : undefined} tabIndex={compact ? 0 : undefined}>
-    <div data-testid="agenda-card-time-status" className={cn("flex flex-wrap items-center justify-between gap-2", compact && "sticky -top-3 z-10 -mx-3 bg-surface-container-lowest px-3 py-1")}><p className="text-sm font-semibold"><time dateTime={a.startsAt}>{clockTime(a.startsAt, timezone)}</time> – <time dateTime={a.endsAt}>{clockTime(a.endsAt, timezone)}</time>{nextDay ? " (+1 día)" : ""}</p><Badge tone={a.status === "PENDING" ? "pending" : a.status === "CONFIRMED" || a.status === "COMPLETED" ? "positive" : "neutral"}>{statusLabels[a.status]}</Badge></div>
-    <p className={cn("font-semibold", compact ? "truncate" : "break-words")}>{a.customerName}</p>
-    {compact ? <p className="break-words text-sm text-on-surface-variant">{a.serviceOfferingName}</p> :
-      <div className="flex min-w-0 items-start gap-1.5 text-sm text-on-surface-variant" data-testid="agenda-appointment-details">
-        <UserRound aria-hidden="true" className="mt-0.5 size-3.5 shrink-0" />
-        <p className="min-w-0 break-words"><span className="font-medium">{a.staffMemberName}</span>{condition ? <> <Badge tone="neutral">{condition}</Badge></> : null}<span aria-hidden="true"> · </span><span className="sr-only">. Servicio: </span><span>{a.serviceOfferingName}</span></p>
-      </div>}
+  const short = compact && a.durationMinutes < 30;
+  const card = <article className={cn("min-w-0 rounded-lg border-l-4 bg-surface-container-lowest shadow-soft", compact ? short ? "h-full overflow-hidden px-2 py-1 focus-visible:outline-focus-ring" : "h-full space-y-1 overflow-hidden p-3 focus-visible:outline-focus-ring" : "space-y-1.5 p-3.5", a.status === "CONFIRMED" || a.status === "COMPLETED" ? "border-tertiary-fixed-dim" : "border-primary")}
+    data-testid="agenda-appointment" data-appointment-id={a.id} aria-label={description} tabIndex={compact ? 0 : undefined}>
+    <div data-testid="agenda-card-time-status" className={cn("flex items-center justify-between gap-2", !compact && "flex-wrap")}><p className={cn("min-w-0 truncate font-semibold", short ? "text-xs" : "text-sm")}><time dateTime={a.startsAt}>{clockTime(a.startsAt, timezone)}</time> – <time dateTime={a.endsAt}>{clockTime(a.endsAt, timezone)}</time>{nextDay ? " (+1 día)" : ""}</p><Badge className={cn("shrink-0", short && "min-h-0 px-2 py-1 text-[10px]")} tone={a.status === "PENDING" ? "pending" : a.status === "CONFIRMED" || a.status === "COMPLETED" ? "positive" : "neutral"}>{statusLabels[a.status]}</Badge></div>
+    {short ? <div className="flex min-w-0 items-center gap-1 text-xs leading-4" data-testid="agenda-short-card-details"><span className="min-w-0 flex-1 truncate font-semibold">{a.customerName}</span><span aria-hidden="true">·</span><span className="min-w-0 flex-1 truncate text-on-surface-variant">{a.serviceOfferingName}</span></div> : <>
+      <p className={cn("font-semibold", compact ? "truncate" : "break-words")}>{a.customerName}</p>
+      {compact ? <p className="truncate text-sm text-on-surface-variant">{a.serviceOfferingName}</p> :
+        <div className="flex min-w-0 items-start gap-1.5 text-sm text-on-surface-variant" data-testid="agenda-appointment-details">
+          <UserRound aria-hidden="true" className="mt-0.5 size-3.5 shrink-0" />
+          <p className="min-w-0 break-words"><span className="font-medium">{a.staffMemberName}</span>{condition ? <> <Badge tone="neutral">{condition}</Badge></> : null}<span aria-hidden="true"> · </span><span className="sr-only">. Servicio: </span><span>{a.serviceOfferingName}</span></p>
+        </div>}
+    </>}
   </article>;
+  return compact ? <Tooltip.Provider delayDuration={300}><Tooltip.Root><Tooltip.Trigger asChild>{card}</Tooltip.Trigger><Tooltip.Portal><Tooltip.Content side="top" sideOffset={6} collisionPadding={12} className="z-50 max-w-80 rounded-md bg-on-surface px-3 py-2 text-sm text-surface shadow-soft" data-testid="agenda-card-tooltip">{description}<Tooltip.Arrow className="fill-on-surface" /></Tooltip.Content></Tooltip.Portal></Tooltip.Root></Tooltip.Provider> : card;
 }
 
 export function AgendaResults({ appointments, timezone, date, now, slotIntervalMinutes, businessHours, mobileNowRef }: { appointments: Appointment[]; timezone: string; date: string; now: number | null; slotIntervalMinutes: SlotIntervalMinutes; businessHours: BusinessHoursDayFormValues; mobileNowRef?: RefObject<HTMLParagraphElement|null> }) {

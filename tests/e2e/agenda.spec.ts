@@ -594,23 +594,26 @@ test("desktop compact controls leave room for the grid and preserve date and fil
  await expectAdminViewport(page);
 });
 
-test("desktop long card content scrolls with keyboard while time and status stay visible",async({page},info)=>{
+test("desktop short and regular appointments show their details without inner scroll",async({page},info)=>{
  if(page.viewportSize()!.width<768)return;
- const row={...appointments[1],starts_at:"2026-10-20T09:00:00-03:00",ends_at:"2026-10-20T09:30:00-03:00",duration_minutes:30,customer:{...appointments[1].customer,name:"María de los Ángeles Fernández de la Torre ".repeat(5)},service_offering:{...appointments[1].service_offering,name:"Corte y cuidado completo de barba con tratamiento ".repeat(4)}};
- await page.route("**/api/backend/api/v1/appointments?*",route=>route.fulfill({json:{data:[row],page:{number:0,size:100,total_elements:1,total_pages:1}}}));
- await page.goto("/agenda?date=2026-10-20");const card=list(page).getByTestId("agenda-appointment");
- await expect(card).toHaveCount(1);
- const customer=card.getByText(row.customer.name,{exact:true});
- await expect(customer).toHaveCSS("text-overflow","ellipsis");await expect(customer).toHaveCSS("white-space","nowrap");
- expect(await customer.evaluate(element=>element.scrollWidth>element.clientWidth)).toBe(true);
- await expect(card).toHaveAccessibleName(/María de los Ángeles.*Corte y cuidado completo/);
- await page.screenshot({path:info.outputPath("agenda-desktop-customer-ellipsis.png"),fullPage:false});
- await card.focus();await page.keyboard.press("End");
- await expect.poll(()=>card.evaluate(element=>element.scrollTop)).toBeGreaterThan(0);
- const header=card.getByTestId("agenda-card-time-status");await expect(header.getByText("Confirmado",{exact:true})).toBeVisible();
- const headerBox=(await header.boundingBox())!,cardBox=(await card.boundingBox())!;
- expect(headerBox.y).toBeGreaterThanOrEqual(cardBox.y-1);expect(headerBox.y+headerBox.height).toBeLessThanOrEqual(cardBox.y+cardBox.height);
- await expect(card).toHaveAttribute("title",/María de los Ángeles.*Corte y cuidado completo/);
- await page.screenshot({path:info.outputPath("agenda-desktop-card-scroll.png"),fullPage:false});
+ const longName="María de los Ángeles Fernández de la Torre ".repeat(3),longService="Barba premium y tratamiento completo ".repeat(3);
+ const rows=[15,20,30].map((duration,index)=>({...appointments[index],id:index+1,starts_at:"2026-10-20T09:00:00-03:00",ends_at:`2026-10-20T09:${String(duration).padStart(2,"0")}:00-03:00`,duration_minutes:duration,customer:{...appointments[index].customer,name:longName},service_offering:{...appointments[index].service_offering,name:longService}}));
+ await page.route("**/api/backend/api/v1/appointments?*",route=>route.fulfill({json:{data:rows,page:{number:0,size:100,total_elements:3,total_pages:1}}}));
+ await page.goto("/agenda?date=2026-10-20");const cards=list(page).getByTestId("agenda-appointment");await expect(cards).toHaveCount(3);
+ const short=cards.nth(0),medium=cards.nth(1),regular=cards.nth(2);
+ for(const card of [short,medium,regular]){
+  await expect(card).toHaveCSS("overflow-y","hidden");
+  await expect(card.getByText(longName,{exact:true})).toBeVisible();await expect(card.getByText(longService,{exact:true})).toBeVisible();
+  await expect(card).toHaveAccessibleName(/María de los Ángeles.*Barba premium/);
+  const bounds=(await card.boundingBox())!;
+  for(const text of [card.getByText(longName,{exact:true}),card.getByText(longService,{exact:true}),card.getByTestId("agenda-card-time-status")]){
+   const box=(await text.boundingBox())!;expect(box.y).toBeGreaterThanOrEqual(bounds.y-1);expect(box.y+box.height).toBeLessThanOrEqual(bounds.y+bounds.height+1);
+  }
+ }
+ expect((await short.boundingBox())!.height).toBeLessThan((await regular.boundingBox())!.height);
+ await short.focus();await expect(page.getByRole("tooltip")).toContainText(/María de los Ángeles.*Barba premium/);
+ await page.screenshot({path:info.outputPath("agenda-short-card-keyboard.png"),fullPage:false});
+ await page.keyboard.press("Escape");await expect(page.getByRole("tooltip")).toHaveCount(0);
+ await regular.hover();await expect(page.getByRole("tooltip")).toContainText(/María de los Ángeles.*Barba premium/,{timeout:5000});
  const axe=await new AxeBuilder({page}).withTags(["wcag2a","wcag2aa"]).analyze();expect(axe.violations).toEqual([]);
 });

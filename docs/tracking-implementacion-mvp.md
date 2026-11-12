@@ -601,3 +601,9 @@ QA: lint, TypeScript, 272 unitarios, build aislado y 9 E2E afectados aprobados e
 El usuario revisó las capturas mobile y desktop, aprobó la distribución y los ajustes finales y solicitó abrir los PRs. Se prepara una única entrega frontend contra dev: barra mobile compacta/sticky, profesionales directos ordenados por condición con búsqueda y degradados, tarjetas agrupadas por horario con profesional/servicio en una fila, Ir a hoy/Hoy y Ahora; desktop con filtros inmediatos, encabezado compacto y nombres de clientes con ellipsis accesible. Backend limpio, sin entrega adicional.
 
 Validaciones previas: lint, TypeScript, 272 unitarios, build aislado; 123 E2E Agenda/Auth en los tres viewports y 9 E2E afectados tras el ajuste final de ellipsis. Revisión visual del usuario completada. PR publicado: [frontend #21](https://github.com/Candela-98/Turnero-frontend/pull/21), rama `feat/agenda-mobile-readability` contra `dev`. Implementación, QA automática y aprobación visual completadas; integración pendiente. Sin consultar CI ni mergear.
+
+### Tarjetas desktop cortas sin scroll interior (2026-11-12)
+
+Turnos de menos de 30 minutos muestran horario/estado y cliente/servicio en dos filas compactas, con ellipsis cuando hace falta y altura proporcional. Las tarjetas desktop ya no tienen scroll interior; tooltip accesible por hover y foco muestra datos completos y Escape lo cierra. El profesional continúa en la columna. Mobile conserva su presentación.
+
+QA local: lint, TypeScript, 272 unitarios y build aislado aprobados. Suite Agenda/Auth de 123 E2E aprobada antes de ampliar el formato compacto a duraciones intermedias; posteriormente 18 E2E de intervalos, selector y tarjetas aprobados, incluyendo 15/20/30 minutos en tres columnas, foco, hover y axe. Captura y prueba local revisadas por el usuario. Ajuste incorporado al PR frontend #21; integración pendiente.
