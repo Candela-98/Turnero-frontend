@@ -24,7 +24,7 @@ export { Textarea, type TextareaProps } from "./textarea";
 
 export { ResponsiveDialog, type ResponsiveDialogProps } from "./responsive-dialog";
 export { AppliedFilterChip, type AppliedFilterChipProps } from "./applied-filter-chip";
-export { FilterOptionGroup, type FilterOptionGroupProps, type FilterOption } from "./filter-option-group";
+export { FILTER_SCROLL_FADE_PX, FilterOptionGroup, type FilterOptionGroupProps, type FilterOption } from "./filter-option-group";
 export { FilterButton, type FilterButtonProps } from "./filter-button";
 export { SearchInput, type SearchInputProps } from "./search-input";
 export { ListToolbar, type ListToolbarProps } from "./list-toolbar";

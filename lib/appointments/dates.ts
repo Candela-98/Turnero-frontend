@@ -42,3 +42,10 @@ export function relativeDayLabel(date: string, otherDate: string) {
   const days = Math.round((Date.parse(`${otherDate}T12:00:00Z`) - Date.parse(`${date}T12:00:00Z`)) / 86400000);
   return days === 0 ? "" : `${days > 0 ? "+" : "−"}${Math.abs(days)} ${Math.abs(days) === 1 ? "día" : "días"}`;
 }
+
+export function compactDate(date: string) {
+  const parts = new Intl.DateTimeFormat("es-AR", { timeZone: "UTC", weekday: "short", day: "numeric", month: "short" }).formatToParts(new Date(`${date}T12:00:00Z`));
+  const get = (type: string) => parts.find(part => part.type === type)!.value.replace(/\./g, "");
+  const label = `${get("weekday")} ${get("day")} ${get("month")}`;
+  return label.charAt(0).toLocaleUpperCase("es-AR") + label.slice(1);
+}

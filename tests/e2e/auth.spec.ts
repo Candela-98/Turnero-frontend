@@ -46,6 +46,18 @@ async function mockGoogleIdentityButton(page: import("@playwright/test").Page) {
 }
 
 test.describe("admin authentication", () => {
+  test.beforeEach(async ({page})=>{
+    // Session mocks must not leak unrelated requests to a real local backend.
+    await page.route(`${apiBaseUrl}/**`,async route=>{
+      const path=new URL(route.request().url()).pathname;
+      if(path.includes("/auth/")) return route.fallback();
+      if(path.endsWith("/service-offerings/categories")) return route.fulfill({json:[]});
+      if(path.endsWith("/business")) return route.fulfill({json:{id:10,name:"Barber Studio",timezone:"America/Argentina/Buenos_Aires"}});
+      if(path.endsWith("/booking-settings")) return route.fulfill({json:{slot_interval_minutes:30}});
+      if(path.endsWith("/business-hours")) return route.fulfill({json:{data:["MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY","SUNDAY"].map((day,index)=>({id:index+1,day_of_week:day,is_closed:false,opens_at:"09:00",closes_at:"18:00"}))}});
+      return route.fulfill({json:{data:[],page:{number:0,size:100,total_elements:0,total_pages:0}}});
+    });
+  });
   test("shows a clean login when there is no session", async ({ page }) => {
     await page.route(authMeUrl, async (route) => {
       await route.fulfill({
@@ -169,7 +181,7 @@ test.describe("admin authentication", () => {
     await page.getByRole("button", { name: "Continuar con Google" }).click();
 
     if (isMobileProject(testInfo.project.name)) {
-      await expect(page.getByText("Agenda de hoy")).toBeVisible();
+      await expect(page.getByText("Agenda del negocio")).toBeVisible();
     } else {
       await expect(page.getByRole("heading", { name: "Agenda" })).toBeVisible();
     }
@@ -193,7 +205,7 @@ test.describe("admin authentication", () => {
     await page.goto("/agenda");
     await expect(page.getByRole("button", { name: "Reintentar" })).toBeVisible();
     await page.getByRole("button", { name: "Reintentar" }).click();
-    await expect(isMobileProject(testInfo.project.name) ? page.getByText("Agenda de hoy") : page.getByRole("heading", { name: "Agenda" })).toBeVisible();
+    await expect(isMobileProject(testInfo.project.name) ? page.getByText("Agenda del negocio") : page.getByRole("heading", { name: "Agenda" })).toBeVisible();
   });
 
   test("logs out and returns to login even when logout reports an expired session", async ({ page }) => {
@@ -224,7 +236,7 @@ test.describe("admin authentication", () => {
 
     await expect(page).toHaveURL(/\/(clientes|servicios)$/);
     if (isMobileProject(testInfo.project.name)) {
-      await expect(page.getByRole("heading", { name: "Servicios" })).toBeVisible();
+      await expect(page.getByRole("heading", { name: "Servicios", exact: true })).toBeVisible();
     } else {
       await expect(page.getByRole("heading", { name: "Clientes", exact: true })).toBeVisible();
       await expect(page.getByText("Todavía no hay clientes", { exact: true })).toBeVisible();

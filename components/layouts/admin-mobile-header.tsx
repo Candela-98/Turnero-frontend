@@ -20,7 +20,7 @@ export function AdminMobileHeader({
   return (
     <header
       className={cn(
-        "sticky top-0 z-20 flex min-h-16 items-center justify-between gap-3 border-b border-outline-variant bg-surface/94 px-4 py-3 backdrop-blur md:hidden",
+        "sticky top-0 z-30 flex h-[var(--admin-mobile-header-height,4.0625rem)] items-center justify-between gap-3 border-b border-outline-variant bg-surface/94 px-4 py-3 backdrop-blur md:hidden",
         className,
       )}
     >

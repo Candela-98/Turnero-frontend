@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 import {
@@ -33,7 +33,7 @@ type AdminRoute = {
 
 const adminRoutes: AdminRoute[] = [
   { href: "/dashboard", icon: <Gauge />, label: "Dashboard", mobile: true, subtitle: "Resumen del negocio" },
-  { href: "/agenda", icon: <CalendarDays />, label: "Agenda", mobile: true, subtitle: "Agenda de hoy" },
+  { href: "/agenda", icon: <CalendarDays />, label: "Agenda", mobile: true, subtitle: "Agenda del negocio" },
   { href: "/clientes", icon: <UsersRound />, label: "Clientes", mobile: true, subtitle: "Gestión de clientes" },
   { href: "/servicios", icon: <Scissors />, label: "Servicios", subtitle: "Gestión de servicios" },
   { href: "/profesionales", icon: <UserRound />, label: "Profesionales", subtitle: "Gestión de profesionales" },
@@ -93,7 +93,7 @@ export function AdminAppShell({ children }: { children: ReactNode }) {
   }
 
   return (
-    <>
+    <div className="min-w-0" style={{ "--admin-mobile-header-height": "4.0625rem" } as CSSProperties}>
       <AdminMobileHeader businessName={business?.name} subtitle={currentRoute?.subtitle ?? "Panel administrativo"} />
       <div
         className="min-h-[calc(100vh-4rem)] md:contents"
@@ -102,6 +102,6 @@ export function AdminAppShell({ children }: { children: ReactNode }) {
         {children}
       </div>
       <AdminMobileBottomNav items={mobileNavItems} />
-    </>
+    </div>
   );
 }
