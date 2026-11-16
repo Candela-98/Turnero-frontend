@@ -21,7 +21,10 @@ En `turnero-frontend/.env.local`:
 ```dotenv
 NEXT_PUBLIC_GOOGLE_CLIENT_ID=<client-id-web>
 TURNERO_API_BASE_URL=http://localhost:8080
+TURNERO_FRONTEND_ORIGIN=http://localhost:3000
 ```
+
+Usá ese valor únicamente si abrís el frontend en `http://localhost:3000`. Si usás otro host, puerto o protocolo, configurá el origen exacto que muestra el navegador y autorizá ese mismo origen en Google Cloud.
 
 En `Turnero-api/.env`:
 
