@@ -1,12 +1,17 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { DELETE, GET, POST, PATCH, PUT } from "@/app/api/backend/[...path]/route";
 
 const originalFetch = global.fetch;
+const localOrigin = "http://localhost:3000";
 
 function routeContext(path: string[]) {
   return { params: Promise.resolve({ path }) };
 }
+
+beforeEach(() => {
+  vi.stubEnv("TURNERO_FRONTEND_ORIGIN", localOrigin);
+});
 
 afterEach(() => {
   global.fetch = originalFetch;
@@ -20,7 +25,7 @@ describe("BFF route handler", () => {
     const fetch = vi.fn().mockResolvedValue(status === 204 ? new Response(null, { status }) : Response.json(body, { status }));
     global.fetch = fetch;
     const response = await DELETE(new Request("http://localhost:3000/api/backend/api/v1/customers/4", {
-      method: "DELETE", headers: { cookie: "turnero_session=opaque" },
+      method: "DELETE", headers: { origin: localOrigin, cookie: "turnero_session=opaque" },
     }), routeContext(["api", "v1", "customers", "4"]));
     expect(response.status).toBe(status);
     if (status === 204) expect(await response.text()).toBe(""); else expect(await response.json()).toEqual(body);
@@ -34,7 +39,7 @@ describe("BFF route handler", () => {
     const body = status === 200 ? { id: 4, name: "Ana", status: "ACTIVE" } : { code: "REJECTED" };
     const fetch = vi.fn().mockResolvedValue(Response.json(body, { status })); global.fetch = fetch;
     const response = await PATCH(new Request("http://localhost:3000/api/backend/api/v1/customers/4", {
-      method: "PATCH", headers: { cookie: "turnero_session=opaque", "content-type": "application/json" }, body: '{"status":"ACTIVE"}',
+      method: "PATCH", headers: { origin: localOrigin, cookie: "turnero_session=opaque", "content-type": "application/json" }, body: '{"status":"ACTIVE"}',
     }), routeContext(["api", "v1", "customers", "4"]));
     expect(response.status).toBe(status); expect(await response.json()).toEqual(body);
     const [target, options] = fetch.mock.calls[0];
@@ -51,7 +56,7 @@ describe("BFF route handler", () => {
     const fetchMock = vi.fn().mockResolvedValue(Response.json(upstream, { status }));
     global.fetch = fetchMock;
     const request = new Request("http://localhost:3000/api/backend/" + path.join("/"), {
-      method, headers: { cookie: "turnero_session=opaque", "content-type": "application/json" },
+      method, headers: { origin: localOrigin, cookie: "turnero_session=opaque", "content-type": "application/json" },
       ...(method === "GET" ? {} : { body: JSON.stringify(body) }),
     });
     const response = await ({ POST, PATCH, GET }[method])(request, routeContext(path));
@@ -72,7 +77,7 @@ describe("BFF route handler", () => {
     }));
     global.fetch = fetchMock;
     const response = await DELETE(new Request("http://localhost:3000/api/backend/api/v1/service-offerings/5/catalog", {
-      method: "DELETE", headers: { cookie: "turnero_session=opaque" },
+      method: "DELETE", headers: { origin: localOrigin, cookie: "turnero_session=opaque" },
     }), routeContext(["api", "v1", "service-offerings", "5", "catalog"]));
     expect(response.status).toBe(status);
     expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -96,6 +101,7 @@ describe("BFF route handler", () => {
   });
 
   it("forwards allowed requests, query params and required headers to the private backend", async () => {
+    vi.stubEnv("TURNERO_FRONTEND_ORIGIN", undefined);
     vi.stubEnv("TURNERO_API_BASE_URL", "http://localhost:8080");
     const fetchMock = vi.fn().mockResolvedValue(
       new Response(JSON.stringify({ user: { id: 1 } }), {
@@ -133,10 +139,10 @@ describe("BFF route handler", () => {
     upstreamHeaders.append("set-cookie", "csrf=two; Path=/");
     global.fetch = vi.fn().mockResolvedValue(new Response("{}", { headers: upstreamHeaders }));
 
-    const response = await GET(
+    const response = await POST(
       new Request("http://localhost:3000/api/backend/api/v1/auth/google", {
         body: JSON.stringify({ id_token: "google-token" }),
-        headers: { "content-type": "application/json" },
+        headers: { origin: localOrigin, "content-type": "application/json" },
         method: "POST",
       }),
       routeContext(["api", "v1", "auth", "google"]),
@@ -155,12 +161,12 @@ describe("BFF route handler", () => {
     const fetchMock = vi.fn();
     global.fetch = fetchMock;
 
-    const unknownRoute = await GET(
-      new Request("http://localhost:3000/api/backend/api/v1/private/secrets"),
+    const unknownRoute = await POST(
+      new Request("http://localhost:3000/api/backend/api/v1/private/secrets", { method: "POST" }),
       routeContext(["api", "v1", "private", "secrets"]),
     );
-    const unsupportedMethod = await GET(
-      new Request("http://localhost:3000/api/backend/api/v1/auth/logout"),
+    const unsupportedMethod = await PATCH(
+      new Request("http://localhost:3000/api/backend/api/v1/auth/logout", { method: "PATCH" }),
       routeContext(["api", "v1", "auth", "logout"]),
     );
 
@@ -169,6 +175,97 @@ describe("BFF route handler", () => {
     expect(unsupportedMethod.status).toBe(405);
     expect(unsupportedMethod.headers.get("allow")).toBe("POST");
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["POST", POST, ["api", "v1", "auth", "logout"]],
+    ["PATCH", PATCH, ["api", "v1", "business"]],
+    ["PUT", PUT, ["api", "v1", "business-hours"]],
+    ["DELETE", DELETE, ["api", "v1", "customers", "4"]],
+  ] as const)("rejects an unrelated, missing or null Origin for %s before calling Spring", async (method, handler, path) => {
+    vi.stubEnv("TURNERO_API_BASE_URL", "http://localhost:8080");
+    const fetchMock = vi.fn();
+    global.fetch = fetchMock;
+
+    for (const origin of ["http://127.0.0.1:3000", undefined, "null"]) {
+      const response = await handler(new Request(`${localOrigin}/api/backend/${path.join("/")}`, {
+        method,
+        headers: origin === undefined ? undefined : { origin },
+      }), routeContext([...path]));
+
+      expect(response.status).toBe(403);
+      expect(await response.json()).toMatchObject({
+        error: "Forbidden",
+        code: "BFF_ORIGIN_FORBIDDEN",
+      });
+    }
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it.each([undefined, "null", `${localOrigin}/admin`])("rejects mutations with invalid origin configuration %s", async configuredOrigin => {
+    vi.stubEnv("TURNERO_FRONTEND_ORIGIN", configuredOrigin);
+    vi.stubEnv("TURNERO_API_BASE_URL", "http://localhost:8080");
+    const fetchMock = vi.fn();
+    global.fetch = fetchMock;
+
+    const response = await POST(new Request(`${localOrigin}/api/backend/api/v1/auth/logout`, {
+      method: "POST",
+      headers: { origin: configuredOrigin ?? localOrigin },
+    }), routeContext(["api", "v1", "auth", "logout"]));
+
+    expect(response.status).toBe(403);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("accepts the configured browser HTTPS origin behind an internal HTTP proxy", async () => {
+    const publicOrigin = "https://turnero.example.com";
+    vi.stubEnv("TURNERO_FRONTEND_ORIGIN", publicOrigin);
+    vi.stubEnv("TURNERO_API_BASE_URL", "http://localhost:8080");
+    const fetchMock = vi.fn().mockResolvedValue(new Response(null, {
+      status: 204,
+      headers: { "set-cookie": "__Host-turnero_session=; Path=/; Secure; HttpOnly; Max-Age=0" },
+    }));
+    global.fetch = fetchMock;
+    const incomingUrl = "http://next.internal:3000/api/backend/api/v1/auth/logout";
+    const context = routeContext(["api", "v1", "auth", "logout"]);
+
+    const rejected = await POST(new Request(incomingUrl, {
+      method: "POST",
+      headers: { origin: "http://next.internal:3000", "x-forwarded-host": "turnero.example.com", "x-forwarded-proto": "https" },
+    }), context);
+    expect(rejected.status).toBe(403);
+    expect(fetchMock).not.toHaveBeenCalled();
+
+    const response = await POST(new Request(incomingUrl, {
+      method: "POST",
+      headers: { origin: publicOrigin, cookie: "__Host-turnero_session=opaque" },
+    }), context);
+
+    expect(response.status).toBe(204);
+    expect(response.headers.get("set-cookie")).toBe("__Host-turnero_session=; Path=/; Secure; HttpOnly; Max-Age=0");
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock.mock.calls[0][1].headers.get("cookie")).toBe("__Host-turnero_session=opaque");
+  });
+
+  it("preserves a 429 body and Retry-After from Spring", async () => {
+    vi.stubEnv("TURNERO_API_BASE_URL", "http://localhost:8080");
+    const body = { code: "RATE_LIMIT_EXCEEDED", message: "Try again later" };
+    global.fetch = vi.fn().mockResolvedValue(Response.json(body, {
+      status: 429,
+      headers: { "retry-after": "30", "cache-control": "no-store", "x-request-id": "req-429" },
+    }));
+    const path = ["api", "v1", "public", "businesses", "studio", "appointments"];
+
+    const response = await POST(new Request(`${localOrigin}/api/backend/${path.join("/")}`, {
+      method: "POST",
+      headers: { origin: localOrigin },
+    }), routeContext(path));
+
+    expect(response.status).toBe(429);
+    expect(await response.json()).toEqual(body);
+    expect(response.headers.get("retry-after")).toBe("30");
+    expect(response.headers.get("cache-control")).toBe("no-store");
+    expect(response.headers.get("x-request-id")).toBe("req-429");
   });
 
   it("normalizes unavailable and timed-out upstreams without leaking backend configuration", async () => {
@@ -233,7 +330,7 @@ it.each([
   global.fetch = fetch;
   const handler = { GET, POST, PATCH }[method];
   const response = await handler(new Request(`http://localhost:3000/api/backend/api/v1/staff-members${suffix}`, {
-    method, headers: { cookie: "turnero_session=opaque", "content-type": "application/json" },
+    method, headers: { origin: localOrigin, cookie: "turnero_session=opaque", "content-type": "application/json" },
     ...(method === "GET" ? {} : { body: JSON.stringify(body) }),
   }), routeContext(["api", "v1", "staff-members", ...(suffix ? ["5"] : [])]));
   expect(response.status).toBe(status);
@@ -268,7 +365,7 @@ it.each([["GET", 200], ["GET", 404], ["PUT", 204], ["PUT", 400], ["PUT", 401], [
   const fetch = vi.fn().mockResolvedValue(status === 204 ? new Response(null, { status }) : Response.json(responseBody, { status }));
   global.fetch = fetch;
   const response = await ({ GET, PUT }[method])(new Request("http://localhost:3000/api/backend/api/v1/staff-members/5/service-offerings", {
-    method, headers: { cookie: "turnero_session=opaque", "content-type": "application/json" },
+    method, headers: { origin: localOrigin, cookie: "turnero_session=opaque", "content-type": "application/json" },
     ...(method === "PUT" ? { body: JSON.stringify(requestBody) } : {}),
   }), routeContext(["api", "v1", "staff-members", "5", "service-offerings"]));
   expect(response.status).toBe(status);
@@ -287,7 +384,7 @@ it.each([["GET", 200], ["GET", 404], ["PUT", 200], ["PUT", 400], ["PUT", 401], [
   const responseBody = status === 200 ? body : { code: "REJECTED", message: "Rejected" };
   const fetch = vi.fn().mockResolvedValue(Response.json(responseBody, { status })); global.fetch = fetch;
   const response = await ({ GET, PUT }[method])(new Request("http://localhost:3000/api/backend/api/v1/staff-members/5/working-hours", {
-    method, headers: { cookie: "turnero_session=opaque", "content-type": "application/json" }, ...(method === "PUT" ? { body: JSON.stringify(body) } : {}),
+    method, headers: { origin: localOrigin, cookie: "turnero_session=opaque", "content-type": "application/json" }, ...(method === "PUT" ? { body: JSON.stringify(body) } : {}),
   }), routeContext(["api", "v1", "staff-members", "5", "working-hours"]));
   expect(response.status).toBe(status); expect(await response.json()).toEqual(responseBody);
   const [target, options] = fetch.mock.calls[0];
@@ -302,7 +399,7 @@ it.each([["GET",200],["GET",404],["DELETE",204],["DELETE",409],["DELETE",404],["
   const returned = status === 409 ? {code:"STAFF_HAS_FUTURE_APPOINTMENTS",message:"Conflict"} : {id:5,status:"ACTIVE"};
   const fetch = vi.fn().mockResolvedValue(status === 204 ? new Response(null,{status}) : Response.json(returned,{status})); global.fetch=fetch;
   const response = await ({GET,DELETE,PATCH}[method])(new Request("http://localhost:3000/api/backend/api/v1/staff-members/5",{
-    method,headers:{cookie:"turnero_session=opaque","content-type":"application/json"},...(method==="PATCH"?{body:JSON.stringify(body)}:{})
+    method,headers:{origin:localOrigin,cookie:"turnero_session=opaque","content-type":"application/json"},...(method==="PATCH"?{body:JSON.stringify(body)}:{})
   }),routeContext(["api","v1","staff-members","5"]));
   expect(response.status).toBe(status);
   if(status !== 204) expect(await response.json()).toEqual(returned);
@@ -316,7 +413,7 @@ it.each([204,404,409,503])("forwards professional removal with status %i through
   vi.stubEnv("TURNERO_API_BASE_URL","http://localhost:8080");
   const body={code:"INVALID_STATE_TRANSITION",message:"Deactivate first"};
   const fetch=vi.fn().mockResolvedValue(status===204?new Response(null,{status}):Response.json(body,{status})); global.fetch=fetch;
-  const response=await DELETE(new Request("http://localhost:3000/api/backend/api/v1/staff-members/5/catalog",{method:"DELETE",headers:{cookie:"turnero_session=opaque"}}),routeContext(["api","v1","staff-members","5","catalog"]));
+  const response=await DELETE(new Request("http://localhost:3000/api/backend/api/v1/staff-members/5/catalog",{method:"DELETE",headers:{origin:localOrigin,cookie:"turnero_session=opaque"}}),routeContext(["api","v1","staff-members","5","catalog"]));
   expect(response.status).toBe(status);
   if(status!==204) expect(await response.json()).toEqual(body);
   expect(fetch).toHaveBeenCalledTimes(1);
@@ -352,7 +449,7 @@ it.each([200, 400, 401, 403, 404, 503])("preserves both customer block commands 
     const responseBody = status === 200 ? { id: 4, public_booking_blocked: body.public_booking_blocked } : { code: "REJECTED" };
     const fetch = vi.fn().mockResolvedValue(Response.json(responseBody, { status })); global.fetch = fetch;
     const response = await PATCH(new Request("http://localhost:3000/api/backend/api/v1/customers/4", {
-      method: "PATCH", headers: { cookie: "turnero_session=opaque", "content-type": "application/json" }, body: JSON.stringify(body),
+      method: "PATCH", headers: { origin: localOrigin, cookie: "turnero_session=opaque", "content-type": "application/json" }, body: JSON.stringify(body),
     }), routeContext(["api", "v1", "customers", "4"]));
     expect(response.status).toBe(status); expect(await response.json()).toEqual(responseBody);
     const [target, options] = fetch.mock.calls[0];
@@ -365,7 +462,7 @@ it.each([[403, "CUSTOMER_BOOKING_BLOCKED"], [409, "CUSTOMER_IDENTITY_AMBIGUOUS"]
   vi.stubEnv("TURNERO_API_BASE_URL", "http://localhost:8080");
   global.fetch = vi.fn().mockResolvedValue(Response.json({ code, message: "Contact the business to arrange your appointment." }, { status }));
   const response = await POST(new Request("http://localhost:3000/api/backend/api/v1/public/businesses/studio/appointments", {
-    method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ customer: { email: "a@example.com" } }),
+    method: "POST", headers: { origin: localOrigin, "content-type": "application/json" }, body: JSON.stringify({ customer: { email: "a@example.com" } }),
   }), routeContext(["api", "v1", "public", "businesses", "studio", "appointments"]));
   expect(response.status).toBe(status); expect(await response.json()).toEqual({ code, message: "Contact the business to arrange your appointment." });
 });
