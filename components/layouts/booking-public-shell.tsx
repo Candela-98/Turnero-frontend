@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { BrandMark } from "./brand-mark";
 
 export type BookingPublicShellProps = {
+  businessName?: string;
   children: ReactNode;
   className?: string;
   footer?: ReactNode;
@@ -12,16 +13,19 @@ export type BookingPublicShellProps = {
 };
 
 export function BookingPublicShell({
+  businessName = "Turnero",
   children,
   className,
   footer,
   progress,
 }: BookingPublicShellProps) {
+  const initials = businessName.trim().split(/\s+/).slice(0, 2).map((word) => word.charAt(0)).join("").toLocaleUpperCase("es-AR");
+
   return (
     <div className="min-h-screen bg-surface text-on-surface">
       <header className="sticky top-0 z-20 border-b border-outline-variant bg-surface/94 backdrop-blur">
         <div className="mx-auto flex min-h-16 w-full max-w-lg items-center justify-between gap-4 px-4 py-3">
-          <BrandMark subtitle="Reservas online" />
+          <BrandMark initials={initials} name={businessName} subtitle="Reservas online" />
           {progress ? <div className="shrink-0">{progress}</div> : null}
         </div>
       </header>
