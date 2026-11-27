@@ -1,12 +1,23 @@
 const API_PREFIX = "/api/v1";
 export const UPSTREAM_TIMEOUT_MS = 10_000;
 
+const mutationMethods = ["POST", "PATCH", "PUT", "DELETE"];
+const errorNames = {
+  403: "Forbidden",
+  404: "Not Found",
+  405: "Method Not Allowed",
+  502: "Bad Gateway",
+  504: "Gateway Timeout",
+};
+
 type AllowedRoute = {
   methods: readonly string[];
   pattern: RegExp;
 };
 
 const allowedRoutes: readonly AllowedRoute[] = [
+  { pattern: /^\/api\/v1\/customer\/businesses\/[^/]+\/auth\/(google|logout)$/, methods: ["POST"] },
+  { pattern: /^\/api\/v1\/customer\/businesses\/[^/]+\/auth\/me$/, methods: ["GET"] },
   { pattern: /^\/api\/v1\/auth\/google$/, methods: ["POST"] },
   { pattern: /^\/api\/v1\/auth\/me$/, methods: ["GET"] },
   { pattern: /^\/api\/v1\/auth\/logout$/, methods: ["POST"] },
@@ -67,40 +78,48 @@ const allowedRoutes: readonly AllowedRoute[] = [
 type BffErrorCode =
   | "BFF_ROUTE_NOT_FOUND"
   | "BFF_METHOD_NOT_ALLOWED"
+  | "BFF_ORIGIN_FORBIDDEN"
   | "UPSTREAM_TIMEOUT"
   | "UPSTREAM_UNAVAILABLE";
 
 function errorResponse(
-  status: number,
+  status: keyof typeof errorNames,
   code: BffErrorCode,
   message: string,
   path: string,
   headers?: HeadersInit,
 ) {
-  const error =
-    status === 504
-      ? "Gateway Timeout"
-      : status === 502
-        ? "Bad Gateway"
-        : status === 405
-          ? "Method Not Allowed"
-          : "Not Found";
-
+  const responseHeaders = new Headers(headers);
+  if (isCustomerAuth(path)) responseHeaders.set("cache-control", "no-store");
   return Response.json(
     {
       status,
-      error,
+      error: errorNames[status],
       code,
       message,
       path,
       timestamp: new Date().toISOString(),
     },
-    { status, headers },
+    { status, headers: responseHeaders },
   );
+}
+
+function isCustomerAuth(pathname: string) {
+  return /^\/api\/v1\/customer\/businesses\/[^/]+\/auth\//.test(pathname);
 }
 
 function getAllowedRoute(pathname: string) {
   return allowedRoutes.find((route) => route.pattern.test(pathname));
+}
+
+function isAllowedMutationOrigin(origin: string | null) {
+  const configuredOrigin = process.env.TURNERO_FRONTEND_ORIGIN;
+  if (!configuredOrigin || origin !== configuredOrigin || !URL.canParse(configuredOrigin)) {
+    return false;
+  }
+
+  const publicUrl = new URL(configuredOrigin);
+  return /^https?:$/.test(publicUrl.protocol) && publicUrl.origin === configuredOrigin;
 }
 
 function getUpstreamUrl(pathname: string, search: string) {
@@ -148,6 +167,11 @@ function getResponseHeaders(upstreamResponse: Response) {
     }
   }
 
+  const retryAfter = upstreamResponse.headers.get("retry-after");
+  if (upstreamResponse.status === 429 && retryAfter !== null) {
+    headers.set("retry-after", retryAfter);
+  }
+
   const setCookieHeaders = (upstreamResponse.headers as Headers & {
     getSetCookie?: () => string[];
   }).getSetCookie?.() ?? [];
@@ -175,6 +199,10 @@ export async function proxyApiRequest(request: Request, pathname: string) {
       pathname,
       { Allow: route.methods.join(", ") },
     );
+  }
+
+  if (mutationMethods.includes(request.method) && !isAllowedMutationOrigin(request.headers.get("origin"))) {
+    return errorResponse(403, "BFF_ORIGIN_FORBIDDEN", "Origen no permitido.", pathname);
   }
 
   const upstreamUrl = getUpstreamUrl(pathname, requestUrl.search);
@@ -207,10 +235,9 @@ export async function proxyApiRequest(request: Request, pathname: string) {
     });
     const responseBody = upstreamResponse.status === 204 ? null : await upstreamResponse.arrayBuffer();
 
-    return new Response(responseBody, {
-      status: upstreamResponse.status,
-      headers: getResponseHeaders(upstreamResponse),
-    });
+    const headers = getResponseHeaders(upstreamResponse);
+    if (isCustomerAuth(pathname)) headers.set("cache-control", "no-store");
+    return new Response(responseBody, { status: upstreamResponse.status, headers });
   } catch (error) {
     const isTimeout = error instanceof DOMException && error.name === "AbortError";
 

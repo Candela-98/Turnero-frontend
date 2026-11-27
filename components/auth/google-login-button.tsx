@@ -55,6 +55,7 @@ function loadGoogleIdentityScript() {
     }
 
     function handleError() {
+      script.remove();
       reject(new Error("Google Identity Services failed to load."));
     }
 
@@ -171,6 +172,7 @@ export function GoogleLoginButton({
     <div
       ref={containerRef}
       aria-busy={!isReady || disabled}
+      inert={disabled || undefined}
       className={disabled ? "pointer-events-none w-full opacity-60" : "w-full"}
     >
       <div ref={buttonRef} />
