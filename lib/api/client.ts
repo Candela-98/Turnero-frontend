@@ -26,6 +26,7 @@ export class ApiError extends Error {
 
 export type ApiRequestOptions = {
   body?: unknown;
+  cache?: RequestCache;
   headers?: HeadersInit;
   method?: "DELETE" | "GET" | "PATCH" | "POST" | "PUT";
   signal?: AbortSignal;
@@ -73,11 +74,12 @@ async function readResponseBody(response: Response) {
 
 export async function apiFetch<TResponse>(
   endpoint: string,
-  { body, headers, method = "GET", signal }: ApiRequestOptions = {},
+  { body, cache, headers, method = "GET", signal }: ApiRequestOptions = {},
 ): Promise<TResponse> {
   const response = await fetch(buildApiUrl(endpoint), {
     body: body === undefined ? undefined : JSON.stringify(body),
     credentials: "include",
+    ...(cache ? { cache } : {}),
     headers: {
       ...(body === undefined ? {} : { "Content-Type": "application/json" }),
       ...headers,

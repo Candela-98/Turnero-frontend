@@ -16,6 +16,8 @@ type AllowedRoute = {
 };
 
 const allowedRoutes: readonly AllowedRoute[] = [
+  { pattern: /^\/api\/v1\/customer\/businesses\/[^/]+\/auth\/(google|logout)$/, methods: ["POST"] },
+  { pattern: /^\/api\/v1\/customer\/businesses\/[^/]+\/auth\/me$/, methods: ["GET"] },
   { pattern: /^\/api\/v1\/auth\/google$/, methods: ["POST"] },
   { pattern: /^\/api\/v1\/auth\/me$/, methods: ["GET"] },
   { pattern: /^\/api\/v1\/auth\/logout$/, methods: ["POST"] },
@@ -87,6 +89,8 @@ function errorResponse(
   path: string,
   headers?: HeadersInit,
 ) {
+  const responseHeaders = new Headers(headers);
+  if (isCustomerAuth(path)) responseHeaders.set("cache-control", "no-store");
   return Response.json(
     {
       status,
@@ -96,8 +100,12 @@ function errorResponse(
       path,
       timestamp: new Date().toISOString(),
     },
-    { status, headers },
+    { status, headers: responseHeaders },
   );
+}
+
+function isCustomerAuth(pathname: string) {
+  return /^\/api\/v1\/customer\/businesses\/[^/]+\/auth\//.test(pathname);
 }
 
 function getAllowedRoute(pathname: string) {
@@ -227,10 +235,9 @@ export async function proxyApiRequest(request: Request, pathname: string) {
     });
     const responseBody = upstreamResponse.status === 204 ? null : await upstreamResponse.arrayBuffer();
 
-    return new Response(responseBody, {
-      status: upstreamResponse.status,
-      headers: getResponseHeaders(upstreamResponse),
-    });
+    const headers = getResponseHeaders(upstreamResponse);
+    if (isCustomerAuth(pathname)) headers.set("cache-control", "no-store");
+    return new Response(responseBody, { status: upstreamResponse.status, headers });
   } catch (error) {
     const isTimeout = error instanceof DOMException && error.name === "AbortError";
 

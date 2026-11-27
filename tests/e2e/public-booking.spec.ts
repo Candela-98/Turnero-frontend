@@ -11,6 +11,7 @@ const otherStaff = { id: 101, name: "Lucas", role_label: "Barbero" };
 test.use({ timezoneId: "Asia/Tokyo" });
 
 async function mockCatalog(page: Page) {
+  await page.route("**/api/backend/api/v1/customer/businesses/*/auth/me", route => route.fulfill({ status: 401, json: { code: "UNAUTHORIZED" } }));
   await page.route(`${publicApi}/booking-profile`, (request) => request.fulfill({ json: {
     business: { name: "Barber Studio", timezone: "America/Argentina/Buenos_Aires" },
     booking_settings: { public_booking_enabled: true, booking_window_days: 7 },

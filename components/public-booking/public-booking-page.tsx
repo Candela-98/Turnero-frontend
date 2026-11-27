@@ -4,6 +4,7 @@ import { skipToken, useQuery, type UseQueryResult } from "@tanstack/react-query"
 import { CalendarDays, Clock3, UserRound, UsersRound } from "lucide-react";
 import { useRef, useState, type FormEvent } from "react";
 
+import { CustomerAccount } from "@/components/auth/customer-account";
 import { BookingPublicShell } from "@/components/layouts/booking-public-shell";
 import { Button, EmptyState, InlineAlert, Input, Skeleton } from "@/components/ui";
 import { ApiError } from "@/lib/api/client";
@@ -337,6 +338,7 @@ export function PublicBookingPage({ slug }: { slug: string }) {
       <header>
         <h1 className="text-3xl font-bold tracking-tight">Reservar un turno</h1>
       </header>
+      <CustomerAccount key={slug} slug={slug} />
       {profile.isPending ? (
         <BookingLoading label="Cargando negocio…" />
       ) : isBookingUnavailable(profile.error) || profile.data?.enabled === false ? (

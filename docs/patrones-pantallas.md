@@ -121,3 +121,12 @@ AdminPageHeader admite compact: conserva título y descripción accesible, omite
 Leyenda compacta de horario y muestra gris decorativa con texto Fuera de horario. Grilla comienza más arriba y conserva desplazamiento interno, cabeceras sticky y eje horario fijo. Tarjetas desktop siguen sin repetir profesional (lo aporta la columna); las tarjetas no tienen scroll interior. En turnos de menos de 30 minutos, horario/estado y cliente/servicio se muestran en dos filas compactas. Un tooltip accesible al hover y foco conserva datos completos; no abre un detalle de turno. Mobile mantiene filas y filtros aprobados.
 
 En tarjetas desktop, el cliente ocupa una sola línea con puntos suspensivos para reservar espacio al servicio. Se conserva el texto completo en el DOM, la descripción accesible y el tooltip disponible al hover o foco. El profesional lo aporta la columna. Mobile mantiene el cliente completo con salto de línea.
+
+### Cuenta en la vista cliente (TURN-123)
+
+La cuenta de `/reservar/{slug}` vive dentro de BookingPublicShell y reutiliza GoogleLoginButton
+con InlineAlert para errores persistentes. Distinguir comprobación inicial de ausencia de sesión,
+error recuperable y cierre pendiente; nunca mostrar un cierre exitoso si falló la revocación.
+El slug permanece en la URL y los datos de cuenta se retiran al expirar/cerrar/cambiar negocio.
+Usar la caché privada cliente, separada de la pública y administrativa; no QueryClient.clear
+sobre la caché admin. La reserva invitada conserva su formulario y comportamiento.
