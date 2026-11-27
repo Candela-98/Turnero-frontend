@@ -1,6 +1,6 @@
 # Integración API Frontend MVP
 
-Actualizado: 2026-09-08
+Actualizado: 2026-11-16
 
 ## Propósito
 
@@ -18,6 +18,7 @@ El MVP usa un BFF/proxy same-origin de Next. La URL real del backend es server-o
 
 ```text
 TURNERO_API_BASE_URL=http://localhost:8080
+TURNERO_FRONTEND_ORIGIN=http://localhost:3000
 NEXT_PUBLIC_GOOGLE_CLIENT_ID=<client-id-web-compartido-con-backend>
 ```
 
@@ -39,6 +40,14 @@ Implementacion base de TURN-97:
 - Reenvia `Accept`, `Content-Type`, `Cookie` y `User-Agent`; conserva `Content-Type`, `Cache-Control`, `X-Request-Id` y cada `Set-Cookie` de la respuesta upstream.
 - Toda request upstream usa `cache: "no-store"` y un timeout de 10 segundos.
 - Si el upstream no esta configurado o no responde, el BFF devuelve errores JSON comunes `UPSTREAM_UNAVAILABLE` (`502`) o `UPSTREAM_TIMEOUT` (`504`) sin exponer configuracion interna.
+
+### Origen de las mutaciones (TURN-118)
+
+El BFF valida primero ruta y método (`404` y `405`). Para un `POST`, `PATCH`, `PUT` o `DELETE` admitido, compara `Origin` con `TURNERO_FRONTEND_ORIGIN`. Un origen ajeno, ausente o `null`, o una configuración ausente o inválida, devuelve `403 BFF_ORIGIN_FORBIDDEN` antes de llamar a Spring. Las lecturas quedan fuera de esa validación. Las respuestas `429` de Spring conservan `Retry-After` cuando está presente.
+
+- **Local.** Definí la variable server-side en `.env.local`. Usá `http://localhost:3000` si ese es el origen que abrís en el navegador. Si usás, por ejemplo, `http://127.0.0.1:3100`, configurá ese valor exacto. Reiniciá Next.js después del cambio.
+- **HTTPS detrás del proxy.** Definí la variable en el entorno de Next.js con el origen público que ve el navegador, por ejemplo `https://turnero.example.com`. Incluí esquema, host y puerto si es no estándar, sin barra final, ruta ni query. El proxy debe conservar el header `Origin` del navegador. El BFF toma el origen esperado de la configuración y deja `TURNERO_API_BASE_URL` para el salto interno a Spring.
+- **Producción.** El origen público real queda pendiente de confirmar. Configuralo antes de habilitar mutaciones en ese entorno.
 
 ## Cliente HTTP frontend
 
